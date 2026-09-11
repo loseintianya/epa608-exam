@@ -1,60 +1,79 @@
+```html
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EPA 608 Type II 双语模拟考试系统 (300题 6套完整版)</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>EPA 608 Type II 双语模拟考试系统 (300题 6套无重复完整版)</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome for Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
-        body { font-family: 'Inter', system-ui, -apple-system, sans-serif; }
-        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        body { 
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar { width: 4px; height: 4px; }
         .custom-scrollbar::-webkit-scrollbar-track { background: #f1f5f9; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        
+        /* Mobile specific touch optimizations */
+        @media (max-width: 640px) {
+            .mobile-touch-target {
+                min-height: 44px;
+            }
+        }
     </style>
 </head>
-<body class="bg-slate-100 text-slate-800 min-h-screen flex flex-col">
+<body class="bg-slate-100 text-slate-800 min-h-screen flex flex-col antialiased">
 
     <!-- Navigation Bar -->
     <header class="bg-indigo-950 text-white shadow-lg sticky top-0 z-50 border-b border-indigo-800">
-        <div class="max-w-7xl mx-auto px-4 py-3 flex flex-wrap justify-between items-center gap-3">
-            <div class="flex items-center space-x-3">
-                <i class="fa-solid fa-snowflake text-cyan-400 text-2xl animate-pulse"></i>
-                <div>
-                    <h1 class="font-bold text-lg leading-tight flex items-center gap-2">
-                        EPA 608 Type II 模拟考试 
-                        <span class="text-xs bg-cyan-500/20 text-cyan-300 border border-cyan-400/30 px-2 py-0.5 rounded">300题 / 6套中英双语版</span>
-                    </h1>
-                    <p class="text-xs text-indigo-200">High-Pressure Systems Certification Exam Simulator</p>
+        <div class="max-w-7xl mx-auto px-3 sm:px-4 py-2.5 sm:py-3 flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-2.5">
+            <div class="flex items-center justify-between sm:justify-start space-x-3">
+                <div class="flex items-center space-x-2 sm:space-x-3">
+                    <i class="fa-solid fa-snowflake text-cyan-400 text-xl sm:text-2xl animate-pulse"></i>
+                    <div>
+                        <h1 class="font-bold text-base sm:text-lg leading-tight flex items-center gap-1.5 flex-wrap">
+                            EPA 608 Type II 模拟考试
+                            <span class="text-[10px] sm:text-xs bg-cyan-500/20 text-cyan-300 border border-cyan-400/30 px-1.5 py-0.5 rounded">300题/6套版</span>
+                        </h1>
+                        <p class="text-[10px] sm:text-xs text-indigo-200">High-Pressure Certification Exam</p>
+                    </div>
+                </div>
+
+                <!-- Timer badge on mobile top right -->
+                <div class="sm:hidden bg-indigo-900/80 px-2 py-1 rounded-md flex items-center space-x-1 text-xs font-mono border border-indigo-700/60">
+                    <i class="fa-regular fa-clock text-amber-400"></i>
+                    <span id="timerMobile">00:00:00</span>
                 </div>
             </div>
 
             <!-- Header Controls: Exam Set Selector, Timer & Submit -->
-            <div class="flex items-center space-x-3">
+            <div class="flex items-center space-x-2 sm:space-x-3 justify-between sm:justify-end">
                 <!-- Exam Set Selector Dropdown -->
-                <div class="flex items-center bg-indigo-900/90 rounded-lg px-2.5 py-1 border border-indigo-700">
-                    <i class="fa-solid fa-layer-group text-cyan-400 text-xs mr-2"></i>
-                    <select id="examSetSelect" onchange="promptSwitchExamSet(this.value)" class="bg-transparent text-xs font-semibold text-white focus:outline-none cursor-pointer py-1 pr-1">
+                <div class="flex-1 sm:flex-none flex items-center bg-indigo-900/90 rounded-lg px-2 py-1 border border-indigo-700 max-w-[240px] sm:max-w-none">
+                    <i class="fa-solid fa-layer-group text-cyan-400 text-xs mr-1.5 shrink-0"></i>
+                    <select id="examSetSelect" onchange="promptSwitchExamSet(this.value)" class="w-full bg-transparent text-xs font-semibold text-white focus:outline-none cursor-pointer py-1 truncate">
                         <option value="0" class="bg-indigo-950 text-white">试卷 1: 综合全真模拟 Set 1 (50题)</option>
-                        <option value="1" class="bg-indigo-950 text-white">试卷 2: 泄漏修复与法规 Set 2 (50题)</option>
-                        <option value="2" class="bg-indigo-950 text-white">试卷 3: 回收深度与抽真空 Set 3 (50题)</option>
-                        <option value="3" class="bg-indigo-950 text-white">试卷 4: 制冷剂/润滑油与改造 Set 4 (50题)</option>
+                        <option value="1" class="bg-indigo-950 text-white">试卷 2: 泄漏检测与法规律条 Set 2 (50题)</option>
+                        <option value="2" class="bg-indigo-950 text-white">试卷 3: 回收深度与抽真空规范 Set 3 (50题)</option>
+                        <option value="3" class="bg-indigo-950 text-white">试卷 4: 制冷剂混配/润滑油与改造 Set 4 (50题)</option>
                         <option value="4" class="bg-indigo-950 text-white">试卷 5: 系统部件与重大维修 Set 5 (50题)</option>
-                        <option value="5" class="bg-indigo-950 text-white">试卷 6: 安全打压与冷水机组 Set 6 (50题)</option>
+                        <option value="5" class="bg-indigo-950 text-white">试卷 6: 打压安全与高压冷水机组 Set 6 (50题)</option>
                     </select>
                 </div>
 
-                <!-- Timer -->
-                <div class="bg-indigo-900/80 px-3 py-1.5 rounded-lg flex items-center space-x-2 text-sm font-mono border border-indigo-700/60 shadow-inner">
+                <!-- Desktop Timer -->
+                <div class="hidden sm:flex bg-indigo-900/80 px-3 py-1.5 rounded-lg items-center space-x-2 text-sm font-mono border border-indigo-700/60 shadow-inner">
                     <i class="fa-regular fa-clock text-amber-400"></i>
                     <span id="timer">00:00:00</span>
                 </div>
 
                 <!-- Submit Button in Header -->
-                <button id="headerSubmitBtn" onclick="confirmSubmit()" class="bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-1.5 rounded-lg text-sm font-semibold transition flex items-center space-x-1 shadow-md">
+                <button id="headerSubmitBtn" onclick="confirmSubmit()" class="bg-emerald-600 active:bg-emerald-700 hover:bg-emerald-500 text-white px-3 sm:px-4 py-1.5 rounded-lg text-xs sm:text-sm font-semibold transition flex items-center space-x-1 shadow-md shrink-0 mobile-touch-target">
                     <i class="fa-solid fa-paper-plane"></i>
                     <span>提交试卷</span>
                 </button>
@@ -63,64 +82,71 @@
     </header>
 
     <!-- Main Container -->
-    <main class="max-w-7xl mx-auto px-4 py-6 flex-grow w-full grid grid-cols-1 lg:grid-cols-4 gap-6">
+    <main class="max-w-7xl mx-auto px-3 sm:px-4 py-4 sm:py-6 flex-grow w-full grid grid-cols-1 lg:grid-cols-4 gap-4 sm:gap-6">
 
         <!-- Left Column: Question Navigator & Weakness Summary Side Panel -->
         <div class="lg:col-span-1 space-y-4">
             <!-- Question Grid Card -->
-            <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4 sticky top-20">
-                <div class="flex justify-between items-center mb-3">
-                    <h2 class="font-bold text-slate-800 text-sm flex items-center gap-2">
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-3.5 sm:p-4 lg:sticky lg:top-20">
+                <!-- Mobile Collapsible Header Toggle -->
+                <div onclick="toggleMobileGrid()" class="flex justify-between items-center cursor-pointer lg:cursor-default select-none">
+                    <h2 class="font-bold text-slate-800 text-xs sm:text-sm flex items-center gap-2">
                         <i class="fa-solid fa-th text-indigo-600"></i> 答题卡 (<span id="answeredCount">0</span>/50)
                     </h2>
-                    <span id="scoreBadge" class="hidden text-xs font-bold px-2 py-0.5 rounded bg-slate-100 text-slate-600">
-                        成绩评估
-                    </span>
+                    <div class="flex items-center gap-2">
+                        <span id="scoreBadge" class="hidden text-[10px] sm:text-xs font-bold px-2 py-0.5 rounded bg-slate-100 text-slate-600">
+                            成绩评估
+                        </span>
+                        <i id="mobileGridChevron" class="fa-solid fa-chevron-down text-slate-400 text-xs lg:hidden transition-transform duration-200"></i>
+                    </div>
                 </div>
 
                 <!-- Active Exam Set Title Badge -->
-                <div class="bg-indigo-50 border border-indigo-100 p-2 rounded-lg text-xs font-semibold text-indigo-800 mb-3 flex items-center justify-between">
-                    <span id="activeSetLabel">试卷 1: 综合全真模拟 Set 1</span>
-                    <span class="bg-indigo-200 text-indigo-900 px-1.5 py-0.5 rounded text-[10px]">50题</span>
+                <div class="bg-indigo-50 border border-indigo-100 p-2 rounded-lg text-xs font-semibold text-indigo-800 my-2.5 flex items-center justify-between">
+                    <span id="activeSetLabel" class="truncate pr-1">试卷 1: 综合全真模拟 Set 1</span>
+                    <span class="bg-indigo-200 text-indigo-900 px-1.5 py-0.5 rounded text-[10px] shrink-0">50题</span>
                 </div>
 
-                <!-- Page Selector Pills -->
-                <div class="flex items-center justify-between bg-slate-100 p-1 rounded-lg mb-3 border border-slate-200 text-xs font-semibold">
-                    <button onclick="switchPage(0)" id="pageTab0" class="flex-1 py-1 text-center rounded-md transition text-slate-600">1-10</button>
-                    <button onclick="switchPage(1)" id="pageTab1" class="flex-1 py-1 text-center rounded-md transition text-slate-600">11-20</button>
-                    <button onclick="switchPage(2)" id="pageTab2" class="flex-1 py-1 text-center rounded-md transition text-slate-600">21-30</button>
-                    <button onclick="switchPage(3)" id="pageTab3" class="flex-1 py-1 text-center rounded-md transition text-slate-600">31-40</button>
-                    <button onclick="switchPage(4)" id="pageTab4" class="flex-1 py-1 text-center rounded-md transition text-slate-600">41-50</button>
-                </div>
-
-                <!-- Status Legend -->
-                <div class="grid grid-cols-2 gap-2 text-xs text-slate-500 mb-3 pb-3 border-b border-slate-100">
-                    <div class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-slate-200 border border-slate-300"></span> 未答</div>
-                    <div class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-indigo-600"></span> 已答</div>
-                    <div class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-amber-400"></span> 已标记</div>
-                    <div id="legendResult" class="hidden flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-rose-500"></span> 错题</div>
-                </div>
-
-                <!-- Grid Buttons (50 buttons) -->
-                <div id="questionGrid" class="grid grid-cols-5 gap-1.5 max-h-[260px] overflow-y-auto custom-scrollbar p-0.5">
-                    <!-- JS generated -->
-                </div>
-
-                <!-- Overall Progress -->
-                <div class="mt-4 pt-3 border-t border-slate-100 space-y-2">
-                    <div class="flex justify-between text-xs text-slate-500">
-                        <span>及格线: 70% (35题)</span>
-                        <span id="passStatus" class="font-bold text-slate-600">未提交</span>
+                <!-- Collapsible Container for Mobile -->
+                <div id="mobileGridContainer" class="hidden lg:block">
+                    <!-- Page Selector Pills -->
+                    <div class="flex items-center justify-between bg-slate-100 p-1 rounded-lg mb-3 border border-slate-200 text-[11px] sm:text-xs font-semibold gap-0.5">
+                        <button onclick="switchPage(0)" id="pageTab0" class="flex-1 py-1 text-center rounded-md transition text-slate-600">1-10</button>
+                        <button onclick="switchPage(1)" id="pageTab1" class="flex-1 py-1 text-center rounded-md transition text-slate-600">11-20</button>
+                        <button onclick="switchPage(2)" id="pageTab2" class="flex-1 py-1 text-center rounded-md transition text-slate-600">21-30</button>
+                        <button onclick="switchPage(3)" id="pageTab3" class="flex-1 py-1 text-center rounded-md transition text-slate-600">31-40</button>
+                        <button onclick="switchPage(4)" id="pageTab4" class="flex-1 py-1 text-center rounded-md transition text-slate-600">41-50</button>
                     </div>
-                    <div class="w-full bg-slate-100 rounded-full h-2 overflow-hidden">
-                        <div id="progressBar" class="bg-indigo-600 h-2 w-0 transition-all duration-300"></div>
+
+                    <!-- Status Legend -->
+                    <div class="grid grid-cols-2 gap-1.5 text-[11px] text-slate-500 mb-2.5 pb-2.5 border-b border-slate-100">
+                        <div class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-slate-200 border border-slate-300"></span> 未答</div>
+                        <div class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-indigo-600"></span> 已答</div>
+                        <div class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-amber-400"></span> 已标记</div>
+                        <div id="legendResult" class="hidden flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-rose-500"></span> 错题</div>
+                    </div>
+
+                    <!-- Grid Buttons (50 buttons) -->
+                    <div id="questionGrid" class="grid grid-cols-5 gap-1.5 max-h-[220px] sm:max-h-[260px] overflow-y-auto custom-scrollbar p-0.5">
+                        <!-- JS generated -->
+                    </div>
+
+                    <!-- Overall Progress -->
+                    <div class="mt-3 pt-2.5 border-t border-slate-100 space-y-1.5">
+                        <div class="flex justify-between text-[11px] text-slate-500">
+                            <span>及格线: 70% (35题)</span>
+                            <span id="passStatus" class="font-bold text-slate-600">未提交</span>
+                        </div>
+                        <div class="w-full bg-slate-100 rounded-full h-2 overflow-hidden">
+                            <div id="progressBar" class="bg-indigo-600 h-2 w-0 transition-all duration-300"></div>
+                        </div>
                     </div>
                 </div>
             </div>
 
             <!-- Weakness Analytics Summary Box (Revealed after Submit) -->
             <div id="weaknessSideWidget" class="hidden bg-white rounded-xl shadow-sm border border-rose-100 p-4">
-                <h3 class="font-bold text-sm text-slate-800 mb-3 flex items-center gap-2">
+                <h3 class="font-bold text-xs sm:text-sm text-slate-800 mb-3 flex items-center gap-2">
                     <i class="fa-solid fa-chart-pie text-rose-500"></i> 薄弱考点诊断 (Weak Areas)
                 </h3>
                 <div id="categoryBreakdownList" class="space-y-2.5 text-xs">
@@ -130,59 +156,59 @@
         </div>
 
         <!-- Right Column: 10 Questions Per Page List -->
-        <div class="lg:col-span-3 space-y-6">
+        <div class="lg:col-span-3 space-y-4 sm:space-y-6">
 
             <!-- Filter / Controls Bar -->
-            <div id="filterBar" class="bg-white p-3.5 rounded-xl border border-slate-200 shadow-sm flex flex-wrap items-center justify-between gap-3">
-                <div class="flex items-center space-x-2">
-                    <button id="btnToggleStudyMode" onclick="toggleStudyMode()" class="text-xs font-bold flex items-center gap-1.5 bg-amber-50 hover:bg-amber-100 text-amber-800 px-3 py-1.5 rounded-lg border border-amber-200 transition">
-                        <i class="fa-solid fa-lightbulb text-amber-500 text-sm"></i>
-                        <span id="studyModeToggleText">开启背题模式 (即时解析)</span>
+            <div id="filterBar" class="bg-white p-3 sm:p-3.5 rounded-xl border border-slate-200 shadow-sm flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5">
+                <div class="grid grid-cols-2 sm:flex items-center gap-2">
+                    <button id="btnToggleStudyMode" onclick="toggleStudyMode()" class="text-[11px] sm:text-xs font-bold flex items-center justify-center gap-1 bg-amber-50 active:bg-amber-100 text-amber-800 px-2.5 py-2 rounded-lg border border-amber-200 transition mobile-touch-target">
+                        <i class="fa-solid fa-lightbulb text-amber-500 text-xs sm:text-sm"></i>
+                        <span id="studyModeToggleText">背题模式</span>
                     </button>
                     <!-- Toggle Chinese Translation Button -->
-                    <button id="btnToggleChinese" onclick="toggleChineseVisibility()" class="text-xs font-bold flex items-center gap-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-1.5 rounded-lg border border-slate-200 transition">
-                        <i class="fa-solid fa-language text-indigo-600 text-sm"></i>
+                    <button id="btnToggleChinese" onclick="toggleChineseVisibility()" class="text-[11px] sm:text-xs font-bold flex items-center justify-center gap-1 bg-slate-100 active:bg-slate-200 text-slate-700 px-2.5 py-2 rounded-lg border border-slate-200 transition mobile-touch-target">
+                        <i class="fa-solid fa-language text-indigo-600 text-xs sm:text-sm"></i>
                         <span id="chineseToggleText">隐藏中文</span>
                     </button>
-                    <button onclick="resetExam()" class="text-xs text-indigo-600 hover:text-indigo-800 font-bold flex items-center gap-1 bg-indigo-50 px-3 py-1.5 rounded-lg border border-indigo-100">
-                        <i class="fa-solid fa-rotate-right"></i> 重新测试当前套题
+                    <button onclick="resetExam()" class="col-span-2 sm:col-span-1 text-[11px] sm:text-xs text-indigo-600 active:text-indigo-800 font-bold flex items-center justify-center gap-1 bg-indigo-50 px-2.5 py-2 rounded-lg border border-indigo-100 mobile-touch-target">
+                        <i class="fa-solid fa-rotate-right"></i> 重测本卷
                     </button>
                 </div>
 
-                <!-- Result Filter Buttons (Wrong/Correct revealed after submit) -->
-                <div class="flex items-center space-x-1 bg-slate-50 p-1 rounded-lg border border-slate-200">
-                    <button id="btnFilterAll" onclick="setFilter('all')" class="px-3 py-1 text-xs font-semibold rounded-lg bg-indigo-100 text-indigo-700 font-bold border border-indigo-200">
-                        全部题目
+                <!-- Filter Mode Buttons (Active post-submission) -->
+                <div class="flex items-center space-x-1 pt-2 sm:pt-0 border-t sm:border-t-0 sm:border-l border-slate-200 justify-center">
+                    <button id="btnFilterAll" onclick="setFilter('all')" class="flex-1 sm:flex-none px-2.5 py-1.5 text-[11px] sm:text-xs font-semibold rounded-lg bg-indigo-100 text-indigo-700 font-bold border border-indigo-200 text-center">
+                        全部
                     </button>
-                    <button id="btnFilterWrong" onclick="setFilter('wrong')" class="hidden px-3 py-1 text-xs font-semibold rounded-lg text-slate-600 hover:bg-slate-100">
-                        只看错题 (<span id="wrongCount">0</span>)
+                    <button id="btnFilterCorrect" onclick="setFilter('correct')" class="hidden flex-1 sm:flex-none px-2.5 py-1.5 text-[11px] sm:text-xs font-semibold rounded-lg text-slate-600 hover:bg-slate-100 text-center">
+                        对题 (<span id="correctCount">0</span>)
                     </button>
-                    <button id="btnFilterCorrect" onclick="setFilter('correct')" class="hidden px-3 py-1 text-xs font-semibold rounded-lg text-slate-600 hover:bg-slate-100">
-                        只看对题 (<span id="correctCount">0</span>)
+                    <button id="btnFilterWrong" onclick="setFilter('wrong')" class="hidden flex-1 sm:flex-none px-2.5 py-1.5 text-[11px] sm:text-xs font-semibold rounded-lg text-slate-600 hover:bg-slate-100 text-center">
+                        错题 (<span id="wrongCount">0</span>)
                     </button>
                 </div>
             </div>
 
             <!-- Page Title Bar -->
             <div class="flex justify-between items-center px-1">
-                <h2 class="text-lg font-extrabold text-slate-800 flex items-center gap-2">
-                    <span class="bg-indigo-600 text-white text-xs px-2.5 py-1 rounded-md" id="currentPageTag">第 1 页</span>
-                    <span id="pageRangeText">展示第 1 - 10 题 (Questions 1 to 10)</span>
+                <h2 class="text-sm sm:text-lg font-extrabold text-slate-800 flex items-center gap-1.5 sm:gap-2">
+                    <span class="bg-indigo-600 text-white text-[10px] sm:text-xs px-2 py-0.5 sm:py-1 rounded-md" id="currentPageTag">第 1 页</span>
+                    <span id="pageRangeText" class="text-xs sm:text-base">1 - 10 题</span>
                 </h2>
-                <div class="text-xs font-semibold text-slate-500">
-                    共 5 页 (Page <span id="pageNumSpan">1</span> / 5)
+                <div class="text-[11px] sm:text-xs font-semibold text-slate-500">
+                    页数 <span id="pageNumSpan">1</span> / 5
                 </div>
             </div>
 
             <!-- Container for rendering 10 Question Cards -->
-            <div id="questionsContainer" class="space-y-6">
+            <div id="questionsContainer" class="space-y-4 sm:space-y-6">
                 <!-- 10 Question cards will be injected here via JS -->
             </div>
 
             <!-- Page Navigation Bottom Controls -->
-            <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex items-center justify-between">
-                <button id="prevPageBtn" onclick="prevPage()" class="px-5 py-2.5 rounded-lg border border-slate-300 text-slate-700 hover:bg-slate-50 font-semibold text-sm flex items-center gap-2 transition disabled:opacity-40">
-                    <i class="fa-solid fa-chevron-left"></i> 上一页 (10题)
+            <div class="bg-white p-3 sm:p-4 rounded-xl shadow-sm border border-slate-200 flex items-center justify-between gap-1">
+                <button id="prevPageBtn" onclick="prevPage()" class="px-3 sm:px-5 py-2 rounded-lg border border-slate-300 text-slate-700 active:bg-slate-50 font-semibold text-xs sm:text-sm flex items-center gap-1 sm:gap-2 transition disabled:opacity-40 mobile-touch-target">
+                    <i class="fa-solid fa-chevron-left"></i> <span class="hidden sm:inline">上一页</span>
                 </button>
                 
                 <!-- Page Numbers -->
@@ -190,8 +216,8 @@
                     <!-- Page dots -->
                 </div>
 
-                <button id="nextPageBtn" onclick="nextPage()" class="px-5 py-2.5 rounded-lg bg-indigo-600 hover:hover:bg-indigo-700 text-white font-semibold text-sm flex items-center gap-2 transition">
-                    下一页 (10题) <i class="fa-solid fa-chevron-right"></i>
+                <button id="nextPageBtn" onclick="nextPage()" class="px-3 sm:px-5 py-2 rounded-lg bg-indigo-600 active:bg-indigo-700 text-white font-semibold text-xs sm:text-sm flex items-center gap-1 sm:gap-2 transition mobile-touch-target">
+                    <span class="hidden sm:inline">下一页</span> <i class="fa-solid fa-chevron-right"></i>
                 </button>
             </div>
         </div>
@@ -267,810 +293,4 @@
             <div class="bg-rose-50/70 border border-rose-200 p-4 rounded-xl mb-6 text-left">
                 <div class="flex items-center gap-2 text-rose-800 font-bold text-sm mb-2">
                     <i class="fa-solid fa-triangle-exclamation text-rose-600"></i>
-                    <span>薄弱知识点诊断 (Weakest Knowledge Domain):</span>
-                </div>
-                <div id="weakestDomainCallout" class="text-sm text-rose-900 font-medium mb-3">
-                    计算中...
-                </div>
-                <div class="space-y-2" id="modalCategoryList">
-                    <!-- Progress bars of categories -->
-                </div>
-            </div>
-
-            <div class="flex gap-3">
-                <button onclick="resetExam()" class="px-4 py-2.5 rounded-xl border border-slate-300 text-slate-700 font-semibold text-sm hover:bg-slate-50 transition w-1/2">
-                    <i class="fa-solid fa-rotate-right mr-1"></i> 重新测试此套题
-                </button>
-                <button onclick="closeModal('resultsModal'); setFilter('wrong');" class="px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-sm transition w-1/2 shadow-md">
-                    <i class="fa-solid fa-magnifying-glass-chart mr-1"></i> 逐题排查错题解析
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        // Helper function to generate structured question database across 6 Exam Sets (50 questions each = 300 total)
-        function getExamSetsData() {
-            // Master template categories
-            const CAT_LEAK = "泄漏检测与修复 (Leak Repair)";
-            const CAT_EVAC = "回收深度与真空度 (Evacuation & Vacuum)";
-            const CAT_REF = "制冷剂与润滑油 (Refrigerants & Oils)";
-            const CAT_COMP = "重大维修与系统部件 (Major Repairs & Components)";
-            const CAT_SAFE = "安全操作与打压测试 (Safety & Pressure Testing)";
-
-            // Set 1: Master Exam (50 items)
-            const set1 = [
-                {
-                    id: 1, category: CAT_LEAK,
-                    questionEn: "After the leak repair of a comfort cooling appliance containing 50 or more pounds of refrigerant, what is the mandatory leak rate threshold that triggers required repairs under EPA Section 608?",
-                    questionZh: "根据EPA Section 608规定，对于充注量在50磅或以上的舒适冷却系统（Comfort Cooling），触发必须修复泄漏的年泄漏率门槛是多少？",
-                    optionsEn: ["5%", "10%", "20%", "30%"], optionsZh: ["5%", "10%", "20%", "30%"], answer: 1,
-                    explanationEn: "Under EPA 608 regulations, the leak rate thresholds for appliances with 50+ lbs of refrigerant are: 10% for Comfort Cooling, 20% for Commercial Refrigeration, and 30% for Industrial Process Refrigeration (IPR).",
-                    explanationZh: "根据 EPA 608 法规规定，对于充注量 ≥ 50 lbs 的系统：舒适冷却（Comfort Cooling）的泄漏率年门槛为 10%；商业制冷为 20%；工业过程制冷（IPR）为 30%。"
-                },
-                {
-                    id: 2, category: CAT_LEAK,
-                    questionEn: "Commercial refrigeration equipment containing more than 50 pounds of refrigerant must be repaired when the annual leak rate exceeds:",
-                    questionZh: "充注量在50磅以上的商业制冷设备（Commercial Refrigeration），年泄漏率超过多少时必须进行修复？",
-                    optionsEn: ["10%", "20%", "30%", "35%"], optionsZh: ["10%", "20%", "30%", "35%"], answer: 1,
-                    explanationEn: "The leak rate threshold for commercial refrigeration appliances (e.g., supermarket display cases) with 50+ lbs of charge is 20%.",
-                    explanationZh: "商业制冷设备（如超市冷柜、冷库）的年泄漏率触发门槛为 20%。"
-                },
-                {
-                    id: 3, category: CAT_LEAK,
-                    questionEn: "What is the leak rate threshold for Industrial Process Refrigeration (IPR) systems containing 50 pounds or more of refrigerant?",
-                    questionZh: "工业过程制冷设备（Industrial Process Refrigeration, IPR）充注量在50磅或以上，其触发强制修复的年泄漏率门槛是多少？",
-                    optionsEn: ["10%", "20%", "30%", "50%"], optionsZh: ["10%", "20%", "30%", "50%"], answer: 2,
-                    explanationEn: "Industrial Process Refrigeration (IPR) systems have complex piping; EPA sets their repair trigger leak rate threshold at 30%.",
-                    explanationZh: "工业过程制冷（IPR）由于管道复杂且充注量大，EPA规定的年泄漏率触发修复门槛为 30%。"
-                },
-                {
-                    id: 4, category: CAT_LEAK,
-                    questionEn: "If a system with 50+ lbs of R-22 exceeds the allowable leak rate threshold, within how many days must the leak be repaired and an initial verification test conducted?",
-                    questionZh: "如果一个含有超过50磅R-22的系统泄漏率超过了法定门槛，通常必须在多少天内完成修复并进行初始泄漏验证测试？",
-                    optionsEn: ["7 days", "14 days", "30 days", "90 days"], optionsZh: ["7 天", "14 天", "30 天", "90 天"], answer: 2,
-                    explanationEn: "EPA rules require that leaks in 50+ lb systems exceeding the threshold must be repaired and undergo an initial verification test within 30 days.",
-                    explanationZh: "EPA 规定，当50磅以上的设备超过泄漏率门槛时，必须在 30 天内 修复泄漏并完成初始验证测试。"
-                },
-                {
-                    id: 5, category: CAT_COMP,
-                    questionEn: "Which of the following service procedures is NOT considered a 'Major Repair' under EPA Section 608 definitions?",
-                    questionZh: "根据EPA 608定义，以下哪项维修操作不属于“重大维修”（Major Repair）？",
-                    optionsEn: ["Replacing a compressor", "Replacing a condenser coil", "Replacing a liquid line filter drier", "Replacing an evaporator coil"],
-                    optionsZh: ["更换压缩机 (Compressor)", "更换冷凝器盘管 (Condenser Coil)", "更换干燥过滤器 (Filter Drier)", "更换蒸发器盘管 (Evaporator Coil)"], answer: 2,
-                    explanationEn: "EPA defines 'Major Repair' as maintenance involving compressor, condenser, evaporator, or heat exchanger removal. Replacing a filter drier is a minor repair.",
-                    explanationZh: "EPA 定义“重大维修”(Major Repair) 为涉及拆卸或更换压缩机、冷凝器、蒸发器或热交换盘管。更换干燥过滤器属于普通次要维修。"
-                },
-                {
-                    id: 6, category: CAT_EVAC,
-                    questionEn: "When using recovery equipment manufactured AFTER November 15, 1993, on a high-pressure system with LESS than 200 lbs of refrigerant, what vacuum level is required?",
-                    questionZh: "使用1993年11月15日之后制造的回收设备，对充注量少于200磅高压制冷剂（如R-22, R-410A）的系统进行回收时，要求的真空抽吸深度是多少？",
-                    optionsEn: ["0 inches of Hg", "4 inches of Hg", "10 inches of Hg", "15 inches of Hg"],
-                    optionsZh: ["0 inches of Hg", "4 inches of Hg", "10 inches of Hg", "15 inches of Hg"], answer: 0,
-                    explanationEn: "For high-pressure systems with < 200 lbs of refrigerant using recovery tools made after 11/15/1993, the required evacuation level is 0 inches of Hg (0 psig).",
-                    explanationZh: "对充注量 < 200 lbs 的高压系统，使用 1993年11月15日之后认证的回收设备，要求的回收深度为 0 inches of Hg Vacuum（达到 0 psig 压力即可）。"
-                },
-                {
-                    id: 7, category: CAT_EVAC,
-                    questionEn: "When using recovery equipment built AFTER November 15, 1993, on a system containing 200 lbs or MORE of high-pressure refrigerant (e.g., R-22), what is the required evacuation level?",
-                    questionZh: "使用1993年11月15日之后制造的设备，对充注量等于或大于200磅高压制冷剂的设备进行回收时，需达到的真空度是多少？",
-                    optionsEn: ["0 inches of Hg", "4 inches of Hg", "10 inches of Hg", "15 inches of Hg"],
-                    optionsZh: ["0 inches of Hg", "4 inches of Hg", "10 inches of Hg", "15 inches of Hg"], answer: 2,
-                    explanationEn: "For medium/high-pressure systems containing 200 lbs or more of refrigerant using post-11/15/1993 equipment, technicians must evacuate the system to 10 inches of Hg vacuum.",
-                    explanationZh: "对于 ≥ 200 lbs 的高压系统，使用 11/15/1993 之后制造的回收设备，必须抽真空至 10 inches of Hg Vacuum。"
-                },
-                {
-                    id: 8, category: CAT_EVAC,
-                    questionEn: "If leaks in an appliance make evacuation to the prescribed level impossible without risking air contamination, what should the technician do?",
-                    questionZh: "如果在回收过程中设备存在泄漏无法达到要求的真空度，技术人员应该怎么做？",
-                    optionsEn: ["Flush with nitrogen and vent", "Evacuate the appliance to 0 psig / 0 inches of Hg before opening", "Run recovery machine for 24 hours", "Vent directly to atmosphere"],
-                    optionsZh: ["充入氮气直接冲洗", "将系统抽取至 0 psig / 0 inches of Hg 即可停止回收并进行维修", "强行抽气24小时", "直接排放到大气"], answer: 1,
-                    explanationEn: "If a system has a leak drawing air in, EPA allows evacuating to 0 psig (0 inches of Hg) before opening for repair.",
-                    explanationZh: "如果系统存在泄漏导致抽真空会吸入外部空气，EPA 允许将系统抽气至 0 psig（0 inches of Hg）后打开维修。"
-                },
-                {
-                    id: 9, category: CAT_REF,
-                    questionEn: "Polyolester (POE) lubricants are commonly used with HFC refrigerants like R-410A and R-134a. What is the most notable property of POE oil?",
-                    questionZh: "多元醇酯油（POE, Polyolester）常用于 HFC 制冷剂系统（如 R-410A），这种润滑油最突出的特性是什么？",
-                    optionsEn: ["Mixes with mineral oil easily", "It is highly hygroscopic and absorbs moisture rapidly from air", "Can only be used with R-22", "It neutralizes acids in system"],
-                    optionsZh: ["易溶于矿物油", "高度吸湿（Hygroscopic），会迅速吸收空气中的水分", "只能用于 R-22", "呈碱性可以中和酸液"], answer: 1,
-                    explanationEn: "POE oil is extremely hygroscopic and reacts with moisture to form acids, so containers must remain tightly sealed.",
-                    explanationZh: "POE 润滑油具有高度吸湿性（Hygroscopic），露置空气中会迅速吸收水分并水解产生酸性物质。"
-                },
-                {
-                    id: 10, category: CAT_REF,
-                    questionEn: "R-410A is a near-azeotropic refrigerant blend. How does its operating pressure compare to R-22?",
-                    questionZh: "R-410A 是一种近共沸混合制冷剂，其运行压力比 R-22 高出约多少？",
-                    optionsEn: ["10% higher", "30% higher", "60% higher", "100% higher"],
-                    optionsZh: ["高出约 10%", "高出约 30%", "高出约 60%", "高出约 100%"], answer: 2,
-                    explanationEn: "R-410A operates at pressures approximately 60% higher than R-22 (e.g. high-side reaches 350-450 psig).",
-                    explanationZh: "R-410A 的运行压力比 R-22 高出约 60%（高压端常达 350-450 psig），决不能充入 R-22 系统。"
-                }
-            ];
-
-            // Fill set 1 remaining 40 questions dynamically with high-quality bilingual EPA 608 items
-            for (let i = 11; i <= 50; i++) {
-                set1.push(generateBilingualQuestion(1, i, CAT_LEAK, CAT_EVAC, CAT_REF, CAT_COMP, CAT_SAFE));
-            }
-
-            // Sets 2 to 6 (50 questions each)
-            const set2 = []; for (let i = 1; i <= 50; i++) set2.push(generateBilingualQuestion(2, i, CAT_LEAK, CAT_EVAC, CAT_REF, CAT_COMP, CAT_SAFE));
-            const set3 = []; for (let i = 1; i <= 50; i++) set3.push(generateBilingualQuestion(3, i, CAT_LEAK, CAT_EVAC, CAT_REF, CAT_COMP, CAT_SAFE));
-            const set4 = []; for (let i = 1; i <= 50; i++) set4.push(generateBilingualQuestion(4, i, CAT_LEAK, CAT_EVAC, CAT_REF, CAT_COMP, CAT_SAFE));
-            const set5 = []; for (let i = 1; i <= 50; i++) set5.push(generateBilingualQuestion(5, i, CAT_LEAK, CAT_EVAC, CAT_REF, CAT_COMP, CAT_SAFE));
-            const set6 = []; for (let i = 1; i <= 50; i++) set6.push(generateBilingualQuestion(6, i, CAT_LEAK, CAT_EVAC, CAT_REF, CAT_COMP, CAT_SAFE));
-
-            return [
-                { id: 0, title: "试卷 1: 综合全真模拟 Set 1", questions: set1 },
-                { id: 1, title: "试卷 2: 泄漏修复与法规 Set 2", questions: set2 },
-                { id: 2, title: "试卷 3: 回收深度与抽真空 Set 3", questions: set3 },
-                { id: 3, title: "试卷 4: 制冷剂/润滑油与改造 Set 4", questions: set4 },
-                { id: 4, title: "试卷 5: 系统部件与重大维修 Set 5", questions: set5 },
-                { id: 5, title: "试卷 6: 安全打压与冷水机组 Set 6", questions: set6 }
-            ];
-        }
-
-        // Helper function to dynamically construct rich, authentic EPA Type II bilingual items
-        function generateBilingualQuestion(setNum, qNum, CAT_LEAK, CAT_EVAC, CAT_REF, CAT_COMP, CAT_SAFE) {
-            const categories = [CAT_LEAK, CAT_EVAC, CAT_REF, CAT_COMP, CAT_SAFE];
-            const cat = categories[(qNum + setNum) % categories.length];
-
-            const pool = [
-                {
-                    cat: CAT_LEAK,
-                    en: "For an appliance with 50+ lbs of refrigerant, within how many days after a successful initial leak verification test must the 'Follow-up Verification Test' be performed?",
-                    zh: "对于包含50磅以上制冷剂的系统，在初始验证测试通过后，EPA要求的“后续验证测试”（Follow-up Verification Test）必须在多长时间内进行？",
-                    optsEn: ["Within 24 hours", "Within 10 days", "Within 30 days", "Within 90 days"],
-                    optsZh: ["24 小时内", "10 天内", "30 天内", "90 天内"], ans: 1,
-                    expEn: "The follow-up verification test must be performed within 10 days of the initial verification test once the system is back operating at normal conditions.",
-                    expZh: "后续验证测试（Follow-up Verification Test）必须在系统恢复正常运行状态后的 10 天内 完成。"
-                },
-                {
-                    cat: CAT_LEAK,
-                    textKey: "recordkeeping",
-                    en: "How long must records of leak inspections, initial/follow-up tests, and refrigerant service for appliances with 50+ lbs be retained?",
-                    zh: "对于充注量在 50 磅以上的设备，泄漏检测、验证测试和制冷剂回收/服务记录必须保存至少多长时间？",
-                    optsEn: ["1 year", "2 years", "3 years", "5 years"],
-                    optsZh: ["1 年", "2 年", "3 年", "5 年"], ans: 2,
-                    expEn: "EPA Section 608 mandates that owners and technicians maintain all service, leak inspection, and recovery records for 50+ lb units for at least 3 years.",
-                    expZh: "EPA Section 608 规定，包含 50 磅及以上制冷剂设备的维修、回收、充注及泄漏检测记录必须保存至少 3 年。"
-                },
-                {
-                    cat: CAT_EVAC,
-                    en: "When evacuating a system after major repairs to ensure deep dehydration, what vacuum level is industry-standard under EPA guidelines?",
-                    zh: "在重大维修后对高压系统进行深度抽真空干燥（Dehydration）时，标准的真空度要求是多少微米汞柱（Microns）？",
-                    optsEn: ["5000 Microns", "2500 Microns", "500 Microns", "50 Microns"],
-                    optsZh: ["5000 微米", "2500 微米", "500 微米 (Microns)", "50 微米"], ans: 2,
-                    expEn: "The standard level of deep evacuation for moisture removal approved by EPA and field practice is 500 microns or lower.",
-                    expZh: "深度抽真空去除水分和空气的标准真空度要求是达到 500 Microns（微米汞柱）或更低。"
-                },
-                {
-                    cat: CAT_EVAC,
-                    en: "When recharging a system that is under a deep vacuum (500 microns), why should refrigerant be charged first as VAPOR rather than liquid?",
-                    zh: "在对处于深真空状态（如 500 microns）的高压系统重新充注制冷剂时，为什么必须先充注气态（Vapor）而不是液态？",
-                    optsEn: ["Liquid will burn the compressor", "Liquid refrigerant vaporizing in deep vacuum will freeze water in heat exchanger tubes", "Vapor cleans the filter drier", "Liquid oil must be charged first"],
-                    optsZh: ["液态充注会烧毁压缩机", "液态在深真空下剧烈蒸发吸热，会导致热交换管内的水结冰胀裂", "气态充注可以清洗干燥过滤器", "必须先充注液态润滑油"], ans: 1,
-                    expEn: "Liquid entering a deep vacuum flashes instantly, chilling heat exchanger tubes below 32°F and freezing static water, bursting internal copper tubes.",
-                    expZh: "深真空下直接充注液态，制冷剂会瞬间剧烈蒸发吸热，导致水管内的水迅速结冰胀裂铜管。因此必须先充气态升压。"
-                },
-                {
-                    cat: CAT_REF,
-                    en: "Why must non-azeotropic / zeotropic refrigerant blends (such as R-407C) be charged into a system in the LIQUID state?",
-                    zh: "非共沸混合制冷剂（Zeotropic Blends，如 R-407C）在充注时，为什么必须以液态形式（Liquid State）充注？",
-                    optsEn: ["Vapor charging overloads compressor", "Vapor charging causes fractionation, altering the blend's chemical ratio", "Liquid bypasses filter drier", "Liquid operates at lower pressure"],
-                    optsZh: ["气态充注会导致压缩机瞬间过载", "气态充注会导致制冷剂发生分馏（Fractionation），改变混合成分比例", "液态充注不需要经过干燥过滤器", "液态充注的压力更低"], ans: 1,
-                    expEn: "Zeotropic components evaporate at different rates. Vapor charging causes 'fractionation'—higher volatility gases escape first, changing blend composition.",
-                    expZh: "非共沸混合物各组分沸点不同。气态充注会导致沸点较低的组分先蒸发流出（分馏 Fractionation），改变混合物的化学成分比例。"
-                },
-                {
-                    cat: CAT_REF,
-                    en: "What is meant by 'Temperature Glide' in blended refrigerants?",
-                    zh: "什么是混合制冷剂的“温度滑移”（Temperature Glide）？",
-                    optsEn: ["The temperature range over which a blend condenses/evaporates at constant pressure", "Temperature drop across compressor", "Oil separation temperature", "Ambient vs condensing temp difference"],
-                    optsZh: ["制冷剂在恒定压力下冷凝/蒸发时，泡点与露点之间的温度差值", "压缩机进出口的温差", "润滑油与制冷剂分离时的温度", "环境温度与冷凝温度的差值"], ans: 0,
-                    expEn: "Temperature glide is the range of temperatures over which a zeotropic blend evaporates or condenses at constant pressure between bubble point and dew point.",
-                    expZh: "温度滑移（Temperature Glide）是指非共沸混合制冷剂在恒定压力下相变（蒸发或冷凝）时，饱和液体温度与饱和气体温度之间的温差。"
-                },
-                {
-                    cat: CAT_COMP,
-                    en: "What is the primary function of a suction line accumulator in a refrigeration system?",
-                    questionZh: "吸气管路蓄热器/气液分离器（Suction Line Accumulator）的主要作用是什么？",
-                    optsEn: ["To prevent superheated vapor from entering compressor", "To prevent liquid refrigerant slugging into the compressor", "To filter acidic impurities", "To boost condenser heat dissipation"],
-                    optsZh: ["防止过热蒸汽进入压缩机", "防止液态制冷剂直接倒灌（Liquid Slugging）进入压缩机损坏气阀", "过滤系统中的酸性杂质", "提高冷凝器的散热效率"], ans: 1,
-                    expEn: "The suction accumulator traps unevaporated liquid refrigerant on the suction line to prevent liquid slugging into the compressor.",
-                    expZh: "吸气蓄集器（Accumulator）安装在低压吸气管路，防止未完全蒸发的液态制冷剂进入压缩机造成“液击”（Liquid Slugging）。"
-                },
-                {
-                    cat: CAT_COMP,
-                    en: "A frost build-up or significant temperature drop across a liquid line filter drier indicates:",
-                    zh: "如果一个高压系统的液体管路干燥过滤器（Filter Drier）前后出现明显温差甚至结霜，这表明：",
-                    optsEn: ["The filter drier is operating normally", "The filter drier has an internal restriction or clog", "The system is undercharged", "Compressor efficiency is low"],
-                    optsZh: ["干燥过滤器正常工作中", "干燥过滤器内部发生堵塞 (Restriction/Clog)", "制冷剂充注不足", "压缩机效率低下"], ans: 1,
-                    expEn: "A temperature difference or frost across a drier signifies an internal restriction, creating an unwanted throttling effect like an expansion valve.",
-                    expZh: "干燥过滤器前后出现温差或结霜，说明内部存在杂质堵塞，产生了节流效应（相当于膨胀阀），导致压力和温度骤降。"
-                },
-                {
-                    cat: CAT_SAFE,
-                    en: "Which gas MUST be used when pressure-testing a high-pressure refrigeration system for leaks?",
-                    zh: "当对制冷系统进行高压泄漏打压测试（Pressure Leak Testing）时，必须使用哪种气体？",
-                    optsEn: ["Pure Oxygen", "Compressed Air", "Dry Nitrogen", "Carbon Dioxide with R-12"],
-                    optsZh: ["纯氧气 (Pure Oxygen)", "压缩空气 (Compressed Air)", "干燥氮气 (Dry Nitrogen)", "二氧化碳与微量R-12混合气"], ans: 2,
-                    expEn: "NEVER use oxygen or compressed air for leak testing because oil mixed with oxygen under pressure can explode. Use Dry Nitrogen.",
-                    expZh: "绝对不能使用氧气或压缩空气进行打压测试，因为润滑油与氧气在高压下混合会引发剧烈爆炸！打压测试必须使用干燥氮气。"
-                },
-                {
-                    cat: CAT_SAFE,
-                    en: "Under EPA rules, a refillable refrigerant recovery cylinder must NOT be filled above what percentage of its capacity by weight?",
-                    zh: "根据EPA规定，可重复充注的制冷剂回收钢瓶，其回收充注量最高不能超过按水重计算容量的多少？",
-                    optsEn: ["50%", "70%", "80%", "95%"],
-                    optsZh: ["50%", "70%", "80%", "95%"], ans: 2,
-                    expEn: "To prevent hydraulic rupture due to liquid thermal expansion, refillable recovery cylinders must never be filled beyond 80% of their liquid capacity.",
-                    expZh: "为防止温度升高时液体热膨胀导致钢瓶剧烈爆炸，回收钢瓶的最大充注量不得超过其容量的 80%（按水重计算）。"
-                }
-            ];
-
-            const template = pool[(qNum + setNum * 3) % pool.length];
-            return {
-                id: qNum,
-                category: template.cat,
-                questionEn: `[Set ${setNum} - Q${qNum}] ${template.en}`,
-                questionZh: `[试卷${setNum} - 第${qNum}题] ${template.zh}`,
-                optionsEn: template.optsEn,
-                optionsZh: template.optsZh,
-                answer: template.ans,
-                explanationEn: template.expEn,
-                explanationZh: template.expZh
-            };
-        }
-
-        const PAGE_SIZE = 10;
-        let allExamSets = [];
-        let currentSetIndex = 0; // 0 to 5
-        let currentQuestionsData = [];
-        
-        let currentPage = 0; // 0 to 4 (5 pages total)
-        let userAnswers = [];
-        let flaggedQuestions = [];
-        let isSubmitted = false;
-        let isStudyMode = false;
-        let timerInterval = null;
-        let secondsElapsed = 0;
-        let activeFilter = 'all'; // 'all', 'wrong', 'correct'
-        let pendingSetIndex = null;
-        let showChinese = true; // Global state for toggling Chinese translation
-
-        window.onload = function() {
-            allExamSets = getExamSetsData();
-            loadExamSet(0);
-        };
-
-        function loadExamSet(setIndex) {
-            currentSetIndex = parseInt(setIndex);
-            currentQuestionsData = allExamSets[currentSetIndex].questions;
-
-            // Update Header dropdown & label
-            document.getElementById('examSetSelect').value = currentSetIndex;
-            document.getElementById('activeSetLabel').innerText = allExamSets[currentSetIndex].title;
-
-            // Reset state for new set
-            userAnswers = new Array(currentQuestionsData.length).fill(null);
-            flaggedQuestions = new Array(currentQuestionsData.length).fill(false);
-            isSubmitted = false;
-            secondsElapsed = 0;
-            activeFilter = 'all';
-
-            // UI elements reset
-            document.getElementById('headerSubmitBtn').classList.remove('hidden');
-            document.getElementById('btnFilterAll').className = "px-3 py-1 text-xs font-semibold rounded-lg bg-indigo-100 text-indigo-700 font-bold border border-indigo-200";
-            document.getElementById('btnFilterWrong').classList.add('hidden');
-            document.getElementById('btnFilterCorrect').classList.add('hidden');
-            document.getElementById('scoreBadge').classList.add('hidden');
-            document.getElementById('legendResult').classList.add('hidden');
-            document.getElementById('weaknessSideWidget').classList.add('hidden');
-            document.getElementById('passStatus').innerText = "未提交";
-            document.getElementById('passStatus').className = "font-bold text-slate-600";
-
-            // Restart timer
-            if (timerInterval) clearInterval(timerInterval);
-            startTimer();
-
-            // Render view
-            renderPaginationDots();
-            switchPage(0);
-            updateProgressBar();
-        }
-
-        function promptSwitchExamSet(newIndex) {
-            if (parseInt(newIndex) === currentSetIndex) return;
-
-            const hasAnswered = userAnswers.some(a => a !== null);
-            if (hasAnswered && !isSubmitted) {
-                pendingSetIndex = newIndex;
-                document.getElementById('switchSetModal').classList.remove('hidden');
-                // Revert select dropdown temporarily until confirmed
-                document.getElementById('examSetSelect').value = currentSetIndex;
-            } else {
-                loadExamSet(newIndex);
-            }
-        }
-
-        function confirmSwitchExamSet() {
-            closeModal('switchSetModal');
-            if (pendingSetIndex !== null) {
-                loadExamSet(pendingSetIndex);
-                pendingSetIndex = null;
-            }
-        }
-
-        function cancelSwitchExamSet() {
-            closeModal('switchSetModal');
-            pendingSetIndex = null;
-            document.getElementById('examSetSelect').value = currentSetIndex;
-        }
-
-        function startTimer() {
-            timerInterval = setInterval(() => {
-                secondsElapsed++;
-                const hrs = String(Math.floor(secondsElapsed / 3600)).padStart(2, '0');
-                const mins = String(Math.floor((secondsElapsed % 3600) / 60)).padStart(2, '0');
-                const secs = String(secondsElapsed % 60).padStart(2, '0');
-                document.getElementById('timer').innerText = `${hrs}:${mins}:${secs}`;
-            }, 1000);
-        }
-
-        function switchPage(pageIndex) {
-            currentPage = pageIndex;
-            renderPage(pageIndex);
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-
-        function prevPage() {
-            if (currentPage > 0) switchPage(currentPage - 1);
-        }
-
-        function nextPage() {
-            if (currentPage < 4) switchPage(currentPage + 1);
-        }
-
-        function renderPaginationDots() {
-            const dotsContainer = document.getElementById('paginationDots');
-            dotsContainer.innerHTML = '';
-            for (let i = 0; i < 5; i++) {
-                const btn = document.createElement('button');
-                btn.id = `dotBtn${i}`;
-                btn.onclick = () => switchPage(i);
-                btn.className = `w-8 h-8 rounded-lg text-xs font-bold transition ${i === currentPage ? 'bg-indigo-600 text-white shadow-sm' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`;
-                btn.innerText = i + 1;
-                dotsContainer.appendChild(btn);
-            }
-        }
-
-        function renderPage(pageIndex) {
-            currentPage = pageIndex;
-            
-            // Update Page Tags
-            document.getElementById('currentPageTag').innerText = `第 ${pageIndex + 1} 页`;
-            const startNum = pageIndex * PAGE_SIZE + 1;
-            const endNum = Math.min((pageIndex + 1) * PAGE_SIZE, currentQuestionsData.length);
-            document.getElementById('pageRangeText').innerText = `展示第 ${startNum} - ${endNum} 题 (Questions ${startNum} to ${endNum})`;
-            document.getElementById('pageNumSpan').innerText = pageIndex + 1;
-
-            // Update Tab Highlights
-            for (let i = 0; i < 5; i++) {
-                const tab = document.getElementById(`pageTab${i}`);
-                const dot = document.getElementById(`dotBtn${i}`);
-                if (i === pageIndex) {
-                    tab.className = "flex-1 py-1 text-center rounded-md transition font-bold bg-indigo-600 text-white shadow-sm";
-                    if (dot) dot.className = "w-8 h-8 rounded-lg text-xs font-bold transition bg-indigo-600 text-white shadow-sm";
-                } else {
-                    tab.className = "flex-1 py-1 text-center rounded-md transition text-slate-600 hover:bg-slate-200 font-medium";
-                    if (dot) dot.className = "w-8 h-8 rounded-lg text-xs font-bold transition bg-slate-100 text-slate-600 hover:bg-slate-200";
-                }
-            }
-
-            // Disable/Enable page prev/next buttons
-            document.getElementById('prevPageBtn').disabled = (pageIndex === 0);
-            document.getElementById('nextPageBtn').disabled = (pageIndex === 4);
-
-            // Render 10 Questions
-            const container = document.getElementById('questionsContainer');
-            container.innerHTML = '';
-
-            const pageQuestions = currentQuestionsData.slice(pageIndex * PAGE_SIZE, (pageIndex + 1) * PAGE_SIZE);
-
-            pageQuestions.forEach((q) => {
-                const realIndex = q.id - 1; // 0-indexed
-
-                if (!shouldDisplayInFilter(realIndex)) return;
-
-                const card = document.createElement('div');
-                card.id = `qCard-${realIndex}`;
-                card.className = "bg-white rounded-2xl shadow-sm border border-slate-200 p-6 transition hover:border-slate-300";
-
-                const isFlagged = flaggedQuestions[realIndex];
-
-                // Options HTML
-                let optionsHtml = '';
-                const labels = ['A', 'B', 'C', 'D'];
-
-                q.optionsEn.forEach((optEn, optIdx) => {
-                    const optZh = q.optionsZh[optIdx];
-                    const isSelected = userAnswers[realIndex] === optIdx;
-
-                    let optClass = "p-3.5 rounded-xl border-2 transition cursor-pointer flex items-center justify-between ";
-
-                    if (isSubmitted) {
-                        const isCorrectAnswer = optIdx === q.answer;
-                        const isUserChoice = optIdx === userAnswers[realIndex];
-
-                        if (isCorrectAnswer) {
-                            optClass += "bg-emerald-50 border-emerald-500 text-emerald-900 font-medium";
-                        } else if (isUserChoice && !isCorrectAnswer) {
-                            optClass += "bg-rose-50 border-rose-500 text-rose-900 font-medium";
-                        } else {
-                            optClass += "bg-white border-slate-200 text-slate-400 opacity-60";
-                        }
-                    } else {
-                        if (isSelected) {
-                            optClass += "bg-indigo-50 border-indigo-600 text-indigo-900 font-medium shadow-sm";
-                        } else {
-                            optClass += "bg-white border-slate-200 hover:border-slate-300 hover:bg-slate-50 text-slate-700";
-                        }
-                    }
-
-                    let iconHtml = '';
-                    if (isSubmitted || isStudyMode) {
-                        if (optIdx === q.answer) {
-                            iconHtml = '<i class="fa-solid fa-circle-check text-emerald-600 text-xl"></i>';
-                        } else if (optIdx === userAnswers[realIndex]) {
-                            iconHtml = '<i class="fa-solid fa-circle-xmark text-rose-500 text-xl"></i>';
-                        }
-                    } else {
-                        iconHtml = isSelected 
-                            ? '<i class="fa-solid fa-circle-dot text-indigo-600 text-xl"></i>' 
-                            : '<i class="fa-regular fa-circle text-slate-300 text-xl"></i>';
-                    }
-
-                    optionsHtml += `
-                        <div onclick="selectOption(${realIndex}, ${optIdx})" class="${optClass}">
-                            <div class="flex items-start space-x-3 pr-2">
-                                <span class="w-7 h-7 rounded-lg bg-slate-100 border border-slate-200 flex items-center justify-center font-bold text-xs text-slate-600 shrink-0 mt-0.5">
-                                    ${labels[optIdx]}
-                                </span>
-                                <div>
-                                    <p class="text-sm font-semibold text-slate-800">${optEn}</p>
-                                    <p class="text-xs text-slate-500 mt-0.5 zh-text ${showChinese ? '' : 'hidden'}">${optZh}</p>
-                                </div>
-                            </div>
-                            <div class="shrink-0">${iconHtml}</div>
-                        </div>
-                    `;
-                });
-
-                // Explanation HTML post submit or in study mode
-                let expHtml = '';
-                if (isSubmitted || (isStudyMode && userAnswers[realIndex] !== null)) {
-                    const isCorrect = userAnswers[realIndex] === q.answer;
-                    const headerClass = isCorrect ? "text-emerald-700" : "text-rose-700";
-                    const headerIcon = isCorrect ? "fa-circle-check text-emerald-600" : "fa-triangle-exclamation text-rose-600";
-                    const statusTitle = isCorrect ? "回答正确 (Correct)" : "正确答案与解析 (Answer Explanation)";
-
-                    expHtml = `
-                        <div class="mt-5 p-4 rounded-xl bg-slate-50 border border-slate-200">
-                            <div class="flex items-center gap-2 font-bold text-sm mb-2 ${headerClass}">
-                                <i class="fa-solid ${headerIcon}"></i>
-                                <span>${statusTitle}</span>
-                            </div>
-                            <div class="space-y-1 text-xs leading-relaxed text-slate-700">
-                                <p class="font-medium"><strong>[EN]</strong> ${q.explanationEn}</p>
-                                <p class="text-slate-500 zh-text ${showChinese ? '' : 'hidden'}"><strong>[中文]</strong> ${q.explanationZh}</p>
-                            </div>
-                        </div>
-                    `;
-                }
-
-                card.innerHTML = `
-                    <div class="flex justify-between items-start gap-4 mb-3">
-                        <div>
-                            <span class="inline-block px-2.5 py-0.5 rounded-md text-xs font-semibold bg-indigo-50 text-indigo-700 border border-indigo-100 mb-2">
-                                ${q.category}
-                            </span>
-                            <h3 class="text-base font-bold text-slate-900 leading-snug">
-                                ${q.id}. ${q.questionEn}
-                            </h3>
-                            <p class="text-xs font-medium text-slate-500 mt-1 zh-text ${showChinese ? '' : 'hidden'}">
-                                ${q.questionZh}
-                            </p>
-                        </div>
-                        <button onclick="toggleFlag(${realIndex})" class="${isFlagged ? 'text-amber-500' : 'text-slate-300 hover:text-amber-500'} p-2 rounded-lg transition shrink-0" title="标记此题">
-                            <i class="fa-solid fa-bookmark text-xl"></i>
-                        </button>
-                    </div>
-
-                    <div class="space-y-2.5 my-4">
-                        ${optionsHtml}
-                    </div>
-
-                    ${expHtml}
-                `;
-
-                container.appendChild(card);
-            });
-
-            renderGrid();
-        }
-
-        function selectOption(qIdx, optIdx) {
-            if (isSubmitted) return;
-            userAnswers[qIdx] = optIdx;
-            
-            renderPage(currentPage);
-            updateProgressBar();
-        }
-
-        function toggleFlag(qIdx) {
-            flaggedQuestions[qIdx] = !flaggedQuestions[qIdx];
-            renderPage(currentPage);
-        }
-
-        function renderGrid() {
-            const gridContainer = document.getElementById('questionGrid');
-            gridContainer.innerHTML = '';
-
-            currentQuestionsData.forEach((q, idx) => {
-                const btn = document.createElement('button');
-                btn.id = `grid-btn-${idx}`;
-                btn.onclick = () => {
-                    const targetPage = Math.floor(idx / PAGE_SIZE);
-                    switchPage(targetPage);
-                    setTimeout(() => {
-                        const el = document.getElementById(`qCard-${idx}`);
-                        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                    }, 100);
-                };
-                
-                let base = "h-8 w-8 rounded-lg font-semibold text-xs transition flex items-center justify-center border ";
-                
-                if (isSubmitted) {
-                    const isCorrect = userAnswers[idx] === currentQuestionsData[idx].answer;
-                    if (isCorrect) {
-                        base += "bg-emerald-500 text-white border-emerald-600";
-                    } else {
-                        base += "bg-rose-500 text-white border-rose-600";
-                    }
-                } else {
-                    if (userAnswers[idx] !== null) {
-                        base += "bg-indigo-600 text-white border-indigo-700 ";
-                    } else {
-                        base += "bg-slate-100 text-slate-700 hover:bg-slate-200 border-slate-200 ";
-                    }
-
-                    if (flaggedQuestions[idx]) {
-                        base += "ring-2 ring-amber-400 border-amber-500 ";
-                    }
-                }
-
-                btn.className = base;
-                btn.innerText = idx + 1;
-                gridContainer.appendChild(btn);
-            });
-
-            const answeredNum = userAnswers.filter(a => a !== null).length;
-            document.getElementById('answeredCount').innerText = answeredNum;
-        }
-
-        function shouldDisplayInFilter(idx) {
-            if (!isSubmitted || activeFilter === 'all') return true;
-            const isCorrect = userAnswers[idx] === currentQuestionsData[idx].answer;
-            if (activeFilter === 'wrong') return !isCorrect;
-            if (activeFilter === 'correct') return isCorrect;
-            return true;
-        }
-
-        function updateProgressBar() {
-            const answeredCount = userAnswers.filter(a => a !== null).length;
-            const percent = (answeredCount / currentQuestionsData.length) * 100;
-            document.getElementById('progressBar').style.width = `${percent}%`;
-        }
-
-        function confirmSubmit() {
-            const unanswered = userAnswers.filter(a => a === null).length;
-            document.getElementById('unansweredNum').innerText = unanswered;
-            document.getElementById('confirmModal').classList.remove('hidden');
-        }
-
-        function closeModal(modalId) {
-            document.getElementById(modalId).classList.add('hidden');
-        }
-
-        function gradeExam() {
-            closeModal('confirmModal');
-            clearInterval(timerInterval);
-            isSubmitted = true;
-
-            let correctCount = 0;
-            currentQuestionsData.forEach((q, idx) => {
-                if (userAnswers[idx] === q.answer) {
-                    correctCount++;
-                }
-            });
-
-            const scorePercent = Math.round((correctCount / currentQuestionsData.length) * 100);
-            const isPassed = scorePercent >= 70; // 70% threshold
-
-            // Breakdown score by category for Weakness Analysis
-            const categoryStats = {};
-
-            currentQuestionsData.forEach((q, idx) => {
-                if (!categoryStats[q.category]) {
-                    categoryStats[q.category] = { total: 0, correct: 0 };
-                }
-                categoryStats[q.category].total++;
-                if (userAnswers[idx] === q.answer) {
-                    categoryStats[q.category].correct++;
-                }
-            });
-
-            // Find weakest category
-            let weakestCategory = '';
-            let lowestAcc = 101;
-
-            Object.keys(categoryStats).forEach(cat => {
-                const stat = categoryStats[cat];
-                const acc = Math.round((stat.correct / stat.total) * 100);
-                stat.acc = acc;
-                if (acc < lowestAcc) {
-                    lowestAcc = acc;
-                    weakestCategory = cat;
-                }
-            });
-
-            // Render Weakness Analysis in Modal
-            const modalCatList = document.getElementById('modalCategoryList');
-            const sideCatList = document.getElementById('categoryBreakdownList');
-            modalCatList.innerHTML = '';
-            sideCatList.innerHTML = '';
-
-            Object.keys(categoryStats).forEach(cat => {
-                const stat = categoryStats[cat];
-                const colorClass = stat.acc >= 70 ? 'bg-emerald-500' : (stat.acc >= 50 ? 'bg-amber-500' : 'bg-rose-500');
-
-                // Modal Item
-                const modalItem = document.createElement('div');
-                modalItem.innerHTML = `
-                    <div class="flex justify-between text-xs font-semibold mb-1 text-slate-700">
-                        <span>${cat}</span>
-                        <span>${stat.correct}/${stat.total} (${stat.acc}%)</span>
-                    </div>
-                    <div class="w-full bg-slate-200 rounded-full h-2 overflow-hidden">
-                        <div class="${colorClass} h-2 rounded-full" style="width: ${stat.acc}%"></div>
-                    </div>
-                `;
-                modalCatList.appendChild(modalItem);
-
-                // Side Widget Item
-                const sideItem = document.createElement('div');
-                sideItem.innerHTML = `
-                    <div class="flex justify-between text-xs font-medium text-slate-600 mb-0.5">
-                        <span class="truncate pr-2">${cat}</span>
-                        <span class="font-bold">${stat.acc}%</span>
-                    </div>
-                    <div class="w-full bg-slate-100 rounded-full h-1.5 overflow-hidden">
-                        <div class="${colorClass} h-1.5 rounded-full" style="width: ${stat.acc}%"></div>
-                    </div>
-                `;
-                sideCatList.appendChild(sideItem);
-            });
-
-            document.getElementById('weakestDomainCallout').innerHTML = `
-                📌 当前套题中最薄弱知识模块为：<span class="font-bold underline text-rose-700">${weakestCategory}</span> (正确率 <span class="font-bold text-rose-700">${lowestAcc}%</span>)。建议重点复习该模块涉及的 EPA 法规条款！
-            `;
-
-            // Display UI updates post-submit
-            document.getElementById('headerSubmitBtn').classList.add('hidden');
-            document.getElementById('btnFilterWrong').classList.remove('hidden');
-            document.getElementById('btnFilterCorrect').classList.remove('hidden');
-            document.getElementById('scoreBadge').classList.remove('hidden');
-            document.getElementById('legendResult').classList.remove('hidden');
-            document.getElementById('weaknessSideWidget').classList.remove('hidden');
-
-            document.getElementById('wrongCount').innerText = currentQuestionsData.length - correctCount;
-            document.getElementById('correctCount').innerText = correctCount;
-
-            const passStatus = document.getElementById('passStatus');
-            if (isPassed) {
-                passStatus.innerText = "PASS (合格)";
-                passStatus.className = "font-bold text-emerald-600";
-            } else {
-                passStatus.innerText = "FAIL (未通过)";
-                passStatus.className = "font-bold text-rose-600";
-            }
-
-            // Results Modal Details
-            document.getElementById('modalScorePercent').innerText = `${scorePercent}%`;
-            document.getElementById('modalScoreCorrect').innerText = `${correctCount} / 50`;
-
-            const resIcon = document.getElementById('resultIcon');
-            const resStatus = document.getElementById('resultStatusText');
-            const passBadge = document.getElementById('modalPassBadge');
-
-            if (isPassed) {
-                resIcon.className = "w-16 h-16 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center mx-auto mb-3 text-3xl";
-                resIcon.innerHTML = '<i class="fa-solid fa-trophy"></i>';
-                resStatus.innerText = `恭喜！您已通过 ${allExamSets[currentSetIndex].title}`;
-                resStatus.className = "text-2xl font-black text-emerald-600 mb-1";
-                passBadge.innerText = "PASS (及格)";
-                passBadge.className = "text-base font-extrabold text-emerald-600 mt-1";
-            } else {
-                resIcon.className = "w-16 h-16 rounded-full bg-rose-100 text-rose-600 flex items-center justify-center mx-auto mb-3 text-3xl";
-                resIcon.innerHTML = '<i class="fa-solid fa-circle-xmark"></i>';
-                resStatus.innerText = "未达到70%及格线，建议针对错题和薄弱模块专项复习";
-                resStatus.className = "text-2xl font-black text-rose-600 mb-1";
-                passBadge.innerText = "FAIL (未及格)";
-                passBadge.className = "text-base font-extrabold text-rose-600 mt-1";
-            }
-
-            document.getElementById('resultsModal').classList.remove('hidden');
-
-            renderPage(currentPage);
-        }
-
-        function setFilter(filterType) {
-            activeFilter = filterType;
-            
-            ['All', 'Wrong', 'Correct'].forEach(type => {
-                const btn = document.getElementById(`btnFilter${type}`);
-                if (type.toLowerCase() === filterType) {
-                    btn.className = "px-3 py-1 text-xs font-semibold rounded-lg bg-indigo-100 text-indigo-700 font-bold border border-indigo-200";
-                } else {
-                    btn.className = "px-3 py-1 text-xs font-semibold rounded-lg text-slate-600 hover:bg-slate-100";
-                }
-            });
-
-            renderPage(currentPage);
-        }
-
-        function toggleChineseVisibility() {
-            showChinese = !showChinese;
-            const btnText = document.getElementById('chineseToggleText');
-            if (btnText) {
-                btnText.innerText = showChinese ? "隐藏中文" : "显示中文";
-            }
-
-            const zhElements = document.querySelectorAll('.zh-text');
-            zhElements.forEach(el => {
-                if (showChinese) {
-                    el.classList.remove('hidden');
-                } else {
-                    el.classList.add('hidden');
-                }
-            });
-        }
-
-        function toggleStudyMode() {
-            isStudyMode = !isStudyMode;
-            const btnText = document.getElementById('studyModeToggleText');
-            const btn = document.getElementById('btnToggleStudyMode');
-            if (isStudyMode) {
-                if (btnText) btnText.innerText = "切换为测验模式 (隐藏解析)";
-                if (btn) {
-                    btn.classList.remove('bg-amber-50', 'text-amber-800', 'border-amber-200');
-                    btn.classList.add('bg-amber-500', 'text-white', 'border-amber-600');
-                }
-            } else {
-                if (btnText) btnText.innerText = "开启背题模式 (即时解析)";
-                if (btn) {
-                    btn.classList.remove('bg-amber-500', 'text-white', 'border-amber-600');
-                    btn.classList.add('bg-amber-50', 'text-amber-800', 'border-amber-200');
-                }
-            }
-            renderPage(currentPage);
-        }
-
-        function resetExam() {
-            closeModal('resultsModal');
-            loadExamSet(currentSetIndex);
-        }
-    </script>
-</body>
-</html>
+                    <span>薄弱知识点诊断
