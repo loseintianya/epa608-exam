@@ -1,0 +1,1725 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EPA 608 Type I 双语模拟考试系统 (100题 2套 · Core+Type I)</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+        body { font-family: 'Inter', system-ui, -apple-system, sans-serif; overflow-x: hidden; }
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #f1f5f9; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+    </style>
+</head>
+<body class="bg-slate-100 text-slate-800 min-h-screen flex flex-col">
+
+    <!-- Navigation Bar -->
+    <header class="bg-indigo-950 text-white shadow-lg sticky top-0 z-50 border-b border-indigo-800">
+        <div class="max-w-7xl mx-auto px-3 sm:px-4 py-2 sm:py-3 flex flex-wrap justify-between items-center gap-2 sm:gap-3">
+            <div class="flex items-center space-x-3">
+                <i class="fa-solid fa-snowflake text-cyan-400 text-xl sm:text-2xl animate-pulse"></i>
+                <div>
+                    <h1 class="font-bold text-base sm:text-lg leading-tight flex items-center gap-2">
+                        EPA 608 Type I 模拟考试 
+                        <span class="hidden md:inline text-xs bg-cyan-500/20 text-cyan-300 border border-cyan-400/30 px-2 py-0.5 rounded">100题 / 2套 · 每套 Core 25 + Type I 25</span>
+                    </h1>
+                    <p class="hidden sm:block text-xs text-indigo-200">Small Appliances Certification Exam Simulator</p>
+                </div>
+            </div>
+
+            <!-- Header Controls: Exam Set Selector, Timer & Submit -->
+            <div class="flex flex-wrap items-center gap-1.5 sm:gap-3 w-full sm:w-auto">
+                <!-- Exam Set Selector Dropdown -->
+                <div class="flex items-center bg-indigo-900/90 rounded-lg px-2 sm:px-2.5 py-1 border border-indigo-700">
+                    <i class="fa-solid fa-layer-group text-cyan-400 text-xs mr-2 hidden sm:inline"></i>
+                    <select id="examSetSelect" onchange="promptSwitchExamSet(this.value)" class="bg-transparent text-xs font-semibold text-white focus:outline-none cursor-pointer py-1 pr-1">
+                        <option value="0" class="bg-indigo-950 text-white">试卷 1 · Set 1</option>
+                        <option value="1" class="bg-indigo-950 text-white">试卷 2 · Set 2</option>
+                    </select>
+                </div>
+
+                <!-- Toggle Chinese Translation Button -->
+                <button id="btnToggleChinese" onclick="toggleChineseVisibility()" class="bg-indigo-900/90 hover:bg-indigo-800 text-white text-xs font-semibold px-2.5 sm:px-3 py-1.5 rounded-lg border border-indigo-700 transition flex items-center gap-1.5" title="显示/隐藏中文">
+                    <i class="fa-solid fa-language text-cyan-400 text-sm"></i>
+                    <span id="chineseToggleText" class="hidden sm:inline">隐藏中文</span>
+                </button>
+
+                <!-- Timer -->
+                <div class="bg-indigo-900/80 px-2 sm:px-3 py-1.5 rounded-lg flex items-center space-x-1.5 sm:space-x-2 text-xs sm:text-sm font-mono border border-indigo-700/60 shadow-inner">
+                    <i class="fa-regular fa-clock text-amber-400"></i>
+                    <span id="timer">00:00:00</span>
+                </div>
+
+                <!-- Submit Button in Header -->
+                <button id="headerSubmitBtn" onclick="confirmSubmit()" class="bg-emerald-600 hover:bg-emerald-500 text-white px-3 sm:px-4 py-1.5 rounded-lg text-xs sm:text-sm font-semibold transition flex items-center space-x-1 shadow-md ml-auto sm:ml-0">
+                    <i class="fa-solid fa-paper-plane"></i>
+                    <span class="hidden sm:inline">提交试卷</span><span class="sm:hidden">交卷</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="max-w-7xl mx-auto px-3 sm:px-4 py-4 sm:py-6 flex-grow w-full grid grid-cols-1 lg:grid-cols-4 gap-4 sm:gap-6">
+
+        <!-- Left Column: Question Navigator & Weakness Summary Side Panel -->
+        <div class="lg:col-span-1 space-y-4">
+            <!-- Question Grid Card -->
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4 lg:sticky lg:top-24">
+                <div class="flex justify-between items-center mb-3">
+                    <h2 class="font-bold text-slate-800 text-sm flex items-center gap-2">
+                        <i class="fa-solid fa-th text-indigo-600"></i> 答题卡 (<span id="answeredCount">0</span>/50)
+                    </h2>
+                    <div class="flex items-center gap-2">
+                        <span id="scoreBadge" class="hidden text-xs font-bold px-2 py-0.5 rounded bg-slate-100 text-slate-600">
+                            成绩评估
+                        </span>
+                        <button id="navPanelToggle" onclick="toggleNavPanel()" class="lg:hidden text-xs font-semibold text-indigo-700 bg-indigo-50 border border-indigo-100 px-2.5 py-1 rounded-lg flex items-center gap-1">
+                            <span id="navPanelToggleText">展开</span> <i id="navPanelToggleIcon" class="fa-solid fa-chevron-down text-[10px]"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Active Exam Set Title Badge -->
+                <div class="bg-indigo-50 border border-indigo-100 p-2 rounded-lg text-xs font-semibold text-indigo-800 mb-3 flex items-center justify-between">
+                    <span id="activeSetLabel">试卷 1: 综合全真模拟 Set 1</span>
+                    <span class="bg-indigo-200 text-indigo-900 px-1.5 py-0.5 rounded text-[10px]">50题</span>
+                </div>
+
+                <div id="navPanelBody" class="hidden lg:block">
+                <!-- Page Selector Pills -->
+                <div class="flex items-center justify-between bg-slate-100 p-1 rounded-lg mb-3 border border-slate-200 text-xs font-semibold">
+                    <button onclick="switchPage(0)" id="pageTab0" class="flex-1 py-1 text-center rounded-md transition text-slate-600">1-10</button>
+                    <button onclick="switchPage(1)" id="pageTab1" class="flex-1 py-1 text-center rounded-md transition text-slate-600">11-20</button>
+                    <button onclick="switchPage(2)" id="pageTab2" class="flex-1 py-1 text-center rounded-md transition text-slate-600">21-30</button>
+                    <button onclick="switchPage(3)" id="pageTab3" class="flex-1 py-1 text-center rounded-md transition text-slate-600">31-40</button>
+                    <button onclick="switchPage(4)" id="pageTab4" class="flex-1 py-1 text-center rounded-md transition text-slate-600">41-50</button>
+                </div>
+
+                <!-- Status Legend -->
+                <div class="grid grid-cols-2 gap-2 text-xs text-slate-500 mb-3 pb-3 border-b border-slate-100">
+                    <div class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-slate-200 border border-slate-300"></span> 未答</div>
+                    <div class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-indigo-600"></span> 已答</div>
+                    <div class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-amber-400"></span> 已标记</div>
+                    <div id="legendResult" class="hidden flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-rose-500"></span> 错题</div>
+                </div>
+
+                <!-- Grid Buttons (50 buttons) -->
+                <div id="questionGrid" class="grid grid-cols-5 gap-1.5 max-h-[260px] overflow-y-auto custom-scrollbar p-0.5">
+                    <!-- JS generated -->
+                </div>
+
+                </div><!-- /navPanelBody -->
+
+                <!-- Overall Progress -->
+                <div class="mt-3 lg:mt-4 pt-3 border-t border-slate-100 space-y-2">
+                    <div class="flex justify-between text-xs text-slate-500">
+                        <span>及格线: 两科各 18/25 (72%)</span>
+                        <span id="passStatus" class="font-bold text-slate-600">未提交</span>
+                    </div>
+                    <div class="w-full bg-slate-100 rounded-full h-2 overflow-hidden">
+                        <div id="progressBar" class="bg-indigo-600 h-2 w-0 transition-all duration-300"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Weakness Analytics Summary Box (Revealed after Submit) -->
+            <div id="weaknessSideWidget" class="hidden bg-white rounded-xl shadow-sm border border-rose-100 p-4">
+                <h3 class="font-bold text-sm text-slate-800 mb-3 flex items-center gap-2">
+                    <i class="fa-solid fa-chart-pie text-rose-500"></i> 薄弱考点诊断 (Weak Areas)
+                </h3>
+                <div id="categoryBreakdownList" class="space-y-2.5 text-xs">
+                    <!-- Category Accuracy Bars Rendered here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Column: 10 Questions Per Page List -->
+        <div class="lg:col-span-3 space-y-6">
+
+            <!-- Filter / Controls Bar -->
+            <div id="filterBar" class="bg-white p-3.5 rounded-xl border border-slate-200 shadow-sm flex flex-wrap items-center justify-between gap-3">
+                <div class="flex items-center space-x-2">
+                    <button id="btnToggleStudyMode" onclick="toggleStudyMode()" class="text-xs font-bold flex items-center gap-1.5 bg-amber-50 hover:bg-amber-100 text-amber-800 px-3 py-1.5 rounded-lg border border-amber-200 transition">
+                        <i class="fa-solid fa-lightbulb text-amber-500 text-sm"></i>
+                        <span id="studyModeToggleText">开启背题模式 (即时解析)</span>
+                    </button>
+                    <button onclick="resetExam()" class="text-xs text-indigo-600 hover:text-indigo-800 font-bold flex items-center gap-1 bg-indigo-50 px-3 py-1.5 rounded-lg border border-indigo-100">
+                        <i class="fa-solid fa-rotate-right"></i> 重新测试当前套题
+                    </button>
+                </div>
+
+                <!-- Result Filter Buttons (Wrong/Correct revealed after submit) -->
+                <div class="flex items-center space-x-1 bg-slate-50 p-1 rounded-lg border border-slate-200">
+                    <button id="btnFilterAll" onclick="setFilter('all')" class="px-3 py-1 text-xs font-semibold rounded-lg bg-indigo-100 text-indigo-700 font-bold border border-indigo-200">
+                        全部题目
+                    </button>
+                    <button id="btnFilterWrong" onclick="setFilter('wrong')" class="hidden px-3 py-1 text-xs font-semibold rounded-lg text-slate-600 hover:bg-slate-100">
+                        只看错题 (<span id="wrongCount">0</span>)
+                    </button>
+                    <button id="btnFilterCorrect" onclick="setFilter('correct')" class="hidden px-3 py-1 text-xs font-semibold rounded-lg text-slate-600 hover:bg-slate-100">
+                        只看对题 (<span id="correctCount">0</span>)
+                    </button>
+                </div>
+            </div>
+
+            <!-- Page Title Bar -->
+            <div class="flex flex-wrap justify-between items-center gap-2 px-1">
+                <h2 class="text-base sm:text-lg font-extrabold text-slate-800 flex items-center gap-2">
+                    <span class="bg-indigo-600 text-white text-xs px-2.5 py-1 rounded-md" id="currentPageTag">第 1 页</span>
+                    <span id="pageRangeText">展示第 1 - 10 题 (Questions 1 to 10)</span>
+                </h2>
+                <div class="text-xs font-semibold text-slate-500">
+                    共 5 页 (Page <span id="pageNumSpan">1</span> / 5)
+                </div>
+            </div>
+
+            <!-- Container for rendering 10 Question Cards -->
+            <div id="questionsContainer" class="space-y-6">
+                <!-- 10 Question cards will be injected here via JS -->
+            </div>
+
+            <!-- Page Navigation Bottom Controls -->
+            <div class="bg-white p-3 sm:p-4 rounded-xl shadow-sm border border-slate-200 flex flex-wrap items-center justify-between gap-3">
+                <button id="prevPageBtn" onclick="prevPage()" class="px-4 sm:px-5 py-2.5 rounded-lg border border-slate-300 text-slate-700 hover:bg-slate-50 font-semibold text-sm flex items-center gap-2 transition disabled:opacity-40">
+                    <i class="fa-solid fa-chevron-left"></i> 上一页<span class="hidden sm:inline"> (10题)</span>
+                </button>
+                
+                <!-- Page Numbers -->
+                <div class="flex items-center space-x-1 order-first w-full justify-center sm:order-none sm:w-auto" id="paginationDots">
+                    <!-- Page dots -->
+                </div>
+
+                <button id="nextPageBtn" onclick="nextPage()" class="px-4 sm:px-5 py-2.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-sm flex items-center gap-2 transition">
+                    下一页<span class="hidden sm:inline"> (10题)</span> <i class="fa-solid fa-chevron-right"></i>
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <!-- Switch Exam Set Confirmation Modal -->
+    <div id="switchSetModal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-md w-full p-5 sm:p-6 shadow-2xl border border-slate-100 text-center">
+            <div class="w-12 h-12 rounded-full bg-amber-50 text-amber-600 flex items-center justify-center mx-auto mb-4 text-xl">
+                <i class="fa-solid fa-arrows-rotate"></i>
+            </div>
+            <h3 class="text-lg font-bold text-slate-800 mb-2">确认切换考试套题？</h3>
+            <p class="text-sm text-slate-500 mb-6">
+                切换到新的试卷将重置您当前套题的答题进度和计时器。是否确定切换？
+            </p>
+            <div class="flex gap-3 justify-center">
+                <button onclick="cancelSwitchExamSet()" class="px-4 py-2.5 rounded-xl border border-slate-300 text-slate-600 font-medium text-sm hover:bg-slate-50 transition w-1/2">
+                    取消
+                </button>
+                <button onclick="confirmSwitchExamSet()" class="px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-sm transition w-1/2 shadow-md">
+                    确认切换
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Submit Confirmation Modal -->
+    <div id="confirmModal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-md w-full p-5 sm:p-6 shadow-2xl border border-slate-100 text-center">
+            <div class="w-12 h-12 rounded-full bg-indigo-50 text-indigo-600 flex items-center justify-center mx-auto mb-4 text-xl">
+                <i class="fa-solid fa-file-signature"></i>
+            </div>
+            <h3 class="text-lg font-bold text-slate-800 mb-2">确认提交 EPA 608 Type I 试卷？</h3>
+            <p id="unansweredWarning" class="text-sm text-slate-500 mb-6">
+                您还有 <span id="unansweredNum" class="font-bold text-amber-600">0</span> 道题未作答。提交后将生成详细的中英错题解析与薄弱知识点分析报告。
+            </p>
+            <div class="flex gap-3 justify-center">
+                <button onclick="closeModal('confirmModal')" class="px-4 py-2.5 rounded-xl border border-slate-300 text-slate-600 font-medium text-sm hover:bg-slate-50 transition w-1/2">
+                    继续答题
+                </button>
+                <button onclick="gradeExam()" class="px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-sm transition w-1/2 shadow-md">
+                    确认提交
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Enhanced Results & Weakness Diagnostic Modal -->
+    <div id="resultsModal" class="hidden fixed inset-0 bg-slate-900/70 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto">
+        <div class="bg-white rounded-2xl max-w-2xl w-full p-4 sm:p-6 shadow-2xl border border-slate-100 text-center my-4 sm:my-8 max-h-[92vh] overflow-y-auto custom-scrollbar">
+            <div id="resultIcon" class="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-3 text-3xl">
+                <!-- Icon via JS -->
+            </div>
+            <h2 id="resultStatusText" class="text-xl sm:text-2xl font-black mb-1">测试结果统计</h2>
+            <p id="resultSubText" class="text-sm text-slate-500 mb-5">EPA Section 608 Type I Certification Diagnostic Report</p>
+            
+            <div class="grid grid-cols-3 gap-2 sm:gap-3 bg-slate-50 p-3 sm:p-4 rounded-xl border border-slate-200 mb-4 sm:mb-6">
+                <div>
+                    <div class="text-xs text-slate-500 font-medium">综合正确率</div>
+                    <div id="modalScorePercent" class="text-2xl sm:text-3xl font-extrabold text-slate-800">0%</div>
+                </div>
+                <div>
+                    <div class="text-xs text-slate-500 font-medium">答对 / 总题数</div>
+                    <div id="modalScoreCorrect" class="text-2xl sm:text-3xl font-extrabold text-emerald-600">0 / 50</div>
+                </div>
+                <div>
+                    <div class="text-xs text-slate-500 font-medium">官方判定</div>
+                    <div id="modalPassBadge" class="text-sm sm:text-base font-extrabold mt-1">未判定</div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3 mb-6">
+                <div id="modalCoreBox" class="p-3 rounded-xl border text-left">
+                    <div class="text-xs font-semibold text-slate-500">Core 核心部分 · 及格 18/25</div>
+                    <div class="flex items-baseline gap-2 mt-1">
+                        <span id="modalCoreScore" class="text-2xl font-extrabold">0 / 25</span>
+                        <span id="modalCoreBadge" class="text-xs font-bold"></span>
+                    </div>
+                </div>
+                <div id="modalT1Box" class="p-3 rounded-xl border text-left">
+                    <div class="text-xs font-semibold text-slate-500">Type I 小型电器部分 · 及格 18/25</div>
+                    <div class="flex items-baseline gap-2 mt-1">
+                        <span id="modalT1Score" class="text-2xl font-extrabold">0 / 25</span>
+                        <span id="modalT1Badge" class="text-xs font-bold"></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Weak Knowledge Areas Analysis Box -->
+            <div class="bg-rose-50/70 border border-rose-200 p-4 rounded-xl mb-6 text-left">
+                <div class="flex items-center gap-2 text-rose-800 font-bold text-sm mb-2">
+                    <i class="fa-solid fa-triangle-exclamation text-rose-600"></i>
+                    <span>薄弱知识点诊断 (Weakest Knowledge Domain):</span>
+                </div>
+                <div id="weakestDomainCallout" class="text-sm text-rose-900 font-medium mb-3">
+                    计算中...
+                </div>
+                <div class="space-y-2" id="modalCategoryList">
+                    <!-- Progress bars of categories -->
+                </div>
+            </div>
+
+            <div class="flex gap-3">
+                <button onclick="resetExam()" class="px-4 py-2.5 rounded-xl border border-slate-300 text-slate-700 font-semibold text-sm hover:bg-slate-50 transition w-1/2">
+                    <i class="fa-solid fa-rotate-right mr-1"></i> 重新测试此套题
+                </button>
+                <button onclick="closeModal('resultsModal'); setFilter('wrong');" class="px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-sm transition w-1/2 shadow-md">
+                    <i class="fa-solid fa-magnifying-glass-chart mr-1"></i> 逐题排查错题解析
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ---------- 题库：2 套 × 50 题（每套 id 1-25 Core，26-50 Type I）----------
+        const CAT = {
+            REG:   "法规与臭氧层 (Regulations & Ozone)",
+            REC:   "回收·回用·再生 (Recovery / Recycling / Reclaim)",
+            CYL:   "钢瓶·安全·运输 (Cylinders, Safety & Shipping)",
+            BAS:   "制冷基础与制冷剂 (Refrigeration Basics & Refrigerants)",
+            SMALL: "小型电器定义与范围 (Small Appliance Definition & Scope)",
+            REQ:   "回收要求：80/90% 与 4 in Hg (Recovery Requirements)",
+            TOOL:  "回收设备·认证·技术 (Recovery Equipment & Techniques)",
+            SVC1:  "小型电器实操·安全·处置 (Servicing, Safety & Disposal)"
+        };
+        const SET1 = [
+            // ---- Core · REG ----
+            { id: 1, part: "core", category: CAT.REG,
+              questionEn: "Why is the air-conditioning system in a passenger car regulated under Section 609 rather than Section 608 of the Clean Air Act?",
+              questionZh: "为什么乘用车的空调系统归《清洁空气法》609 节而不是 608 节管？",
+              optionsEn: ["Because Section 608 only applies to systems over 50 lb","Because automotive systems use only HFC refrigerants","Because Section 609 covers motor vehicle air conditioning (MVAC) specifically, while 608 covers stationary appliances","Because car systems hold less than 5 lb of refrigerant"],
+              optionsZh: ["因为 608 节只管 50 磅以上的系统","因为汽车系统只用 HFC 制冷剂","因为 609 节专门管机动车空调（MVAC），608 节管固定式设备","因为汽车系统充注量不到 5 磅"],
+              answer: 2,
+              explanationEn: "Section 609 is the MVAC-specific program; 608 covers stationary appliances of any size. Refrigerant type and charge size are not what separates the two sections—a 3 lb window unit is still a 608 small appliance.",
+              explanationZh: "609 节是专门针对机动车空调的项目；608 节管所有固定式设备，不分大小。制冷剂种类和充注量都不是划分依据——3 磅的窗机仍然是 608 节的小型电器。" },
+            { id: 2, part: "core", category: CAT.REG,
+              questionEn: "Which of the following actions has been legal since July 1, 1992, even though knowingly venting CFC and HCFC refrigerants became illegal on that date?",
+              questionZh: "1992 年 7 月 1 日起明知故犯地排放 CFC/HCFC 制冷剂即属违法。下列哪种行为在该日期之后仍然是合法的？",
+              optionsEn: ["Letting a refrigerator's R-12 charge escape to speed up a compressor swap","Releasing the small amount of refrigerant trapped in a hose when disconnecting it after recovery","Bleeding off R-22 to lower a system's high-side pressure","Purging a system with its own refrigerant before brazing"],
+              optionsZh: ["换压缩机时为了省事把冰箱里的 R-12 放掉","回收完成后拆软管时释放软管里残留的微量制冷剂","为了降高压侧压力放掉一些 R-22","焊接前用系统自身的制冷剂吹扫"],
+              answer: 1,
+              explanationEn: "The de minimis release from disconnecting hoses after a good-faith recovery is an allowed exception. The other three are deliberate venting of refrigerant for convenience, which the 1992 prohibition specifically targets.",
+              explanationZh: "认真回收之后拆软管时的微量释放（de minimis）是允许的例外。其余三项都是为了省事而故意排放，正是 1992 年禁令针对的行为。" },
+            { id: 3, part: "core", category: CAT.REG,
+              questionEn: "In which layer of the atmosphere is the ozone layer that protects Earth from ultraviolet radiation located?",
+              questionZh: "保护地球免受紫外线伤害的臭氧层位于大气的哪一层？",
+              optionsEn: ["The stratosphere, roughly 10–30 miles up","The mesosphere","The ionosphere","The troposphere, at ground level"],
+              optionsZh: ["平流层，大约 10–30 英里高","中间层","电离层","对流层，靠近地面"],
+              answer: 0,
+              explanationEn: "Stratospheric ozone absorbs UV-B. Ground-level (tropospheric) ozone is a pollutant, not the protective layer. The mesosphere and ionosphere are higher and contain little ozone.",
+              explanationZh: "平流层臭氧吸收 UV-B。地面（对流层）的臭氧是污染物，不是保护层。中间层和电离层更高，臭氧很少。" },
+            { id: 4, part: "core", category: CAT.REG,
+              questionEn: "HFC refrigerants such as R-134a have an ozone depletion potential of zero. Why are they still regulated under EPA refrigerant management rules?",
+              questionZh: "R-134a 这类 HFC 制冷剂的 ODP 为 0。为什么它们仍然受 EPA 制冷剂管理规则约束？",
+              optionsEn: ["Because HFCs react with mineral oil to form acids","Because HFCs are flammable in air","Because HFCs are toxic at low concentrations","Because HFCs are potent greenhouse gases with high global warming potential"],
+              optionsZh: ["因为 HFC 会和矿物油反应生成酸","因为 HFC 在空气中易燃","因为 HFC 在低浓度下就有毒","因为 HFC 是全球变暖潜能值很高的强温室气体"],
+              answer: 3,
+              explanationEn: "HFCs contain no chlorine, so they do not deplete ozone, but their GWP is in the hundreds to thousands. Common HFCs are neither toxic at service concentrations nor flammable (A1), and they do not form acid with oil.",
+              explanationZh: "HFC 不含氯，不破坏臭氧，但 GWP 高达几百到几千。常见 HFC 在维修浓度下既不毒也不燃（A1），也不会和油生成酸。" },
+            { id: 5, part: "core", category: CAT.REG,
+              questionEn: "In 2026 a technician services an older commercial ice-cream freezer that uses R-22. Production and import of virgin R-22 ended on January 1, 2020. May the technician add R-22 to this unit?",
+              questionZh: "2026 年技师维修一台用 R-22 的老式商用冰淇淋柜。原生 R-22 自 2020 年 1 月 1 日起停止生产和进口。技师还能给它加 R-22 吗？",
+              optionsEn: ["No; R-22 may only be used in equipment built after 2020","No; any use of R-22 became illegal in 2020","Yes, but only with R-22 that was recovered, recycled or reclaimed from existing supply","Yes, but only if the unit is converted to R-410A first"],
+              optionsZh: ["不能，R-22 只能用于 2020 年后生产的设备","不能，2020 年起任何使用 R-22 的行为都违法","能，但只能用回收、回用或再生的存量 R-22","能，但必须先改成 R-410A"],
+              answer: 2,
+              explanationEn: "The 2020 ban stopped production and import of new R-22, not its use. Existing equipment may be serviced with recovered, recycled or reclaimed R-22 indefinitely. Converting to R-410A is a design change, not a legal requirement, and no R-22 equipment has been built for the U.S. market since 2010.",
+              explanationZh: "2020 年禁的是新 R-22 的生产和进口，不是使用。现有设备可以一直用回收、回用或再生的 R-22 维修。改 R-410A 是设计改动不是法律要求，而且 2010 年后美国市场就没有新的 R-22 设备了。" },
+            { id: 6, part: "core", category: CAT.REG,
+              questionEn: "Which Section 608 certification exam may be taken as an open-book, non-proctored (mail-in or online) test?",
+              questionZh: "哪一类 608 认证考试可以采用开卷、非监考（邮寄或在线）的方式？",
+              optionsEn: ["Universal","Type I only","Type II only","Type III only"],
+              optionsZh: ["Universal","只有 Type I","只有 Type II","只有 Type III"],
+              answer: 1,
+              explanationEn: "Only the Type I (small appliance) exam may be administered without a proctor. Type II, Type III and Universal must be proctored, closed-book tests.",
+              explanationZh: "只有 Type I（小型电器）考试可以不设监考。Type II、Type III 和 Universal 都必须是监考闭卷。" },
+            { id: 7, part: "core", category: CAT.REG,
+              questionEn: "A technician holding a Type I card asks whether the 2020 AIM Act changed which certification is needed to buy HFC refrigerant. What is the correct statement?",
+              questionZh: "持 Type I 证的技师问：2020 年 AIM Act 是否改变了购买 HFC 制冷剂所需的认证？正确说法是：",
+              optionsEn: ["AIM Act phases down HFC production, and EPA rules under it rely on the existing Section 608 technician certification for HFC handling","AIM Act removed all certification requirements for HFCs because they do not deplete ozone","AIM Act only applies to automotive HFC refrigerants","AIM Act created a separate HFC-only certification that replaces Section 608"],
+              optionsZh: ["AIM Act 逐步削减 HFC 产量，其下的 EPA 规则沿用现有的 608 技师认证来管 HFC 操作","AIM Act 取消了 HFC 的全部认证要求，因为它不破坏臭氧","AIM Act 只适用于汽车用 HFC","AIM Act 创建了一个单独的 HFC 认证来取代 608"],
+              answer: 0,
+              explanationEn: "The AIM Act gives EPA authority to phase down HFC production and consumption; its technician provisions reference the Section 608 program rather than creating a new certification or eliminating one. It is not limited to vehicles.",
+              explanationZh: "AIM Act 授权 EPA 逐步削减 HFC 的生产与消费；对技师的要求引用 608 项目，既没有新建认证，也没有取消认证，也不限于汽车。" },
+            // ---- Core · REC ----
+            { id: 8, part: "core", category: CAT.REC,
+              questionEn: "Which of the following is NOT required for refrigerant to be considered 'reclaimed'?",
+              questionZh: "下列哪项**不**是制冷剂被视为「再生（reclaimed）」的必要条件？",
+              optionsEn: ["Reprocessing to AHRI Standard 700 purity","Chemical analysis verifying that the standard is met","Processing by an EPA-certified reclaimer","Returning the refrigerant to the appliance it was recovered from"],
+              optionsZh: ["再加工到 AHRI 700 标准纯度","化学分析证明达到该标准","由 EPA 认证的再生商处理","把制冷剂送回原来回收它的那台设备"],
+              answer: 3,
+              explanationEn: "Reclaim means reprocessing to AHRI 700, verifying by lab analysis, and doing so at an EPA-certified reclaimer. Where the refrigerant is used afterward is irrelevant—reclaimed refrigerant may be sold to anyone.",
+              explanationZh: "再生 = 加工到 AHRI 700、实验室分析验证、由 EPA 认证再生商完成。之后用在哪台设备与定义无关——再生后的制冷剂可以卖给任何人。" },
+            { id: 9, part: "core", category: CAT.REC,
+              questionEn: "Why may refrigerant recovered from a customer's rooftop unit be put back into that same customer's other equipment without being reclaimed?",
+              questionZh: "为什么从客户屋顶机回收的制冷剂可以不经再生就灌回同一客户的其他设备？",
+              optionsEn: ["Because reclaiming is only required for CFC refrigerants","Because the refrigerant is automatically clean after passing through recovery equipment","Because the rules restrict the sale or transfer of used refrigerant to a different owner, not reuse by the same owner","Because rooftop units are exempt from all refrigerant purity rules"],
+              optionsZh: ["因为只有 CFC 才需要再生","因为制冷剂经过回收机后自动就干净了","因为规则限制的是把用过的制冷剂卖给或转给**不同**业主，不限制同一业主自用","因为屋顶机不受任何制冷剂纯度规则约束"],
+              answer: 2,
+              explanationEn: "The purity requirement (reclaim to AHRI 700) applies when used refrigerant changes ownership. The same owner accepts the risk of reusing their own refrigerant. Recovery does not clean refrigerant, and the rule applies to all refrigerant types.",
+              explanationZh: "纯度要求（再生到 AHRI 700）在制冷剂换主人时才触发。同一业主自己承担回用风险。回收不等于清洁，而且规则对所有制冷剂都适用。" },
+            { id: 10, part: "core", category: CAT.REC,
+              questionEn: "Why can a cylinder containing a mixture of R-22 and R-410A generally NOT be reclaimed and resold?",
+              questionZh: "为什么一个混装了 R-22 和 R-410A 的钢瓶通常**不能**再生后出售？",
+              optionsEn: ["Because R-410A is flammable when mixed with R-22","Because separating mixed refrigerants back to single-component purity is technically impractical, so the mixture must be sent for destruction","Because reclaimers only accept CFC refrigerants","Because mixed refrigerants are exempt from AHRI 700"],
+              optionsZh: ["因为 R-410A 与 R-22 混合后易燃","因为把混合制冷剂重新分离到单一成分纯度在技术上不可行，只能送去销毁","因为再生商只收 CFC","因为混合制冷剂不受 AHRI 700 约束"],
+              answer: 1,
+              explanationEn: "Reclaimers cannot economically separate blended refrigerants; a mixed cylinder is typically destroyed at the technician's cost. Neither refrigerant is flammable, reclaimers handle all refrigerant classes, and AHRI 700 still applies.",
+              explanationZh: "再生商无法经济地把混合制冷剂分开，混装瓶通常由技师付费销毁。两者都不易燃，再生商处理所有类别，AHRI 700 依然适用。" },
+            { id: 11, part: "core", category: CAT.REC,
+              questionEn: "Which of the following is NOT part of routine maintenance for a self-contained recovery machine?",
+              questionZh: "下列哪项**不**属于自带压缩机式回收机的日常维护？",
+              optionsEn: ["Purging the machine with the next refrigerant to be recovered before each job","Checking that the machine's own compressor oil level is correct","Changing the machine's oil after recovering from a burned-out system","Replacing the inlet filter-drier regularly"],
+              optionsZh: ["每次作业前用下一种要回收的制冷剂吹扫回收机","检查回收机自身压缩机油位是否正确","从烧毁系统回收后更换回收机的油","定期更换进口干燥过滤器"],
+              answer: 0,
+              explanationEn: "A recovery machine is cleared of residual refrigerant by evacuating it, not by purging with refrigerant—purging would vent refrigerant. Oil changes after burnouts, filter-drier replacement and oil-level checks are all standard maintenance.",
+              explanationZh: "回收机的残留制冷剂靠抽真空清除，不能用制冷剂吹扫——吹扫等于排放。烧毁后换油、换干燥过滤器、查油位都是标准维护。" },
+            { id: 12, part: "core", category: CAT.REC,
+              questionEn: "A technician must recover 150 lb of R-404A from a walk-in freezer with a 55 lb receiver full of liquid. Which recovery method removes the bulk of the charge fastest?",
+              questionZh: "技师要从一台带 55 磅满液储液器的冷库回收 150 磅 R-404A。哪种回收方式能最快抽走大部分制冷剂？",
+              optionsEn: ["Slowly bleeding vapor through a filter-drier","Heating the receiver with a torch and recovering vapor","Vapor recovery from the suction line only","Push-pull liquid recovery, moving liquid with the recovery machine's discharge pressure"],
+              optionsZh: ["通过干燥过滤器慢慢放气回收","用焊枪加热储液器再做气态回收","只从吸气管做气态回收","推拉式液态回收，用回收机排气压力把液体推入钢瓶"],
+              answer: 3,
+              explanationEn: "Push-pull moves liquid directly and is the fastest for large liquid volumes; vapor-only recovery of 150 lb would take hours. Bleeding through a drier is not a recovery method, and open-flame heating of a receiver is unsafe.",
+              explanationZh: "推拉法直接搬液体，对大量液态制冷剂最快；150 磅只做气态回收要几个小时。经干燥器放气不是回收方法，明火加热储液器不安全。" },
+            { id: 13, part: "core", category: CAT.REC,
+              questionEn: "Which of the following operations is performed on-site by the technician rather than at an EPA-certified facility?",
+              questionZh: "下列哪项操作是由技师在**现场**完成，而不是在 EPA 认证的工厂完成？",
+              optionsEn: ["Destroying a mixed-refrigerant cylinder","Reclaiming refrigerant to AHRI 700 purity","Recycling refrigerant by passing it through oil separation and filter-driers","Certifying refrigerant purity by chemical analysis"],
+              optionsZh: ["销毁混合制冷剂钢瓶","把制冷剂再生到 AHRI 700 纯度","通过油分离和干燥过滤器对制冷剂进行回用处理","用化学分析认证制冷剂纯度"],
+              answer: 2,
+              explanationEn: "Recycling is field cleaning with oil separators and driers. Reclaim, laboratory certification and destruction all happen at certified facilities.",
+              explanationZh: "回用（recycle）是现场用油分和干燥器清洁。再生、实验室认证和销毁都在认证工厂进行。" },
+            // ---- Core · CYL ----
+            { id: 14, part: "core", category: CAT.CYL,
+              questionEn: "Why is it illegal and dangerous to refill a disposable refrigerant cylinder with recovered refrigerant?",
+              questionZh: "为什么把回收的制冷剂灌进一次性制冷剂钢瓶既违法又危险？",
+              optionsEn: ["Because disposable cylinders are painted the wrong color for recovered refrigerant","Because disposable cylinders are built to DOT specifications for one-time use and are not designed or tested to withstand repeated pressurization","Because recovered refrigerant is always contaminated with oil","Because disposable cylinders are too small to hold a useful amount"],
+              optionsZh: ["因为一次性钢瓶的颜色不符合回收制冷剂的规定","因为一次性钢瓶按 DOT 规格只为单次使用设计，没有设计或测试过反复加压","因为回收的制冷剂总是混有油","因为一次性钢瓶太小装不了多少"],
+              answer: 1,
+              explanationEn: "Disposable (DOT-39) cylinders are non-refillable by design; repeated filling risks rupture. Color and size are not the safety issue, and oil contamination is handled by the recovery machine's separator.",
+              explanationZh: "一次性（DOT-39）钢瓶设计上不可重灌，反复充装有爆裂风险。颜色和大小不是安全问题，油污由回收机的油分处理。" },
+            { id: 15, part: "core", category: CAT.CYL,
+              questionEn: "A recovery cylinder is stamped with a water capacity of 30 lb. What is the maximum weight of refrigerant that may legally be put into it?",
+              questionZh: "一个回收钢瓶标注水容量 30 磅。最多可以合法装入多少制冷剂？",
+              optionsEn: ["24 lb","15 lb","30 lb","27 lb"],
+              optionsZh: ["24 磅","15 磅","30 磅","27 磅"],
+              answer: 0,
+              explanationEn: "Recovery cylinders may be filled to 80% of water capacity by weight: 30 × 0.80 = 24 lb. Filling to 100% or 90% leaves no room for liquid expansion; 50% is unnecessarily conservative.",
+              explanationZh: "回收钢瓶按重量最多充到水容量的 80%：30 × 0.8 = 24 磅。装到 100% 或 90% 没有留液体膨胀空间；50% 过于保守。" },
+            { id: 16, part: "core", category: CAT.CYL,
+              questionEn: "Which of the following is NOT required to be marked on a refillable recovery cylinder?",
+              questionZh: "下列哪项**不**要求标在可重复充装的回收钢瓶上？",
+              optionsEn: ["The tare (empty) weight","The DOT specification number","The date of the last hydrostatic test","The name of the technician who last filled it"],
+              optionsZh: ["皮重（空瓶重）","DOT 规格编号","最近一次水压测试日期","最后一次充装该瓶的技师姓名"],
+              answer: 3,
+              explanationEn: "DOT spec, retest date and tare weight are stamped on the cylinder. The technician's name is kept in the shop's records, not on the cylinder.",
+              explanationZh: "DOT 规格、复检日期和皮重都打在瓶身上。技师姓名记录在店里的档案中，不打在瓶上。" },
+            { id: 17, part: "core", category: CAT.CYL,
+              questionEn: "Why does liquid refrigerant cause frostbite almost instantly when it contacts bare skin?",
+              questionZh: "为什么液态制冷剂接触裸露皮肤几乎立刻造成冻伤？",
+              optionsEn: ["Because the liquid is stored at very high temperature","Because refrigerant is chemically corrosive to skin","Because the liquid flashes to vapor at atmospheric pressure, absorbing latent heat from the skin at temperatures far below freezing","Because refrigerant reacts with sweat to form acid"],
+              optionsZh: ["因为液体储存时温度很高","因为制冷剂对皮肤有化学腐蚀性","因为液体在大气压下瞬间气化，以远低于冰点的温度从皮肤吸收潜热","因为制冷剂与汗液反应生成酸"],
+              answer: 2,
+              explanationEn: "R-22 boils at about −41°F at atmospheric pressure; the phase change pulls heat out of tissue. Common refrigerants are not corrosive, do not form acid with sweat, and are stored at ambient temperature.",
+              explanationZh: "R-22 在大气压下沸点约 −41°F，相变从组织吸热。常见制冷剂不腐蚀皮肤，不与汗液生酸，储存温度是环境温度。" },
+            { id: 18, part: "core", category: CAT.CYL,
+              questionEn: "A chest freezer in a small, unventilated basement has lost its entire charge of R-134a overnight. What is the primary hazard when the technician enters?",
+              questionZh: "小型无通风地下室里的一台卧式冷柜一夜之间漏光了 R-134a。技师进入时的主要危险是什么？",
+              optionsEn: ["Fire, because R-134a is highly flammable","Oxygen displacement, because refrigerant vapor is heavier than air and pools in low areas","Chemical burns from contact with the vapor","Ozone poisoning from the released gas"],
+              optionsZh: ["火灾，因为 R-134a 高度易燃","缺氧，因为制冷剂蒸气比空气重，会在低处积聚","接触蒸气造成化学烧伤","释放气体导致臭氧中毒"],
+              answer: 1,
+              explanationEn: "Refrigerant vapors displace oxygen and collect in low spots like basements. R-134a is A1 (non-flammable), does not burn skin as vapor, and there is no 'ozone poisoning' from refrigerant.",
+              explanationZh: "制冷剂蒸气排挤氧气并在地下室等低处积聚。R-134a 是 A1（不燃），蒸气不烧皮肤，也不存在制冷剂「臭氧中毒」。" },
+            { id: 19, part: "core", category: CAT.CYL,
+              questionEn: "While brazing a line on a system that was not fully recovered, a technician notices a sharp, acrid smell. What has most likely happened?",
+              questionZh: "在一台没有完全回收的系统上焊管时，技师闻到刺鼻的酸味。最可能发生了什么？",
+              optionsEn: ["Residual refrigerant contacted the open flame and decomposed into phosgene and other toxic gases","The nitrogen purge is too strong","The system oil is boiling","The brazing rod is contaminated"],
+              optionsZh: ["残留制冷剂接触明火分解出光气等有毒气体","氮气吹扫压力太大","系统油在沸腾","焊条被污染了"],
+              answer: 0,
+              explanationEn: "Halogenated refrigerants exposed to flame or hot surfaces break down into phosgene, hydrochloric and hydrofluoric acid. The remedy is to stop, ventilate, and fully recover before brazing. Nitrogen is odorless, and boiling oil does not produce an acrid gas.",
+              explanationZh: "卤代制冷剂遇明火或高温分解成光气、盐酸和氢氟酸。正确做法是停下、通风、彻底回收后再焊。氮气无味，油沸腾也不会产生刺鼻气体。" },
+            // ---- Core · BAS ----
+            { id: 20, part: "core", category: CAT.BAS,
+              questionEn: "Why does the condenser of a refrigeration system give off heat?",
+              questionZh: "为什么制冷系统的冷凝器会向外放热？",
+              optionsEn: ["Because the expansion valve throttles refrigerant there","Because the refrigerant is absorbing heat from the surrounding air","Because the compressor motor is mounted inside it","Because high-pressure refrigerant vapor is changing state to liquid and must reject the latent heat it absorbed in the evaporator plus the heat of compression"],
+              optionsZh: ["因为膨胀阀在这里节流","因为制冷剂在这里从周围空气吸热","因为压缩机电机装在里面","因为高压制冷剂蒸气在这里冷凝成液体，必须放出它在蒸发器吸收的潜热加上压缩热"],
+              answer: 3,
+              explanationEn: "Condensation releases latent heat; the condenser also rejects the work added by the compressor. The compressor is a separate component, the expansion device is downstream, and heat absorption happens in the evaporator.",
+              explanationZh: "冷凝放出潜热，冷凝器还要排掉压缩机做的功。压缩机是独立部件，膨胀装置在下游，吸热发生在蒸发器。" },
+            { id: 21, part: "core", category: CAT.BAS,
+              questionEn: "Why does an HCFC such as R-22 have a much lower ozone depletion potential than a CFC such as R-12?",
+              questionZh: "为什么 R-22 这类 HCFC 的臭氧消耗潜能值远低于 R-12 这类 CFC？",
+              optionsEn: ["Because HCFCs are used only in small appliances","Because HCFCs contain no chlorine at all","Because the hydrogen atom in an HCFC makes the molecule less stable, so most of it breaks down in the lower atmosphere before reaching the stratosphere","Because HCFCs are heavier than air and never rise"],
+              optionsZh: ["因为 HCFC 只用于小型电器","因为 HCFC 完全不含氯","因为 HCFC 分子里的氢原子使其不稳定，大部分在到达平流层前就在低层大气分解了","因为 HCFC 比空气重不会上升"],
+              answer: 2,
+              explanationEn: "HCFCs do contain chlorine, but the C–H bond lets them degrade in the troposphere, so less chlorine reaches the ozone layer. All refrigerant gases mix into the atmosphere regardless of density, and usage sector has nothing to do with ODP.",
+              explanationZh: "HCFC 含氯，但 C–H 键让它在对流层就降解，到达臭氧层的氯变少。所有制冷剂气体都会混入大气，与密度无关；使用领域与 ODP 无关。" },
+            { id: 22, part: "core", category: CAT.BAS,
+              questionEn: "Which of the following lubricants is NOT compatible with R-134a in a sealed system?",
+              questionZh: "下列哪种润滑油在密封系统中与 R-134a **不**兼容？",
+              optionsEn: ["Polyalkylene glycol (PAG) oil","Mineral oil","Both POE and PAG are incompatible","Polyolester (POE) oil"],
+              optionsZh: ["聚烷基乙二醇油（PAG）","矿物油","POE 和 PAG 都不兼容","聚酯油（POE）"],
+              answer: 1,
+              explanationEn: "Mineral oil does not mix with HFCs; it settles in the evaporator and starves the compressor. POE is the standard R-134a oil in stationary equipment and PAG is used in automotive systems—both are compatible.",
+              explanationZh: "矿物油与 HFC 不互溶，会沉在蒸发器里导致压缩机缺油。固定设备用 POE，汽车用 PAG，两者都与 R-134a 兼容。" },
+            { id: 23, part: "core", category: CAT.BAS,
+              questionEn: "Why must the refrigerant leaving the evaporator have some superheat before it reaches the compressor?",
+              questionZh: "为什么离开蒸发器的制冷剂在到达压缩机前必须有一定的过热度？",
+              optionsEn: ["To guarantee that only vapor, not liquid, enters the compressor, since liquid is incompressible and can damage it","To raise the condensing pressure","To keep the oil from returning to the compressor","To increase the cooling capacity of the evaporator"],
+              optionsZh: ["为了保证进入压缩机的只有蒸气没有液体，因为液体不可压缩会损坏压缩机","为了提高冷凝压力","为了不让油回到压缩机","为了提高蒸发器的制冷量"],
+              answer: 0,
+              explanationEn: "Superheat proves all liquid has boiled off. Excess superheat actually reduces capacity, it does not raise condensing pressure, and oil return is a separate concern.",
+              explanationZh: "过热度证明液体已全部蒸发。过热度太大反而降低制冷量；它不提高冷凝压力；回油是另一回事。" },
+            { id: 24, part: "core", category: CAT.BAS,
+              questionEn: "A technician replaces a failed compressor on a small split system. Should the filter-drier also be replaced?",
+              questionZh: "技师给一台小型分体机换了坏掉的压缩机。干燥过滤器也要换吗？",
+              optionsEn: ["Only if the system uses R-410A","Only if the compressor was replaced under warranty","No, driers last the life of the system","Yes; opening the system admits moisture and the old drier may already be saturated or contaminated"],
+              optionsZh: ["只有 R-410A 系统才需要","只有保修更换压缩机时才需要","不用，干燥器和系统同寿命","要换；系统打开会进水分，旧干燥器可能已经饱和或被污染"],
+              answer: 3,
+              explanationEn: "Any time the sealed system is opened, the drier should be replaced to capture moisture and debris. This applies to every refrigerant and is unrelated to warranty status.",
+              explanationZh: "只要打开密封系统就该换干燥器，以捕获水分和杂质。对所有制冷剂都适用，与保修无关。" },
+            { id: 25, part: "core", category: CAT.BAS,
+              questionEn: "Under ASHRAE Standard 34, what safety classification is assigned to isobutane (R-600a), now common in household refrigerators?",
+              questionZh: "按 ASHRAE 34 标准，如今家用冰箱常用的异丁烷（R-600a）属于哪个安全等级？",
+              optionsEn: ["A1 — lower toxicity, no flame propagation","A2L — lower toxicity, mildly flammable","A3 — lower toxicity, highly flammable","B2 — higher toxicity, flammable"],
+              optionsZh: ["A1——低毒、不燃","A2L——低毒、弱可燃","A3——低毒、高度易燃","B2——高毒、可燃"],
+              answer: 2,
+              explanationEn: "Hydrocarbons like R-600a and R-290 are A3. A1 is R-134a/R-410A, A2L is R-32/R-1234yf, and B2 refers to ammonia-type toxicity classes.",
+              explanationZh: "R-600a、R-290 等碳氢制冷剂是 A3。A1 是 R-134a/R-410A，A2L 是 R-32/R-1234yf，B2 是氨这类高毒等级。" },
+            // ---- Type I · SMALL ----
+            { id: 26, part: "type1", category: CAT.SMALL,
+              questionEn: "Under EPA regulations, a 'small appliance' is one that is fully manufactured, charged and hermetically sealed in a factory with how much refrigerant or less?",
+              questionZh: "按 EPA 规定，「小型电器」指在工厂内完整制造、充注并密封，制冷剂充注量不超过多少的设备？",
+              optionsEn: ["2 lb","5 lb","15 lb","50 lb"],
+              optionsZh: ["2 磅","5 磅","15 磅","50 磅"],
+              answer: 1,
+              explanationEn: "The definition is 5 lb or less. 15 lb is the limit for using system-dependent recovery equipment, and 50 lb is the threshold for leak-repair rules.",
+              explanationZh: "定义是 5 磅以下。15 磅是可用系统依赖式回收机的上限，50 磅是泄漏维修规则的门槛。" },
+            { id: 27, part: "type1", category: CAT.SMALL,
+              questionEn: "Which of the following is NOT a small appliance under Section 608?",
+              questionZh: "下列哪种设备**不**属于 608 节定义的小型电器？",
+              optionsEn: ["A residential split-system heat pump with a 7 lb charge","A household dehumidifier","A vending machine with a 12 oz factory charge","A packaged terminal air conditioner (PTAC) with a 3 lb charge"],
+              optionsZh: ["充注 7 磅的家用分体热泵","家用除湿机","出厂充注 12 盎司的自动售货机","充注 3 磅的整体式窗式空调（PTAC）"],
+              answer: 0,
+              explanationEn: "A split system is field-connected and charged, and 7 lb exceeds 5 lb—it is a Type II appliance. Dehumidifiers, vending machines and PTACs under 5 lb are all classic small appliances.",
+              explanationZh: "分体机在现场连接充注，而且 7 磅超过 5 磅——属于 Type II 设备。除湿机、售货机、5 磅以下的 PTAC 都是典型小型电器。" },
+            { id: 28, part: "type1", category: CAT.SMALL,
+              questionEn: "A hotel asks a Type I-certified technician to service a PTAC unit whose nameplate shows a factory charge of 6 lb of R-410A. May the technician do the work?",
+              questionZh: "酒店请一名持 Type I 证的技师维修一台 PTAC，铭牌显示出厂充注 6 磅 R-410A。技师可以做吗？",
+              optionsEn: ["No; PTACs require Type III certification","Yes, because PTACs are always small appliances","Yes, because R-410A does not deplete ozone","No; a 6 lb charge exceeds the 5 lb small-appliance limit, so Type II or Universal certification is required"],
+              optionsZh: ["不可以；PTAC 需要 Type III","可以，PTAC 总是小型电器","可以，R-410A 不破坏臭氧层","不可以；6 磅超过 5 磅小型电器上限，需要 Type II 或 Universal"],
+              answer: 3,
+              explanationEn: "Classification depends on the charge, not the product name. Over 5 lb of a high-pressure refrigerant makes it a Type II appliance. Type III is for low-pressure chillers, and refrigerant ODP never changes the certification required.",
+              explanationZh: "分类看充注量，不看产品名称。高压制冷剂超过 5 磅就是 Type II 设备。Type III 是低压冷水机组，制冷剂 ODP 从不改变所需认证。" },
+            { id: 29, part: "type1", category: CAT.SMALL,
+              questionEn: "For a Type I certification exam given by mail or online without a proctor, what minimum score is required on each section?",
+              questionZh: "以邮寄或在线非监考方式进行的 Type I 认证考试，每部分至少要答对多少才算通过？",
+              optionsEn: ["72% (18 of 25)","80% (20 of 25)","84% (21 of 25)","70% (18 of 25)"],
+              optionsZh: ["72%（25 题对 18 题）","80%（25 题对 20 题）","84%（25 题对 21 题）","70%（25 题对 18 题）"],
+              answer: 2,
+              explanationEn: "Non-proctored Type I exams require 84% (21 of 25) on both the Core and Type I sections. Proctored exams require 72% (18 of 25). 70% and 80% are not EPA thresholds.",
+              explanationZh: "非监考 Type I 考试要求 Core 和 Type I 两部分各 84%（21/25）。监考考试要求 72%（18/25）。70% 和 80% 都不是 EPA 的标准。" },
+            { id: 30, part: "type1", category: CAT.SMALL,
+              questionEn: "A window air conditioner uses R-410A, which is not an ozone-depleting refrigerant. What certification does a technician need to recover refrigerant from it?",
+              questionZh: "一台窗式空调用的是不破坏臭氧层的 R-410A。技师从它回收制冷剂需要什么认证？",
+              optionsEn: ["None, because R-410A is an HFC","Type I or Universal, because a window unit is a small appliance regardless of refrigerant","Type II, because R-410A is a high-pressure refrigerant","Only a state HVAC license"],
+              optionsZh: ["不需要，因为 R-410A 是 HFC","Type I 或 Universal，因为窗机是小型电器，与制冷剂种类无关","Type II，因为 R-410A 是高压制冷剂","只需要州的 HVAC 执照"],
+              answer: 1,
+              explanationEn: "Certification follows the appliance type: a factory-sealed unit with 5 lb or less is a small appliance. Section 608 certification is required for HFCs too, and 'high-pressure' alone does not make it Type II if it is a small appliance.",
+              explanationZh: "认证跟着设备类型走：出厂密封且 ≤5 磅就是小型电器。HFC 也需要 608 认证；只要是小型电器，「高压」本身不会让它变成 Type II。" },
+            { id: 31, part: "type1", category: CAT.SMALL,
+              questionEn: "Which sequence correctly shows the refrigerants used in household refrigerators from the 1980s to today?",
+              questionZh: "下列哪个顺序正确表示了家用冰箱从 1980 年代到今天所用的制冷剂？",
+              optionsEn: ["R-12 → R-134a → R-600a","R-502 → R-404A → R-448A","R-11 → R-123 → R-1233zd","R-22 → R-410A → R-32"],
+              optionsZh: ["R-12 → R-134a → R-600a","R-502 → R-404A → R-448A","R-11 → R-123 → R-1233zd","R-22 → R-410A → R-32"],
+              answer: 0,
+              explanationEn: "Domestic refrigerators moved from CFC R-12 to HFC R-134a in the mid-1990s and increasingly to hydrocarbon R-600a. The R-22 line is residential AC, the R-502 line is commercial refrigeration, and the R-11 line is low-pressure chillers.",
+              explanationZh: "家用冰箱 1990 年代中期从 CFC R-12 换到 HFC R-134a，如今越来越多用碳氢 R-600a。R-22 那条线是家用空调，R-502 那条是商用制冷，R-11 那条是低压冷水机组。" },
+            // ---- Type I · REQ ----
+            { id: 32, part: "type1", category: CAT.REQ,
+              questionEn: "When recovering from a small appliance with recovery equipment manufactured after November 15, 1993, what percentage of the charge must be recovered if the appliance compressor is operating?",
+              questionZh: "用 1993 年 11 月 15 日后生产的回收机从小型电器回收，若电器压缩机能运转，必须回收充注量的百分之几？",
+              optionsEn: ["100%","70%","80%","90%"],
+              optionsZh: ["100%","70%","80%","90%"],
+              answer: 3,
+              explanationEn: "Post-1993 equipment: 90% with an operating compressor, 80% with a non-operating compressor. 100% is not achievable in practice, and 70% is not a regulatory figure.",
+              explanationZh: "1993 年后的回收机：压缩机能转 90%，不能转 80%。100% 实际做不到，70% 不是法规数字。" },
+            { id: 33, part: "type1", category: CAT.REQ,
+              questionEn: "A shop still uses a small-appliance recovery unit it purchased in 1991. The freezer being serviced has a working compressor. What is the minimum recovery required?",
+              questionZh: "某店仍在用 1991 年购买的小型电器回收机。待修冷柜的压缩机能正常运转。最低回收要求是多少？",
+              optionsEn: ["The unit may not be used at all","90% of the charge","80% of the charge, or evacuation to 4 in Hg vacuum","50% of the charge"],
+              optionsZh: ["这台回收机根本不能用","充注量的 90%","充注量的 80%，或抽到 4 in Hg 真空","充注量的 50%"],
+              answer: 2,
+              explanationEn: "Grandfathered (pre-November 15, 1993) recovery equipment must achieve 80% regardless of compressor status, or 4 in Hg. The 90% figure applies only to post-1993 equipment with an operating compressor. Old equipment remains legal to use.",
+              explanationZh: "1993-11-15 之前的旧回收机不管压缩机转不转都是 80%，或者抽到 4 in Hg。90% 只适用于 1993 年后设备且压缩机能转。旧设备仍可合法使用。" },
+            { id: 34, part: "type1", category: CAT.REQ,
+              questionEn: "Why do the small-appliance rules allow evacuation to 4 in Hg vacuum as an alternative to recovering a fixed percentage of the charge?",
+              questionZh: "为什么小型电器规则允许用「抽到 4 in Hg 真空」来替代「回收固定百分比的充注量」？",
+              optionsEn: ["Because 4 in Hg is a deeper vacuum than any recovery machine can reach","Because the actual charge remaining in a used appliance is often unknown, so a measurable vacuum level provides an objective alternative standard","Because 4 in Hg removes 100% of the refrigerant","Because percentage recovery only applies to Type II appliances"],
+              optionsZh: ["因为 4 in Hg 比任何回收机能达到的真空都深","因为旧电器里实际剩多少制冷剂往往不清楚，一个可测量的真空度提供了客观的替代标准","因为 4 in Hg 能抽出 100% 的制冷剂","因为百分比回收只适用于 Type II 设备"],
+              answer: 1,
+              explanationEn: "A leaking or partially charged appliance makes percentage-of-charge impossible to verify; a vacuum gauge reading is objective. 4 in Hg is a shallow vacuum, does not remove all refrigerant, and percentage recovery is exactly the small-appliance standard.",
+              explanationZh: "漏过或半缺氟的电器无法核实百分比；真空表读数是客观的。4 in Hg 是很浅的真空，抽不干净全部制冷剂；百分比回收恰恰就是小型电器的标准。" },
+            { id: 35, part: "type1", category: CAT.REQ,
+              questionEn: "Which of the following requirements does NOT apply to a household refrigerator containing 6 oz of R-134a?",
+              questionZh: "下列哪项要求**不**适用于一台含 6 盎司 R-134a 的家用冰箱？",
+              optionsEn: ["Leaks exceeding a set annual rate must be repaired within 30 days","Technicians opening the sealed system must hold Section 608 certification","Refrigerant must be recovered before the appliance is disposed of","Venting refrigerant during servicing is prohibited"],
+              optionsZh: ["年泄漏率超标必须在 30 天内修复","打开密封系统的技师必须持 608 认证","报废前必须回收制冷剂","维修中禁止排放制冷剂"],
+              answer: 0,
+              explanationEn: "Mandatory leak-repair rates apply only to appliances with 50 lb or more of refrigerant. Recovery before disposal, the venting prohibition and technician certification all apply to small appliances.",
+              explanationZh: "强制泄漏维修率只适用于 50 磅以上的设备。报废前回收、禁止排放、技师持证都适用于小型电器。" },
+            { id: 36, part: "type1", category: CAT.REQ,
+              questionEn: "A scrap-metal recycler receives a refrigerator with its refrigerant still inside and no tag or paperwork. Who is responsible for recovering the refrigerant before the unit is crushed?",
+              questionZh: "废金属回收站收到一台还带着制冷剂、没有标签也没有文件的冰箱。压扁之前谁负责回收制冷剂？",
+              optionsEn: ["The refrigerator manufacturer","No one; the recycler may crush it as received","The original homeowner, who must be tracked down","The recycler, as the final person in the disposal chain, must recover it or verify it was already recovered"],
+              optionsZh: ["冰箱制造商","没人负责，回收站可以直接压扁","原房主，必须把他找出来","回收站作为处置链上的最后一人，必须回收或核实已回收"],
+              answer: 3,
+              explanationEn: "The final disposer is responsible for ensuring refrigerant has been removed. Without a signed statement from whoever removed it, the recycler must recover it themselves. Crushing with refrigerant inside is illegal venting.",
+              explanationZh: "最终处置者负责确保制冷剂已被抽出。没有抽取人的签字声明，回收站就必须自己回收。带着制冷剂压扁属于违法排放。" },
+            { id: 37, part: "type1", category: CAT.REQ,
+              questionEn: "A technician is using system-dependent (passive) recovery on a refrigerator whose compressor will not start. Which action helps push the remaining refrigerant out of the system?",
+              questionZh: "技师用系统依赖式（被动）回收机处理一台压缩机无法启动的冰箱。下列哪种做法有助于把剩余制冷剂推出系统？",
+              optionsEn: ["Running a vacuum pump directly into a pressurized recovery cylinder","Adding nitrogen to the low side to raise pressure","Gently heating and tapping the compressor to free refrigerant trapped in the oil","Opening the system to atmosphere to equalize"],
+              optionsZh: ["把真空泵直接接到带压的回收钢瓶上","往低压侧充氮气升压","轻轻加热并敲击压缩机，让溶在油里的制冷剂释放出来","把系统开放到大气以平衡压力"],
+              answer: 2,
+              explanationEn: "Heating and tapping the compressor releases refrigerant dissolved in the oil. Nitrogen would contaminate the recovered refrigerant, opening to atmosphere is venting, and a vacuum pump may only discharge into a non-pressurized container.",
+              explanationZh: "加热敲击压缩机能释放溶在油里的制冷剂。充氮会污染回收的制冷剂，开放到大气就是排放，真空泵只能排到非压力容器。" },
+            { id: 38, part: "type1", category: CAT.REQ,
+              questionEn: "A refrigerator nameplate reads 'CHARGE: 6.0 OZ R-134a'. Using a post-1993 recovery unit with the compressor running, what is the minimum amount that must be recovered?",
+              questionZh: "冰箱铭牌标注「充注量：6.0 盎司 R-134a」。用 1993 年后的回收机、压缩机运转时，最少要回收多少？",
+              optionsEn: ["4.8 oz","5.4 oz","6.0 oz","3.0 oz"],
+              optionsZh: ["4.8 盎司","5.4 盎司","6.0 盎司","3.0 盎司"],
+              answer: 1,
+              explanationEn: "90% of 6.0 oz = 5.4 oz. 4.8 oz would be the 80% figure (compressor not running or pre-1993 equipment); 6.0 oz is 100%, which is not required; 3.0 oz is only 50%.",
+              explanationZh: "6.0 × 90% = 5.4 盎司。4.8 盎司是 80%（压缩机不转或旧回收机）；6.0 盎司是 100%，不要求；3.0 盎司只有 50%。" },
+            // ---- Type I · TOOL ----
+            { id: 39, part: "type1", category: CAT.TOOL,
+              questionEn: "Recovery equipment used on small appliances and manufactured after which date must be certified by an EPA-approved laboratory?",
+              questionZh: "在哪个日期之后生产的、用于小型电器的回收设备必须经 EPA 认可的实验室认证？",
+              optionsEn: ["November 15, 1993","November 15, 1995","January 1, 2020","July 1, 1992"],
+              optionsZh: ["1993 年 11 月 15 日","1995 年 11 月 15 日","2020 年 1 月 1 日","1992 年 7 月 1 日"],
+              answer: 0,
+              explanationEn: "November 15, 1993 is the recovery-equipment certification date. July 1, 1992 is the venting ban, November 15, 1995 extended the ban to substitutes, and 2020 is the R-22 production phase-out.",
+              explanationZh: "1993-11-15 是回收设备认证日期。1992-07-01 是禁排令，1995-11-15 是禁排扩展到替代品，2020 是 R-22 停产。" },
+            { id: 40, part: "type1", category: CAT.TOOL,
+              questionEn: "What distinguishes a 'system-dependent' (passive) recovery device from a 'self-contained' (active) one?",
+              questionZh: "「系统依赖式」（被动）回收设备与「自带压缩机式」（主动）回收设备的区别是什么？",
+              optionsEn: ["System-dependent devices are used only on Type II appliances","Self-contained devices cannot recover liquid refrigerant","A system-dependent device has its own compressor; a self-contained device does not","A system-dependent device relies on the appliance's compressor or internal pressure to move refrigerant; a self-contained device has its own pump or compressor"],
+              optionsZh: ["系统依赖式只用于 Type II 设备","自带式无法回收液态制冷剂","系统依赖式自带压缩机，自带式没有","系统依赖式靠电器自身压缩机或系统内压推动制冷剂；自带式有自己的泵或压缩机"],
+              answer: 3,
+              explanationEn: "Passive devices borrow the appliance's compressor or pressure difference; active devices bring their own. Passive devices are limited to appliances with 15 lb or less, and active machines handle liquid via push-pull or liquid ports.",
+              explanationZh: "被动式借用电器压缩机或压差；主动式自带动力。被动式只能用于 ≤15 磅设备；主动式可通过推拉或液体口回收液态制冷剂。" },
+            { id: 41, part: "type1", category: CAT.TOOL,
+              questionEn: "System-dependent (passive) recovery equipment may be used only on appliances that normally contain how much refrigerant or less?",
+              questionZh: "系统依赖式（被动）回收设备只能用于正常充注量不超过多少的设备？",
+              optionsEn: ["200 lb","5 lb","15 lb","50 lb"],
+              optionsZh: ["200 磅","5 磅","15 磅","50 磅"],
+              answer: 2,
+              explanationEn: "The passive-recovery limit is 15 lb. 5 lb defines a small appliance, 50 lb triggers leak-repair rules, and 200 lb is a Type II evacuation-table threshold.",
+              explanationZh: "被动回收上限是 15 磅。5 磅定义小型电器，50 磅触发泄漏维修规则，200 磅是 Type II 真空表的分界。" },
+            { id: 42, part: "type1", category: CAT.TOOL,
+              questionEn: "A technician is recovering from a refrigerator whose compressor runs normally, using a system-dependent recovery bag. Where should the access fitting be connected?",
+              questionZh: "技师用系统依赖式回收袋从一台压缩机正常运转的冰箱回收。接口应接在哪里？",
+              optionsEn: ["The low side only, with the compressor off","The high side (discharge/process tube), letting the running compressor push refrigerant out","Both sides simultaneously, with the compressor off","The evaporator drain line"],
+              optionsZh: ["只接低压侧，压缩机关闭","接高压侧（排气/工艺管），让运转的压缩机把制冷剂推出来","高低压侧同时接，压缩机关闭","接蒸发器排水管"],
+              answer: 1,
+              explanationEn: "With a working compressor, run it and recover from the high side so the compressor does the pushing. Connecting to both sides is the technique for a non-operating compressor. The drain line carries condensate, not refrigerant.",
+              explanationZh: "压缩机能转就让它运转，从高压侧回收，由压缩机推。高低压侧同时接是压缩机不转时的做法。排水管走的是冷凝水，不是制冷剂。" },
+            { id: 43, part: "type1", category: CAT.TOOL,
+              questionEn: "Why must a piercing-type access valve be removed from a small appliance after the service is complete?",
+              questionZh: "为什么维修完成后必须把穿刺式接口阀从小型电器上拆掉？",
+              optionsEn: ["Because the rubber seal in a piercing valve deteriorates and becomes a permanent leak source if left on the system","Because piercing valves are illegal under any circumstances","Because leaving it on would void the refrigerant's AHRI 700 certification","Because the valve is needed for the next job"],
+              optionsZh: ["因为穿刺阀里的橡胶密封会老化，留在系统上会变成永久泄漏点","因为穿刺阀在任何情况下都是非法的","因为留着会使制冷剂的 AHRI 700 认证失效","因为下一个活还要用这个阀"],
+              answer: 0,
+              explanationEn: "Piercing valves are a temporary access method; their gaskets fail over time. The fix is to braze on a permanent process-tube fitting or remove and seal the pierced spot. They are legal for temporary use, and refrigerant certification is unrelated.",
+              explanationZh: "穿刺阀是临时接入手段，垫片会逐渐失效。正确做法是焊上永久的工艺管接头或拆除并封堵穿刺点。临时使用是合法的，与制冷剂认证无关。" },
+            { id: 44, part: "type1", category: CAT.TOOL,
+              questionEn: "A technician has one 30 lb recovery cylinder on the truck. The first job is an R-12 freezer and the second is an R-134a refrigerator. What is the correct practice?",
+              questionZh: "技师车上只有一个 30 磅回收钢瓶。第一个活是 R-12 冷柜，第二个是 R-134a 冰箱。正确做法是？",
+              optionsEn: ["Recover the R-134a first, then the R-12 on top of it","Recover both into the same cylinder since both are used in refrigerators","Recover the R-12 into the cylinder and vent the R-134a since it is not ozone-depleting","Use a separate, properly labeled cylinder for each refrigerant; never mix refrigerants in a recovery cylinder"],
+              optionsZh: ["先回收 R-134a，再把 R-12 回收在上面","都回收到同一个瓶里，反正都是冰箱用的","R-12 回收进瓶，R-134a 放掉，因为它不破坏臭氧","每种制冷剂用单独的、正确标识的钢瓶；回收瓶里绝不混装制冷剂"],
+              answer: 3,
+              explanationEn: "Mixed refrigerant cannot be reclaimed and must be destroyed at cost. Venting any refrigerant, including HFCs, is illegal. Order of recovery does not change the fact that the result is a mixture.",
+              explanationZh: "混合制冷剂无法再生，只能付费销毁。排放任何制冷剂（包括 HFC）都违法。先后顺序不改变混合的结果。" },
+            // ---- Type I · SVC1 ----
+            { id: 45, part: "type1", category: CAT.SVC1,
+              questionEn: "Why must a technician never use oxygen to pressurize a refrigeration system for leak testing?",
+              questionZh: "为什么技师绝对不能用氧气给制冷系统打压检漏？",
+              optionsEn: ["Because oxygen corrodes copper tubing instantly","Because oxygen is too expensive","Because oxygen under pressure reacts violently with the refrigerant oil in the system and can explode","Because oxygen will dissolve into the refrigerant and cannot be removed"],
+              optionsZh: ["因为氧气会瞬间腐蚀铜管","因为氧气太贵","因为压力下的氧气与系统中的润滑油剧烈反应，可能爆炸","因为氧气会溶入制冷剂无法去除"],
+              answer: 2,
+              explanationEn: "Compressed oxygen plus oil is an explosion hazard; the same applies to compressed air, which contains oxygen. Only dry nitrogen should be used. Cost, solubility and corrosion are not the reason.",
+              explanationZh: "压缩氧气加油是爆炸危险，压缩空气含氧同理。只能用干氮气。价格、溶解和腐蚀都不是原因。" },
+            { id: 46, part: "type1", category: CAT.SVC1,
+              questionEn: "Before opening the sealed system of a refrigerator charged with R-600a (isobutane), what preparation is essential?",
+              questionZh: "在打开一台充注 R-600a（异丁烷）冰箱的密封系统之前，必须做什么准备？",
+              optionsEn: ["Pressurize the system with oxygen to displace the flammable gas","Ensure good ventilation, remove all ignition sources, and use recovery equipment rated for flammable refrigerants","Warm the compressor with a propane torch to speed recovery","No special preparation; R-600a is handled like R-134a"],
+              optionsZh: ["用氧气给系统加压以排出可燃气体","确保通风良好、清除所有火源，并使用适用于可燃制冷剂的回收设备","用丙烷焊枪加热压缩机以加快回收","不需要特殊准备，R-600a 和 R-134a 一样处理"],
+              answer: 1,
+              explanationEn: "R-600a is an A3 refrigerant. Ventilation, no ignition sources and spark-proof equipment are mandatory. Oxygen makes things worse, an open flame near a hydrocarbon is the ignition source you are trying to avoid, and it is not handled like an A1 refrigerant.",
+              explanationZh: "R-600a 是 A3 制冷剂。通风、无火源、防爆设备是必须的。氧气只会更危险，碳氢旁边用明火正是要避免的点火源，它不能像 A1 制冷剂那样随意处理。" },
+            { id: 47, part: "type1", category: CAT.SVC1,
+              questionEn: "What type of lubricant is normally used with R-134a in a domestic refrigerator compressor?",
+              questionZh: "家用冰箱压缩机在使用 R-134a 时通常配什么润滑油？",
+              optionsEn: ["Polyolester (POE) oil","Silicone oil","Mineral oil","Alkylbenzene oil"],
+              optionsZh: ["聚酯油（POE）","硅油","矿物油","烷基苯油"],
+              answer: 0,
+              explanationEn: "R-134a requires POE oil for miscibility. Mineral oil is for R-12, alkylbenzene is used with some HCFC retrofits, and silicone oil is not a refrigeration lubricant.",
+              explanationZh: "R-134a 需要 POE 油以保证互溶。矿物油配 R-12，烷基苯油用于某些 HCFC 改造，硅油不是制冷润滑油。" },
+            { id: 48, part: "type1", category: CAT.SVC1,
+              questionEn: "A refrigerator cools normally for an hour after start-up, then the evaporator warms up and the compressor runs continuously. After the unit is unplugged for a few hours it works again briefly. What is the most likely cause?",
+              questionZh: "一台冰箱开机后一小时内制冷正常，之后蒸发器回暖、压缩机不停机。断电几小时后又能短暂正常工作。最可能的原因是？",
+              optionsEn: ["An overcharge of refrigerant","A failed defrost heater","A worn compressor valve","Moisture in the system freezing at the capillary tube outlet, causing an intermittent ice restriction"],
+              optionsZh: ["制冷剂过充","化霜加热器坏了","压缩机阀片磨损","系统内水分在毛细管出口结冰，造成间歇性冰堵"],
+              answer: 3,
+              explanationEn: "The classic ice-restriction pattern: works until moisture freezes at the cap-tube outlet, then clears when the system warms. A worn valve or overcharge would not self-correct after a rest, and a defrost heater failure causes frost buildup, not this cycle.",
+              explanationZh: "典型冰堵：工作到水分在毛细管出口结冰为止，系统回温后又通了。阀片磨损或过充不会休息后自愈；化霜器坏是结霜，不是这种循环。" },
+            { id: 49, part: "type1", category: CAT.SVC1,
+              questionEn: "A salvage yard is about to crush a batch of old refrigerators. What must happen first?",
+              questionZh: "废品场准备压扁一批旧冰箱。之前必须先做什么？",
+              optionsEn: ["The refrigerators must be at least 20 years old","Nothing, as long as the doors are removed","The refrigerant must be recovered by a certified technician or a recovery process, and the yard must keep a record of it","The compressors must be drained of oil only"],
+              optionsZh: ["冰箱必须至少 20 年以上","不用做什么，只要把门拆掉就行","必须由持证技师或回收流程先回收制冷剂，并且废品场要保存相关记录","只需把压缩机里的油放掉"],
+              answer: 2,
+              explanationEn: "Crushing an appliance with refrigerant inside is venting. The final disposer must recover or obtain a signed statement that recovery was done, and keep it for three years. Door removal is a child-safety measure, oil removal alone is not enough, and age is irrelevant.",
+              explanationZh: "带着制冷剂压扁就是排放。最终处置者必须回收或取得已回收的签字声明并保存三年。拆门是儿童安全措施，只放油不够，年龄无关。" },
+            { id: 50, part: "type1", category: CAT.SVC1,
+              questionEn: "When converting an older R-12 refrigerator to R-134a, which of the following is NOT a required step?",
+              questionZh: "把一台老式 R-12 冰箱改造成 R-134a 时，下列哪项**不**是必需的步骤？",
+              optionsEn: ["Replace the filter-drier with one compatible with R-134a","Replace the evaporator coil","Recover the R-12 charge completely","Replace the mineral oil with POE oil"],
+              optionsZh: ["把干燥过滤器换成 R-134a 兼容型","更换蒸发器盘管","彻底回收 R-12","把矿物油换成 POE 油"],
+              answer: 1,
+              explanationEn: "A retrofit requires recovery, an oil change and a compatible drier (the old desiccant may not suit HFCs). The evaporator coil is reused; only the oil, drier and sometimes the cap tube or compressor are addressed.",
+              explanationZh: "改造需要回收、换油、换兼容的干燥器（旧干燥剂可能不适合 HFC）。蒸发器沿用；只处理油、干燥器，有时还有毛细管或压缩机。" }
+        ];
+        const SET2 = [
+            // ---- Core · REG ----
+            { id: 1, part: "core", category: CAT.REG,
+              questionEn: "In March 1996 a technician deliberately released the R-134a charge from a walk-in cooler to atmosphere rather than recovering it. Was this legal at the time?",
+              questionZh: "1996 年 3 月，一名技师把冷库里的 R-134a 直接放到大气而不是回收。当时这样做合法吗？",
+              optionsEn: ["Yes, because R-134a does not deplete the ozone layer","Yes, because the venting ban did not cover HFCs until 2020","No; knowingly venting substitute refrigerants such as HFCs became illegal on November 15, 1995","No; venting R-134a has been illegal since July 1, 1992"],
+              optionsZh: ["合法，因为 R-134a 不破坏臭氧层","合法，禁排令直到 2020 年才覆盖 HFC","不合法；1995 年 11 月 15 日起明知故犯地排放 HFC 等替代制冷剂即属违法","不合法；排放 R-134a 从 1992 年 7 月 1 日起就违法"],
+              answer: 2,
+              explanationEn: "The 1992 ban covered CFCs and HCFCs; substitutes (HFCs and others) were added on November 15, 1995. Ozone-depletion status is not a defense, and 2020 is the R-22 production phase-out date, unrelated to venting.",
+              explanationZh: "1992 年禁令覆盖 CFC 和 HCFC；替代品（HFC 等）在 1995-11-15 加入。不破坏臭氧不是免责理由；2020 是 R-22 停产日期，与排放无关。" },
+            { id: 2, part: "core", category: CAT.REG,
+              questionEn: "Why is the small amount of refrigerant released when a technician disconnects a hose after recovery NOT considered an illegal venting?",
+              questionZh: "为什么技师回收完成后拆软管时释放的少量制冷剂**不**算违法排放？",
+              optionsEn: ["Because releases of less than one pound are always exempt","Because EPA treats these de minimis releases as unavoidable when a good-faith attempt to recover has been made","Because HFC refrigerants are not covered by the venting ban","Because the release occurs outside the appliance"],
+              optionsZh: ["因为不到一磅的释放一律豁免","因为 EPA 认为在认真回收之后这类微量释放（de minimis）是不可避免的","因为 HFC 制冷剂不受禁排令约束","因为释放发生在设备外部"],
+              answer: 1,
+              explanationEn: "The de minimis exemption depends on a good-faith recovery effort, not on a weight limit—one pound is not an exemption. HFCs are covered by the ban, and location of the release is irrelevant.",
+              explanationZh: "de minimis 豁免的前提是认真回收，不是重量上限——一磅不是豁免线。HFC 也在禁排范围内，释放地点无关。" },
+            { id: 3, part: "core", category: CAT.REG,
+              questionEn: "A public-health study links stratospheric ozone loss to a rise in a particular disease. Which effect is directly attributed to increased UV-B reaching the ground?",
+              questionZh: "一项公共卫生研究把平流层臭氧减少与某种疾病上升联系起来。下列哪种影响直接归因于到达地面的 UV-B 增加？",
+              optionsEn: ["Increased skin cancer and cataracts","Increased asthma from ground-level smog","Higher rates of carbon-monoxide poisoning","More frequent hearing loss"],
+              optionsZh: ["皮肤癌和白内障增加","地面烟雾导致的哮喘增加","一氧化碳中毒增多","听力损失更频繁"],
+              answer: 0,
+              explanationEn: "UV-B causes skin cancer, cataracts and immune suppression, and damages crops and marine life. Smog, CO poisoning and hearing loss are unrelated to the ozone layer.",
+              explanationZh: "UV-B 导致皮肤癌、白内障、免疫抑制，还伤害农作物和海洋生物。烟雾、CO 中毒和听力损失与臭氧层无关。" },
+            { id: 4, part: "core", category: CAT.REG,
+              questionEn: "R-134a has a GWP of about 1,430 and R-410A about 2,088. If 2 lb of each escapes, which release has the larger warming impact, and by roughly how much?",
+              questionZh: "R-134a 的 GWP 约 1,430，R-410A 约 2,088。各泄漏 2 磅，哪种的温室效应更大，大约大多少？",
+              optionsEn: ["They are equal because both are HFCs","R-410A, by about 2 lb of CO₂-equivalent","R-134a, by about 650 lb of CO₂-equivalent","R-410A, by about 1,300 lb of CO₂-equivalent"],
+              optionsZh: ["相等，因为都是 HFC","R-410A，约多 2 磅 CO₂ 当量","R-134a，约多 650 磅 CO₂ 当量","R-410A，约多 1,300 磅 CO₂ 当量"],
+              answer: 3,
+              explanationEn: "CO₂-equivalent = mass × GWP. R-410A: 2 × 2,088 ≈ 4,176; R-134a: 2 × 1,430 = 2,860; difference ≈ 1,316 lb. Being in the same chemical family does not make GWPs equal.",
+              explanationZh: "CO₂ 当量 = 质量 × GWP。R-410A：2 × 2,088 ≈ 4,176；R-134a：2 × 1,430 = 2,860；差约 1,316 磅。同属 HFC 不代表 GWP 相同。" },
+            { id: 5, part: "core", category: CAT.REG,
+              questionEn: "A technician holds a Universal certification. Which of the following jobs is he permitted to perform?",
+              questionZh: "一名技师持有 Universal 认证。下列哪项工作他可以做？",
+              optionsEn: ["Only the centrifugal chiller","None of these without an additional Type-specific card","Recovering R-134a from a vending machine, R-410A from a rooftop unit, and R-123 from a centrifugal chiller","Only the vending machine and the rooftop unit"],
+              optionsZh: ["只能做离心冷水机组","没有额外的分类证一项都不能做","从售货机回收 R-134a、从屋顶机回收 R-410A、从离心冷水机组回收 R-123","只能做售货机和屋顶机"],
+              answer: 2,
+              explanationEn: "Universal certification covers Types I, II and III—small appliances, high-pressure and low-pressure appliances alike. No additional card is needed.",
+              explanationZh: "Universal 覆盖 Type I、II、III——小型电器、高压和低压设备都能做，不需要额外的证。" },
+            { id: 6, part: "core", category: CAT.REG,
+              questionEn: "Which of the following buyers does NOT need to show Section 608 certification to purchase refrigerant?",
+              questionZh: "下列哪种购买者**不**需要出示 608 认证就能购买制冷剂？",
+              optionsEn: ["A homeowner buying a 25 lb cylinder of R-22 for a personal AC unit","A wholesaler buying R-134a for resale to certified technicians","An apprentice buying R-404A for a supermarket job","A technician buying a 30 lb cylinder of R-410A"],
+              optionsZh: ["为自家空调买 25 磅 R-22 的房主","买 R-134a 转售给持证技师的批发商","为超市工程购买 R-404A 的学徒","买 30 磅 R-410A 的技师"],
+              answer: 1,
+              explanationEn: "Sales for resale to a certified technician are exempt, as are small cans (2 lb or less) of automotive refrigerant. Homeowners and apprentices buying bulk refrigerant for stationary equipment must be certified.",
+              explanationZh: "转售给持证技师的批发交易豁免，2 磅以下小罐汽车制冷剂也豁免。房主和学徒买固定设备用的大瓶制冷剂都必须持证。" },
+            { id: 7, part: "core", category: CAT.REG,
+              questionEn: "An employee reports that his employer routinely vents refrigerant, and EPA collects a large fine based on the report. What may the employee receive?",
+              questionZh: "一名员工举报雇主经常排放制冷剂，EPA 据此开出大额罚单。该员工可能获得什么？",
+              optionsEn: ["An award of up to $10,000 for information leading to the penalty","Automatic Universal certification","Half of the fine collected","Nothing; only EPA inspectors can trigger enforcement"],
+              optionsZh: ["最高 10,000 美元的举报奖励","自动获得 Universal 认证","罚款的一半","什么都没有，只有 EPA 检查员才能启动执法"],
+              answer: 0,
+              explanationEn: "The Clean Air Act authorizes awards of up to $10,000 to individuals who supply information leading to a penalty. Reports from any person can trigger enforcement; there is no percentage share or free certification.",
+              explanationZh: "《清洁空气法》授权对提供导致处罚的信息的个人给予最高 10,000 美元奖励。任何人的举报都能触发执法；没有分成，也没有免费认证。" },
+            // ---- Core · REC ----
+            { id: 8, part: "core", category: CAT.REC,
+              questionEn: "Why is field recycling with a recovery/recycling machine NOT sufficient to make refrigerant 'reclaimed'?",
+              questionZh: "为什么用现场回收/回用机处理过的制冷剂**不能**算作「再生」？",
+              optionsEn: ["Because recycling is only permitted for CFC refrigerants","Because reclaim requires the refrigerant to be at least five years old","Because field machines only handle vapor, not liquid","Because on-site recycling removes oil, moisture and particulates but does not verify purity by laboratory analysis to AHRI 700"],
+              optionsZh: ["因为回用只允许用于 CFC","因为再生要求制冷剂至少五年以上","因为现场机只能处理气态不能处理液态","因为现场回用只去除油、水分和颗粒，没有经过实验室分析验证达到 AHRI 700"],
+              answer: 3,
+              explanationEn: "Recycling reduces contaminants; reclaim proves the result meets AHRI 700 by chemical analysis at a certified facility. Machine type, refrigerant family and age are irrelevant.",
+              explanationZh: "回用只是减少污染物；再生要在认证工厂通过化学分析证明达到 AHRI 700。机器类型、制冷剂种类和年限都无关。" },
+            { id: 9, part: "core", category: CAT.REC,
+              questionEn: "Which of the following is NOT one of the contaminants that AHRI Standard 700 sets limits for in reclaimed refrigerant?",
+              questionZh: "下列哪项**不**是 AHRI 700 标准对再生制冷剂设定限值的污染物？",
+              optionsEn: ["Non-condensable gases","Acidity","Refrigerant color","Moisture"],
+              optionsZh: ["非冷凝气体","酸度","制冷剂颜色","水分"],
+              answer: 2,
+              explanationEn: "AHRI 700 specifies limits for moisture, non-condensables, acidity, chlorides, high-boiling residue, particulates and other refrigerants. Color is not a measured property of refrigerant purity.",
+              explanationZh: "AHRI 700 规定水分、非冷凝气体、酸度、氯化物、高沸点残留、颗粒和其他制冷剂的限值。颜色不是纯度指标。" },
+            { id: 10, part: "core", category: CAT.REC,
+              questionEn: "A technician recovers 20 lb of R-134a from a customer's cooler and, without reclaiming it, sells it to a neighbor for the neighbor's walk-in box. Is this permitted?",
+              questionZh: "技师从客户的冷柜回收了 20 磅 R-134a，没有再生就卖给邻居装到邻居的冷库里。这样做允许吗？",
+              optionsEn: ["Yes, as long as the neighbor is also certified","No; used refrigerant that changes ownership must first be reclaimed to AHRI 700 by a certified reclaimer","No; used refrigerant may never be sold under any circumstances","Yes, because the refrigerant passed through a recovery machine"],
+              optionsZh: ["允许，只要邻居也持证","不允许；换主人的旧制冷剂必须先由认证再生商再生到 AHRI 700","不允许；旧制冷剂在任何情况下都不能卖","允许，因为制冷剂经过了回收机"],
+              answer: 1,
+              explanationEn: "Recovery does not restore purity, and the buyer's certification does not change the rule. Used refrigerant may be sold—but only after reclaim.",
+              explanationZh: "回收不等于恢复纯度，买方持证也不改变规则。旧制冷剂可以卖——但必须先再生。" },
+            { id: 11, part: "core", category: CAT.REC,
+              questionEn: "Why does placing the recovery cylinder in a bucket of ice speed up refrigerant recovery?",
+              questionZh: "为什么把回收钢瓶放进冰桶能加快制冷剂回收？",
+              optionsEn: ["Because cooling the cylinder lowers its internal pressure, increasing the pressure difference that drives refrigerant from the appliance into the cylinder","Because ice prevents the cylinder from overfilling","Because a cold cylinder holds more than 80% of its water capacity","Because cold metal attracts refrigerant molecules"],
+              optionsZh: ["因为降低钢瓶温度会降低其内部压力，增大了把制冷剂从设备推入钢瓶的压差","因为冰能防止钢瓶过充","因为冷钢瓶能装超过水容量 80% 的制冷剂","因为冷的金属会吸引制冷剂分子"],
+              answer: 0,
+              explanationEn: "Recovery is driven by pressure difference; a colder cylinder has lower vapor pressure. Cooling does not change the 80% fill limit and has nothing to do with molecular attraction.",
+              explanationZh: "回收靠压差；冷钢瓶的蒸气压更低。降温不改变 80% 充装上限，也不是什么分子吸引。" },
+            { id: 12, part: "core", category: CAT.REC,
+              questionEn: "Which of the following is NOT a typical source of non-condensable gases in a recovery cylinder?",
+              questionZh: "下列哪项**不**是回收钢瓶中非冷凝气体的典型来源？",
+              optionsEn: ["Air drawn in through a leak on the low side of a system operating in a vacuum","Nitrogen left in a system after leak testing","Failing to evacuate the recovery cylinder before use","Excess POE oil carried over with the refrigerant"],
+              optionsZh: ["系统低压侧在负压运行时从泄漏处吸入的空气","检漏后残留在系统中的氮气","使用前没有把回收钢瓶抽真空","随制冷剂带出的多余 POE 油"],
+              answer: 3,
+              explanationEn: "Non-condensables are gases (air, nitrogen) that do not liquefy at condensing conditions. Oil is a liquid contaminant handled by the oil separator, not an NCG.",
+              explanationZh: "非冷凝气体是空气、氮气这类在冷凝条件下不液化的气体。油是液体污染物，由油分处理，不属于 NCG。" },
+            { id: 13, part: "core", category: CAT.REC,
+              questionEn: "Refrigerant recovered from a system with a burned-out compressor is found to be acidic. What should be done with it?",
+              questionZh: "从一台压缩机烧毁的系统回收的制冷剂检测出酸性。应该怎么处理？",
+              optionsEn: ["Vent it, since acidic refrigerant is exempt from the venting ban","Return it to the same system after the new compressor is installed","Send it to a certified reclaimer or for destruction; do not reuse it as-is","Filter it once through a drier and reuse it anywhere"],
+              optionsZh: ["放掉，酸性制冷剂不受禁排令约束","装新压缩机后灌回同一系统","送认证再生商处理或销毁；不能原样回用","用干燥器过滤一次就可以到处用"],
+              answer: 2,
+              explanationEn: "Acidic refrigerant would attack the new compressor; a single drier pass cannot restore it. There is no venting exemption for contaminated refrigerant.",
+              explanationZh: "酸性制冷剂会腐蚀新压缩机；过一次干燥器恢复不了。受污染的制冷剂也没有排放豁免。" },
+            // ---- Core · CYL ----
+            { id: 14, part: "core", category: CAT.CYL,
+              questionEn: "Why must a recovery cylinder never be filled beyond 80% of its water capacity?",
+              questionZh: "为什么回收钢瓶绝不能装超过其水容量的 80%？",
+              optionsEn: ["Because the remaining 20% is needed for the oil that comes with the refrigerant","Because liquid refrigerant expands when warmed; without vapor space a full cylinder can become hydrostatically locked and rupture","Because the scale used for recovery is only accurate to 80%","Because DOT requires 20% of every cylinder to remain empty for inspection"],
+              optionsZh: ["因为剩下的 20% 要留给随制冷剂带出的油","因为液态制冷剂升温会膨胀；没有气相空间的满瓶会液压锁死并爆裂","因为回收用的秤只在 80% 以内准确","因为 DOT 要求每个瓶留 20% 空间供检查"],
+              answer: 1,
+              explanationEn: "Liquid expansion with temperature is the hazard; the vapor headspace absorbs it. Oil volume, scale accuracy and inspection are not the reason.",
+              explanationZh: "液体随温度膨胀是危险所在；气相空间用来吸收膨胀。油量、秤的精度、检查都不是原因。" },
+            { id: 15, part: "core", category: CAT.CYL,
+              questionEn: "A refillable recovery cylinder is stamped with a hydrostatic test date of March 2021. In September 2026, may a technician still fill it?",
+              questionZh: "一个可重复充装的回收钢瓶打有 2021 年 3 月的水压测试日期。2026 年 9 月技师还能给它充装吗？",
+              optionsEn: ["No; refillable cylinders must be retested every 5 years, so it expired in March 2026","Yes, as long as it is visually undamaged","No; recovery cylinders may only be used for 2 years","Yes; the cylinder is good for 10 years from the test date"],
+              optionsZh: ["不能；可重复充装钢瓶每 5 年必须复检，2026 年 3 月已到期","能，只要外观没有损伤","不能；回收钢瓶只能用 2 年","能，钢瓶从测试日期起 10 年有效"],
+              answer: 0,
+              explanationEn: "March 2021 plus 5 years is March 2026, so the cylinder is out of date. Visual condition does not substitute for the hydrostatic test; 10-year and 2-year figures are wrong.",
+              explanationZh: "2021 年 3 月加 5 年是 2026 年 3 月，已过期。外观好不能代替水压测试；10 年和 2 年都是错的。" },
+            { id: 16, part: "core", category: CAT.CYL,
+              questionEn: "Which of the following methods is NOT acceptable for warming a recovery cylinder to speed up refrigerant transfer?",
+              questionZh: "下列哪种给回收钢瓶加热以加快转移的方法**不**可接受？",
+              optionsEn: ["Setting it in the sun on a warm day","Placing it in a tub of warm water","Wrapping it in an electric heat blanket rated for cylinders","Heating it with a propane torch"],
+              optionsZh: ["晴天放在太阳下","放在温水桶里","用专为钢瓶设计的电加热毯包裹","用丙烷焊枪加热"],
+              answer: 3,
+              explanationEn: "Open flame can weaken the cylinder and raise pressure uncontrollably; cylinders must never exceed 125°F. Warm water, a rated heat blanket or sunlight are gentle, controlled methods.",
+              explanationZh: "明火会削弱瓶体并使压力失控上升；钢瓶温度不得超过 125°F。温水、专用加热毯、晒太阳都是温和可控的方法。" },
+            { id: 17, part: "core", category: CAT.CYL,
+              questionEn: "Why must a disposable refrigerant cylinder be evacuated to a vacuum and then punctured or rendered useless before it is discarded?",
+              questionZh: "为什么一次性制冷剂钢瓶报废前必须抽成真空并打孔或使其无法再用？",
+              optionsEn: ["To remove the oil residue that would otherwise contaminate the landfill","To recover the scrap value of the steel","To ensure no refrigerant is left to vent and to prevent anyone from illegally refilling the cylinder","Because DOT requires all cylinders to be vacuum-tested before scrapping"],
+              optionsZh: ["为了去除会污染填埋场的油渍","为了回收钢材的废品价值","为了确保没有制冷剂残留排放，并防止有人非法重灌","因为 DOT 要求所有钢瓶报废前做真空测试"],
+              answer: 2,
+              explanationEn: "Any refrigerant left in a discarded cylinder eventually vents, and an intact 'empty' cylinder invites illegal refilling. Scrap value, DOT testing and oil residue are not the reasons.",
+              explanationZh: "废弃瓶里残留的制冷剂最终会排放，完好的空瓶会引来非法重灌。废品价值、DOT 测试和油渍都不是原因。" },
+            { id: 18, part: "core", category: CAT.CYL,
+              questionEn: "Which of the following is NOT a requirement when transporting recovery cylinders in a service van?",
+              questionZh: "下列哪项**不**是在服务车上运输回收钢瓶的要求？",
+              optionsEn: ["Cylinders must be kept in an upright position","Cylinders must be chilled below 40°F during transport","Cylinders must be secured so they cannot tip or roll","Cylinders must carry DOT-compliant labels identifying the refrigerant"],
+              optionsZh: ["钢瓶必须直立放置","运输途中钢瓶必须冷却到 40°F 以下","钢瓶必须固定，不能倾倒或滚动","钢瓶必须贴有符合 DOT 的制冷剂标识"],
+              answer: 1,
+              explanationEn: "Securing, labeling and upright storage are standard DOT transport requirements. There is no chilling requirement—only the 125°F maximum.",
+              explanationZh: "固定、标识、直立是 DOT 运输的标准要求。没有冷却要求，只有 125°F 上限。" },
+            { id: 19, part: "core", category: CAT.CYL,
+              questionEn: "A technician finds a disposable R-410A cylinder with 10 psig still showing on the gauge. May it be thrown in the scrap bin?",
+              questionZh: "技师发现一个一次性 R-410A 钢瓶表压还有 10 psig。可以直接扔进废品箱吗？",
+              optionsEn: ["No; the remaining refrigerant must first be recovered until the cylinder is in a vacuum, then the cylinder is punctured","No; the cylinder must be returned to the manufacturer for refilling","Yes, because 10 psig is a negligible amount","Yes, if the valve is closed tightly"],
+              optionsZh: ["不可以；必须先回收剩余制冷剂直到瓶内为真空，再把瓶打孔","不可以；必须退回厂家重灌","可以，10 psig 微不足道","可以，只要把阀门关紧"],
+              answer: 0,
+              explanationEn: "Any positive pressure means refrigerant remains. It must be recovered to a vacuum before disposal. Disposable cylinders are never refilled, and a closed valve does not stop eventual leakage.",
+              explanationZh: "有正压就说明还有制冷剂，报废前必须回收到真空。一次性瓶从不重灌，关阀也挡不住最终的泄漏。" },
+            // ---- Core · BAS ----
+            { id: 20, part: "core", category: CAT.BAS,
+              questionEn: "A household refrigerator uses a capillary tube instead of a thermostatic expansion valve. What is the capillary tube's function in the cycle?",
+              questionZh: "家用冰箱用毛细管而不是热力膨胀阀。毛细管在循环中的作用是什么？",
+              optionsEn: ["To store excess liquid refrigerant","To separate oil from the refrigerant","To compress the refrigerant vapor","To act as a fixed metering device that drops refrigerant pressure between the condenser and the evaporator"],
+              optionsZh: ["储存多余的液态制冷剂","把油从制冷剂中分离出来","压缩制冷剂蒸气","作为固定节流装置，在冷凝器和蒸发器之间降低制冷剂压力"],
+              answer: 3,
+              explanationEn: "The cap tube is a fixed-orifice metering device; it does the same job as a TXV but without adjustment. Compression is the compressor's job, storage is the receiver's, and oil separation is a separate component.",
+              explanationZh: "毛细管是固定孔径的节流装置，功能同膨胀阀但不可调。压缩是压缩机的事，储液是储液器的事，油分是另一个部件。" },
+            { id: 21, part: "core", category: CAT.BAS,
+              questionEn: "Which of the following is NOT a characteristic of a zeotropic (400-series) refrigerant blend?",
+              questionZh: "下列哪项**不**是非共沸（400 系列）混合制冷剂的特性？",
+              optionsEn: ["It can fractionate, so a leak changes the composition of what remains","It should be charged as a liquid","It behaves exactly like a single pure refrigerant at all conditions","It has a temperature glide during evaporation and condensation"],
+              optionsZh: ["会分馏，泄漏后剩余成分会改变","应以液态充注","在任何条件下都像单一纯制冷剂一样","蒸发和冷凝时有温度滑移"],
+              answer: 2,
+              explanationEn: "Zeotropes glide, fractionate and must be liquid-charged. Behaving like a pure refrigerant describes an azeotrope (500-series), not a zeotrope.",
+              explanationZh: "非共沸有滑移、会分馏、必须液态充注。「像纯制冷剂一样」说的是共沸（500 系列），不是非共沸。" },
+            { id: 22, part: "core", category: CAT.BAS,
+              questionEn: "Why is R-502 numbered in the 500 series rather than the 400 series?",
+              questionZh: "为什么 R-502 编在 500 系列而不是 400 系列？",
+              optionsEn: ["Because it contains five components","Because it is an azeotropic blend that boils and condenses at a single temperature like a pure refrigerant","Because it was invented in the 1950s","Because it has a GWP over 5,000"],
+              optionsZh: ["因为它有五种成分","因为它是共沸混合物，像纯制冷剂一样在单一温度下沸腾和冷凝","因为它是 1950 年代发明的","因为它的 GWP 超过 5,000"],
+              answer: 1,
+              explanationEn: "500-series numbers denote azeotropes; 400-series denote zeotropes with glide. Component count, invention date and GWP do not determine the series.",
+              explanationZh: "500 系列表示共沸，400 系列表示有滑移的非共沸。成分数量、发明年代和 GWP 都不决定编号。" },
+            { id: 23, part: "core", category: CAT.BAS,
+              questionEn: "Why should a container of POE oil be used promptly and kept tightly capped after opening?",
+              questionZh: "为什么 POE 油开封后要尽快用完并保持盖紧？",
+              optionsEn: ["Because POE oil is hygroscopic and absorbs moisture from the air, which then forms acid in the system","Because POE oil becomes flammable after contact with air","Because POE oil loses its color when exposed to light","Because POE oil evaporates rapidly at room temperature"],
+              optionsZh: ["因为 POE 油有吸湿性，会从空气中吸收水分，进入系统后生成酸","因为 POE 油接触空气后变得易燃","因为 POE 油见光会褪色","因为 POE 油在室温下会快速蒸发"],
+              answer: 0,
+              explanationEn: "POE absorbs water readily and cannot be dried by vacuum alone; the moisture hydrolyzes the ester into acid. It does not evaporate quickly, is not flammable in service, and color is irrelevant.",
+              explanationZh: "POE 极易吸水，且不能靠抽真空去除；水分让酯水解成酸。它不会快速蒸发，正常使用不易燃，颜色无关。" },
+            { id: 24, part: "core", category: CAT.BAS,
+              questionEn: "Inside an evaporator, a thermometer shows the refrigerant staying at the same temperature even though it is absorbing a great deal of heat from the air. What explains this?",
+              questionZh: "蒸发器里的温度计显示制冷剂温度不变，但它却在从空气中吸收大量热量。怎么解释？",
+              optionsEn: ["The refrigerant is being compressed","The evaporator fan is not running","The thermometer is defective","The refrigerant is absorbing latent heat while changing from liquid to vapor at constant temperature"],
+              optionsZh: ["制冷剂正在被压缩","蒸发器风扇没转","温度计坏了","制冷剂在恒温下从液态变为气态，吸收的是潜热"],
+              answer: 3,
+              explanationEn: "Latent heat changes state without changing temperature; that is exactly what an evaporator exploits. Compression happens in the compressor, and a stopped fan would reduce heat absorption, not explain constant temperature.",
+              explanationZh: "潜热改变状态而不改变温度，蒸发器正是利用这一点。压缩发生在压缩机里；风扇停转会减少吸热，解释不了温度恒定。" },
+            { id: 25, part: "core", category: CAT.BAS,
+              questionEn: "R-134a boils at about −15°F (−26°C) at atmospheric pressure. Under EPA's appliance classifications, an appliance using R-134a is a:",
+              questionZh: "R-134a 在大气压下沸点约 −15°F（−26°C）。按 EPA 的设备分类，使用 R-134a 的设备属于：",
+              optionsEn: ["Medium-pressure appliance","Low-pressure appliance","High-pressure appliance","Very-high-pressure appliance"],
+              optionsZh: ["中压设备","低压设备","高压设备","超高压设备"],
+              answer: 2,
+              explanationEn: "High-pressure refrigerants boil between −58°F and 50°F at atmospheric pressure; R-134a is in that range. Low-pressure boils above 50°F (R-123), very-high-pressure below −58°F (R-503). 'Medium-pressure' is not an EPA class.",
+              explanationZh: "高压制冷剂在大气压下沸点在 −58°F 到 50°F 之间，R-134a 在此范围。低压沸点高于 50°F（R-123），超高压低于 −58°F（R-503）。「中压」不是 EPA 分类。" },
+            // ---- Type I · SMALL ----
+            { id: 26, part: "type1", category: CAT.SMALL,
+              questionEn: "Which of the following is NOT part of the EPA definition of a small appliance?",
+              questionZh: "下列哪项**不**属于 EPA 对小型电器的定义？",
+              optionsEn: ["Contains 5 lb or less of refrigerant","Uses only non-ozone-depleting refrigerant","Fully manufactured and charged in a factory","Hermetically sealed"],
+              optionsZh: ["制冷剂充注量 5 磅以下","只使用不破坏臭氧层的制冷剂","在工厂内完整制造并充注","密封式"],
+              answer: 1,
+              explanationEn: "The definition is about construction and charge size, not refrigerant type. An R-12 refrigerator and an R-600a refrigerator are both small appliances.",
+              explanationZh: "定义看构造和充注量，不看制冷剂种类。R-12 冰箱和 R-600a 冰箱都是小型电器。" },
+            { id: 27, part: "type1", category: CAT.SMALL,
+              questionEn: "A property manager hands a technician a list of equipment in the building. Which item on the list qualifies as a small appliance that a Type I technician may service?",
+              questionZh: "物业经理给技师一份楼内设备清单。清单上哪一项属于 Type I 技师可以维修的小型电器？",
+              optionsEn: ["A water cooler with a 4 oz factory charge","A 3-ton residential split system","A supermarket display case connected to a remote rack","A 100-ton centrifugal chiller"],
+              optionsZh: ["出厂充注 4 盎司的饮水机","3 吨家用分体机","接远端机组的超市陈列柜","100 吨离心冷水机组"],
+              answer: 0,
+              explanationEn: "Water coolers, along with refrigerators, freezers, window units, PTACs, dehumidifiers and vending machines, are typical small appliances. Split systems and remote-rack cases are field-charged Type II equipment; a centrifugal chiller is usually Type III.",
+              explanationZh: "饮水机与冰箱、冷柜、窗机、PTAC、除湿机、售货机一样是典型小型电器。分体机和远端机组陈列柜是现场充注的 Type II 设备；离心冷水机组通常是 Type III。" },
+            { id: 28, part: "type1", category: CAT.SMALL,
+              questionEn: "A Type I technician is asked to recover refrigerant from two units: a household refrigerator and a pickup truck's air conditioner. Which may he legally work on?",
+              questionZh: "请一名 Type I 技师从两台设备回收制冷剂：一台家用冰箱和一辆皮卡的车载空调。他可以合法处理哪台？",
+              optionsEn: ["Only the truck; refrigerators require Type II","Neither without Universal certification","Both, because both hold less than 5 lb","Only the refrigerator; the truck's air conditioner falls under Section 609 and requires MVAC certification"],
+              optionsZh: ["只有皮卡；冰箱需要 Type II","没有 Universal 两个都不能做","都可以，两者都不到 5 磅","只有冰箱；皮卡空调归 609 节，需要 MVAC 认证"],
+              answer: 3,
+              explanationEn: "Motor vehicle AC is a Section 609 matter regardless of charge size. A household refrigerator is a Type I small appliance; Universal is not needed for it.",
+              explanationZh: "机动车空调不论充注量都归 609 节。家用冰箱是 Type I 小型电器，不需要 Universal。" },
+            { id: 29, part: "type1", category: CAT.SMALL,
+              questionEn: "Why does EPA permit the Type I exam, but not the Type II or III exams, to be taken without a proctor?",
+              questionZh: "为什么 EPA 允许 Type I 考试可以不设监考，而 Type II 和 III 不行？",
+              optionsEn: ["Because the Type I exam has no Core section","Because small-appliance refrigerants are non-toxic","Because small appliances hold little refrigerant, so the environmental risk from an under-qualified technician is considered lower","Because Type I technicians are supervised by Type II technicians"],
+              optionsZh: ["因为 Type I 考试没有 Core 部分","因为小型电器用的制冷剂无毒","因为小型电器充注量少，不合格技师带来的环境风险被认为较低","因为 Type I 技师受 Type II 技师监督"],
+              answer: 2,
+              explanationEn: "The lower risk per appliance justifies the relaxed testing format, offset by a higher passing score (84%). There is no supervision arrangement, and the Type I exam does include the 25-question Core section.",
+              explanationZh: "单台设备风险低，所以考试形式可以放宽，代价是更高的及格线（84%）。没有所谓监督安排，Type I 考试同样包含 25 题的 Core。" },
+            { id: 30, part: "type1", category: CAT.SMALL,
+              questionEn: "A technician is called to a window air conditioner that runs but does not cool. He notes the unit is from 2005 and charged with R-22. Which statement is correct?",
+              questionZh: "技师上门处理一台开机但不制冷的窗式空调。他注意到这台机器是 2005 年的，充注 R-22。下列哪个说法正确？",
+              optionsEn: ["It must be scrapped because R-22 is illegal to use","It is a Type I small appliance; any refrigerant removed must be recovered, and it may be recharged with recovered or reclaimed R-22","It is a Type II appliance because R-22 is a high-pressure refrigerant","The technician may vent the R-22 because the unit is over 20 years old"],
+              optionsZh: ["必须报废，因为使用 R-22 违法","它是 Type I 小型电器；取出的制冷剂必须回收，可以用回收或再生的 R-22 重新充注","它是 Type II 设备，因为 R-22 是高压制冷剂","可以放掉 R-22，因为机器超过 20 年"],
+              answer: 1,
+              explanationEn: "A factory-sealed window unit is a small appliance regardless of refrigerant. Using existing R-22 is legal; venting is never legal; age does not change anything.",
+              explanationZh: "出厂密封的窗机不管用什么制冷剂都是小型电器。使用存量 R-22 合法；排放永远不合法；年龄不改变任何规则。" },
+            { id: 31, part: "type1", category: CAT.SMALL,
+              questionEn: "A commercial ice machine has two independent refrigeration circuits, each factory-sealed with 3 lb of R-404A. How is this appliance classified?",
+              questionZh: "一台商用制冰机有两个独立制冷回路，每个回路出厂密封充注 3 磅 R-404A。这台设备如何分类？",
+              optionsEn: ["As a small appliance, because each circuit contains 5 lb or less","As a Type II appliance, because the total charge is 6 lb","As a Type III appliance","It is unregulated because R-404A is an HFC"],
+              optionsZh: ["小型电器，因为每个回路都不超过 5 磅","Type II 设备，因为总充注量 6 磅","Type III 设备","不受监管，因为 R-404A 是 HFC"],
+              answer: 0,
+              explanationEn: "The 5 lb limit is applied per hermetically sealed circuit. Separate circuits are not added together. HFCs are fully regulated, and Type III is for low-pressure chillers.",
+              explanationZh: "5 磅上限按每个独立密封回路计算，多个回路不相加。HFC 完全受监管，Type III 是低压冷水机组。" },
+            // ---- Type I · REQ ----
+            { id: 32, part: "type1", category: CAT.REQ,
+              questionEn: "A technician is recovering R-134a from a household refrigerator whose compressor has burned out and will not run, using recovery equipment manufactured in 2015. What is the minimum required recovery?",
+              questionZh: "技师用 2015 年生产的回收机从一台压缩机烧毁、无法运转的家用冰箱回收 R-134a。最低回收要求是多少？",
+              optionsEn: ["Evacuation to 10 in Hg vacuum","No requirement, because the compressor cannot run","90% of the nameplate charge","80% of the nameplate charge, or evacuation to 4 in Hg vacuum"],
+              optionsZh: ["抽到 10 in Hg 真空","没有要求，因为压缩机不能转","铭牌充注量的 90%","铭牌充注量的 80%，或抽到 4 in Hg 真空"],
+              answer: 3,
+              explanationEn: "Post-1993 equipment must recover 90% when the compressor operates and 80% when it does not, or reach 4 in Hg. 10 in Hg is a Type II figure. A dead compressor never waives the requirement.",
+              explanationZh: "1993-11-15 后生产的回收机：压缩机能转 90%，不能转 80%，或者抽到 4 in Hg。10 in Hg 是 Type II 的数值。压缩机坏了也不能免除回收要求。" },
+            { id: 33, part: "type1", category: CAT.REQ,
+              questionEn: "For small-appliance recovery equipment manufactured BEFORE November 15, 1993, what is the required recovery percentage?",
+              questionZh: "1993 年 11 月 15 日**之前**生产的小型电器回收设备，要求的回收百分比是多少？",
+              optionsEn: ["60%","90%","80%","70%"],
+              optionsZh: ["60%","90%","80%","70%"],
+              answer: 2,
+              explanationEn: "Grandfathered equipment must recover 80% of the charge (or reach 4 in Hg) whether or not the compressor runs. 90% is the post-1993 operating-compressor standard.",
+              explanationZh: "旧设备不论压缩机转不转都要回收 80%（或抽到 4 in Hg）。90% 是 1993 年后设备在压缩机能转时的标准。" },
+            { id: 34, part: "type1", category: CAT.REQ,
+              questionEn: "A customer's refrigerator has a slow leak and needs recharging every year. The customer does not want to pay for a repair. What are the technician's obligations?",
+              questionZh: "客户的冰箱有慢漏，每年都要补氟。客户不想花钱修。技师有什么义务？",
+              optionsEn: ["Refuse service, because leaks in any appliance must be repaired within 30 days","Recharge the unit if asked; small appliances have no mandatory leak-repair requirement, but any refrigerant removed during service must be recovered, never vented","Report the customer to EPA","Recharge only with R-600a, which is exempt from all rules"],
+              optionsZh: ["拒绝服务，因为任何设备的泄漏都必须 30 天内修复","客户要求就可以补氟；小型电器没有强制泄漏维修要求，但维修中取出的制冷剂必须回收，不能排放","向 EPA 举报客户","只能改用 R-600a，它不受任何规则约束"],
+              answer: 1,
+              explanationEn: "Leak-repair mandates apply to appliances with 50 lb or more. Topping off a small appliance is legal; venting is not. There is nothing to report, and R-600a is still regulated.",
+              explanationZh: "泄漏维修强制要求适用于 50 磅以上设备。给小型电器补氟合法，排放不合法。没什么可举报的，R-600a 同样受监管。" },
+            { id: 35, part: "type1", category: CAT.REQ,
+              questionEn: "Why do EPA rules place responsibility for refrigerant recovery on the final person in the disposal chain, such as a scrap yard?",
+              questionZh: "为什么 EPA 规则把回收制冷剂的责任放在处置链的最后一环（如废品场）？",
+              optionsEn: ["Because the final disposer is the last point at which refrigerant can be captured before the appliance is crushed or shredded, guaranteeing someone is accountable","Because homeowners are legally allowed to vent refrigerant","Because manufacturers are exempt from all refrigerant rules","Because scrap yards have the best recovery equipment"],
+              optionsZh: ["因为最终处置者是设备被压扁或粉碎前最后能截住制冷剂的环节，确保有人负责","因为房主可以合法排放制冷剂","因为制造商不受任何制冷剂规则约束","因为废品场的回收设备最好"],
+              answer: 0,
+              explanationEn: "Placing the duty at the end of the chain closes the loophole where each party assumes someone else did the recovery. Homeowners may not vent, and equipment quality is not the rationale.",
+              explanationZh: "把责任放在链条末端，堵住了「以为别人已经回收了」的漏洞。房主不能排放，设备好坏不是理由。" },
+            { id: 36, part: "type1", category: CAT.REQ,
+              questionEn: "A recycler accepts a refrigerator with a signed statement that its refrigerant was already recovered. Which of the following is NOT required on that statement?",
+              questionZh: "回收站收到一台冰箱，附带一份制冷剂已回收的签字声明。下列哪项**不**是该声明必须包含的内容？",
+              optionsEn: ["A signature from the person who recovered it","The name and address of the person who recovered the refrigerant","The date the refrigerant was recovered","The serial number of the recovery machine used"],
+              optionsZh: ["回收者的签名","回收制冷剂者的姓名和地址","回收制冷剂的日期","所用回收机的序列号"],
+              answer: 3,
+              explanationEn: "The statement must identify who recovered the refrigerant, when, and carry their signature; it is kept for three years. The machine's serial number is not required.",
+              explanationZh: "声明要写明谁回收、何时回收并签名，保存三年。回收机序列号不是必需项。" },
+            { id: 37, part: "type1", category: CAT.REQ,
+              questionEn: "A technician has recovered R-134a from several customers' refrigerators into one cylinder. A new customer's refrigerator needs a charge. May the technician use this cylinder?",
+              questionZh: "技师把多个客户冰箱回收的 R-134a 装在同一个钢瓶里。一位新客户的冰箱需要充注。技师可以用这瓶吗？",
+              optionsEn: ["Yes, because it is all the same refrigerant","Yes, if the technician first runs it through a recycling machine","No; refrigerant recovered from one owner's equipment may not be used in a different owner's equipment unless it has been reclaimed","No; recovered refrigerant may never be reused"],
+              optionsZh: ["可以，反正都是同一种制冷剂","可以，只要先过一遍回用机","不可以；从一个业主设备回收的制冷剂，未经再生不能用于另一个业主的设备","不可以；回收的制冷剂永远不能再用"],
+              answer: 2,
+              explanationEn: "Crossing ownership lines requires reclaim to AHRI 700. Same refrigerant type and field recycling are not enough. Recovered refrigerant can be reused—in the same owner's equipment.",
+              explanationZh: "跨业主使用必须再生到 AHRI 700。同种制冷剂和现场回用都不够。回收的制冷剂可以再用——但只能用在同一业主的设备。" },
+            { id: 38, part: "type1", category: CAT.REQ,
+              questionEn: "When using a system-dependent recovery process on a small appliance with a non-operating compressor, which of the following is NOT an acceptable technique?",
+              questionZh: "对压缩机不运转的小型电器用系统依赖式回收时，下列哪项**不**是可接受的技术？",
+              optionsEn: ["Using a vacuum pump to pull refrigerant into a non-pressurized container","Opening the process tube to atmosphere briefly to relieve pressure before connecting","Applying gentle heat to the compressor and tapping it to release refrigerant from the oil","Connecting to both the high and low sides of the system"],
+              optionsZh: ["用真空泵把制冷剂抽到非压力容器","接管前先短暂打开工艺管泄压","轻轻加热并敲击压缩机，让油里的制冷剂释放","同时接系统的高压侧和低压侧"],
+              answer: 1,
+              explanationEn: "Opening the system to atmosphere is venting, no matter how brief. Heating and tapping, two-sided connection and vacuum pump to a non-pressurized container are all EPA-recognized methods.",
+              explanationZh: "把系统打开到大气就是排放，再短也不行。加热敲击、双侧接管、真空泵接非压力容器都是 EPA 认可的方法。" },
+            // ---- Type I · TOOL ----
+            { id: 39, part: "type1", category: CAT.TOOL,
+              questionEn: "A shop uses a small-appliance recovery unit bought new in 1992 that was never certified by an EPA-approved laboratory. May it still be used legally?",
+              questionZh: "某店用的是 1992 年新买的小型电器回收机，从未经 EPA 认可实验室认证。现在还能合法使用吗？",
+              optionsEn: ["Yes; equipment manufactured before November 15, 1993 is grandfathered, provided it meets the 80% recovery or 4 in Hg standard","Yes, but only on appliances built before 1993","No; uncertified equipment may only be used by Universal technicians","No; all recovery equipment must be certified regardless of age"],
+              optionsZh: ["能；1993 年 11 月 15 日前生产的设备豁免认证，只要满足 80% 回收或 4 in Hg 的标准","能，但只能用于 1993 年前的电器","不能；未认证设备只能由 Universal 技师使用","不能；所有回收设备不论年代都必须认证"],
+              answer: 0,
+              explanationEn: "The certification mandate applies to equipment manufactured on or after November 15, 1993. Older units remain legal as long as they perform to the 80%/4 in Hg standard. The appliance's age and the technician's certification level do not matter.",
+              explanationZh: "认证要求适用于 1993-11-15 及之后生产的设备。旧设备只要达到 80%/4 in Hg 就仍合法。电器年代和技师认证级别都无关。" },
+            { id: 40, part: "type1", category: CAT.TOOL,
+              questionEn: "Why does a system-dependent (passive) recovery device depend on the appliance's own compressor?",
+              questionZh: "为什么系统依赖式（被动）回收设备要依赖电器自身的压缩机？",
+              optionsEn: ["Because EPA prohibits passive devices from containing electrical parts","Because the appliance compressor filters the refrigerant","Because passive devices only work with R-12","Because passive devices have no pump or compressor of their own to create the pressure difference that moves refrigerant"],
+              optionsZh: ["因为 EPA 禁止被动设备含有电气部件","因为电器的压缩机会过滤制冷剂","因为被动设备只对 R-12 有效","因为被动设备自身没有泵或压缩机来制造推动制冷剂的压差"],
+              answer: 3,
+              explanationEn: "A passive device is essentially a container and hoses; the appliance compressor (or system pressure) must supply the motive force. There is no EPA ban on electrical parts, compressors do not filter, and refrigerant type is irrelevant.",
+              explanationZh: "被动设备本质上是容器加软管，需要电器压缩机（或系统压力）提供动力。EPA 没有禁止电气部件，压缩机不过滤，制冷剂种类无关。" },
+            { id: 41, part: "type1", category: CAT.TOOL,
+              questionEn: "On which of the following appliances may system-dependent (passive) recovery equipment NOT be used?",
+              questionZh: "下列哪种设备**不能**使用系统依赖式（被动）回收设备？",
+              optionsEn: ["A window air conditioner with a 2 lb charge","A reach-in cooler with a 12 lb charge","A walk-in cooler with a 20 lb charge","A refrigerator with a 6 oz charge"],
+              optionsZh: ["充注 2 磅的窗式空调","充注 12 磅的立式冷柜","充注 20 磅的冷库","充注 6 盎司的冰箱"],
+              answer: 2,
+              explanationEn: "Passive recovery is limited to appliances containing 15 lb or less. The 20 lb walk-in exceeds that; the other three are within the limit.",
+              explanationZh: "被动回收只能用于 15 磅以下的设备。20 磅的冷库超限；其余三个都在限值内。" },
+            { id: 42, part: "type1", category: CAT.TOOL,
+              questionEn: "A refrigerator's compressor is burned out and cannot run. Using passive recovery, where should the technician connect to maximize the amount of refrigerant recovered?",
+              questionZh: "冰箱压缩机烧毁无法运转。用被动回收时，技师应接在哪里才能尽量多回收制冷剂？",
+              optionsEn: ["The low side only","Both the high side and the low side at the same time","The condenser fan motor terminals","The high side only"],
+              optionsZh: ["只接低压侧","高压侧和低压侧同时接","冷凝器风扇电机接线端","只接高压侧"],
+              answer: 1,
+              explanationEn: "With no compressor to push, refrigerant is trapped on both sides of the restriction; connecting both sides lets all of it flow to the recovery container. High-side-only is the method for a running compressor. Fan terminals carry no refrigerant.",
+              explanationZh: "压缩机不推，制冷剂困在节流件两侧；双侧同时接才能全部流入回收容器。只接高压侧是压缩机能转时的做法。风扇接线端没有制冷剂。" },
+            { id: 43, part: "type1", category: CAT.TOOL,
+              questionEn: "A technician finds a piercing valve left on a refrigerator's process tube by a previous repair, and the system is now low on charge. What should be done?",
+              questionZh: "技师发现上一次维修在冰箱工艺管上留下了一个穿刺阀，现在系统缺氟。应该怎么做？",
+              optionsEn: ["Recover the remaining refrigerant, remove the piercing valve, braze on a permanent access fitting, then leak-test, evacuate and recharge","Add a second piercing valve on the other side for balance","Leave it; piercing valves are designed to be permanent","Tighten the piercing valve and recharge through it"],
+              optionsZh: ["回收剩余制冷剂，拆掉穿刺阀，焊上永久接口，然后检漏、抽真空、重新充注","在另一侧再加一个穿刺阀以平衡","不管它，穿刺阀本来就是永久的","把穿刺阀拧紧，从它那里补氟"],
+              answer: 0,
+              explanationEn: "The leftover piercing valve is very likely the leak. Proper repair replaces it with a brazed fitting. Tightening only delays the next leak, adding another valve adds another leak point, and piercing valves are temporary by design.",
+              explanationZh: "遗留的穿刺阀很可能就是漏点。正确修法是换成焊接接口。拧紧只是推迟下次泄漏，再加一个阀就多一个漏点，穿刺阀设计上就是临时的。" },
+            { id: 44, part: "type1", category: CAT.TOOL,
+              questionEn: "Why should a self-contained recovery machine be evacuated before it is used on a different refrigerant?",
+              questionZh: "为什么自带压缩机式回收机在换用另一种制冷剂前要先抽真空？",
+              optionsEn: ["To test the machine's pressure switch","To cool the machine down between jobs","To lubricate the machine's compressor","To remove residual refrigerant so it does not mix with and contaminate the next refrigerant recovered"],
+              optionsZh: ["为了测试回收机的压力开关","为了让机器在两次作业之间冷却","为了润滑回收机的压缩机","为了清除残留制冷剂，避免与下一种制冷剂混合造成污染"],
+              answer: 3,
+              explanationEn: "Refrigerant left in the machine's internal circuit would blend with the next batch, producing an unreclaimable mixture. Evacuation is not a lubrication, testing or cooling step.",
+              explanationZh: "机器内部残留的制冷剂会混进下一批，产生无法再生的混合物。抽真空不是润滑、测试或冷却步骤。" },
+            // ---- Type I · SVC1 ----
+            { id: 45, part: "type1", category: CAT.SVC1,
+              questionEn: "A technician needs to pressure-test a repaired refrigerator circuit but has only a shop air compressor and no nitrogen on hand. What should he do?",
+              questionZh: "技师要给修好的冰箱回路打压，但手边只有车间空压机，没有氮气。他应该怎么做？",
+              optionsEn: ["Use compressed shop air, since it is mostly nitrogen anyway","Use pure oxygen from the brazing rig, which is cleaner than shop air","Wait until dry nitrogen is available; neither compressed air nor oxygen may be used because both introduce oxygen that can explode with oil and moisture that contaminates the system","Use refrigerant vapor from a recovery cylinder at full cylinder pressure"],
+              optionsZh: ["用车间压缩空气，反正大部分是氮气","用焊接设备的纯氧，比车间空气干净","等有干氮气再做；压缩空气和氧气都不能用，两者都带入可能与油爆炸的氧气和污染系统的水分","用回收钢瓶里的制冷剂蒸气以钢瓶全压打压"],
+              answer: 2,
+              explanationEn: "Shop air contains 21% oxygen plus moisture; oxygen is even worse. Only dry nitrogen (with a regulator and relief valve) is acceptable. Pressurizing with a full cylinder of refrigerant wastes refrigerant and, if it leaks, vents it.",
+              explanationZh: "压缩空气含 21% 氧气和水分；纯氧更糟。只能用带减压阀和安全阀的干氮气。用整瓶制冷剂打压既浪费又会在泄漏时排放。" },
+            { id: 46, part: "type1", category: CAT.SVC1,
+              questionEn: "Which of the following is NOT a required safety practice when servicing a refrigerator charged with propane (R-290)?",
+              questionZh: "维修充注丙烷（R-290）的冰箱时，下列哪项**不**是必需的安全措施？",
+              optionsEn: ["Using recovery equipment and tools rated for flammable refrigerants","Wearing a self-contained breathing apparatus (SCBA) at all times","Checking the area with a combustible-gas detector before brazing","Working in a well-ventilated area away from ignition sources"],
+              optionsZh: ["使用适用于可燃制冷剂的回收设备和工具","全程佩戴自给式呼吸器（SCBA）","焊接前用可燃气体探测器检查作业区","在通风良好、远离火源的地方作业"],
+              answer: 1,
+              explanationEn: "R-290 is flammable (A3) but of low toxicity; the hazards are ignition and oxygen displacement in confined spaces, not toxicity requiring SCBA. Ventilation, rated equipment and gas detection are the standard precautions.",
+              explanationZh: "R-290 易燃（A3）但低毒；危险在于点火和密闭空间缺氧，不是需要 SCBA 的毒性。通风、专用设备和气体探测才是标准措施。" },
+            { id: 47, part: "type1", category: CAT.SVC1,
+              questionEn: "After a compressor burnout in an R-134a refrigerator, a technician installs a new compressor. What additional steps are required to prevent the new compressor from failing?",
+              questionZh: "一台 R-134a 冰箱压缩机烧毁后，技师换了新压缩机。为防止新压缩机再次损坏，还需要做什么？",
+              optionsEn: ["Flush or clean the system to remove acid and carbon, install a new filter-drier (a suction-line drier if heavily contaminated), evacuate deeply and charge with new refrigerant","Add extra oil to dilute the acid","Run the system for an hour on the old refrigerant, then recover it","Nothing; the new compressor comes with fresh oil"],
+              optionsZh: ["清洗系统以去除酸和碳，换新的干燥过滤器（污染严重时加吸气管干燥器），深抽真空，充注新制冷剂","多加些油稀释酸","先用旧制冷剂运行一小时再回收","不用做什么，新压缩机自带新油"],
+              answer: 0,
+              explanationEn: "A burnout leaves acid and sludge throughout the system; without cleanup the new compressor fails quickly. Extra oil does not neutralize acid, and running on contaminated refrigerant spreads the damage.",
+              explanationZh: "烧毁会在整个系统留下酸和油泥；不清理新压缩机很快就会坏。加油不能中和酸，用污染的制冷剂运行只会扩散损害。" },
+            { id: 48, part: "type1", category: CAT.SVC1,
+              questionEn: "A household refrigerator's nameplate lists its refrigerant charge. In what unit is that charge usually stated?",
+              questionZh: "家用冰箱铭牌上标注的制冷剂充注量通常用什么单位？",
+              optionsEn: ["Gallons","Cubic feet","Pounds","Ounces or grams"],
+              optionsZh: ["加仑","立方英尺","磅","盎司或克"],
+              answer: 3,
+              explanationEn: "Small-appliance charges are tiny—typically 3 to 8 oz (roughly 85 to 230 g)—so nameplates use ounces or grams. Pounds are used for larger systems; gallons and cubic feet are not refrigerant charge units.",
+              explanationZh: "小型电器充注量很小——通常 3 到 8 盎司（约 85 到 230 克）——所以铭牌用盎司或克。磅用于大系统；加仑和立方英尺不是充注量单位。" },
+            { id: 49, part: "type1", category: CAT.SVC1,
+              questionEn: "Why may a homeowner NOT simply cut the lines on an old refrigerator and let the refrigerant escape before hauling it to the dump?",
+              questionZh: "为什么房主**不能**在把旧冰箱拉去垃圾场之前直接剪断管路让制冷剂跑掉？",
+              optionsEn: ["Because the refrigerant is needed to recycle the steel","Because only the manufacturer may cut refrigerant lines","Because the Clean Air Act venting prohibition applies to any person, not just technicians, and the refrigerant must be recovered before disposal","Because refrigerant lines are under such high pressure that cutting them is impossible"],
+              optionsZh: ["因为回收钢材需要制冷剂","因为只有制造商才能剪制冷剂管路","因为《清洁空气法》的禁排规定适用于任何人而不只是技师，报废前必须回收制冷剂","因为制冷剂管路压力太高，根本剪不动"],
+              answer: 2,
+              explanationEn: "The venting ban is not limited to certified technicians—'any person' who knowingly vents is liable. Household refrigerators run at modest pressure, and refrigerant plays no role in steel recycling.",
+              explanationZh: "禁排规定不限于持证技师——「任何人」明知故犯地排放都要担责。家用冰箱压力不高，制冷剂与钢材回收无关。" },
+            { id: 50, part: "type1", category: CAT.SVC1,
+              questionEn: "An old R-12 refrigerator is low on charge. The technician has no R-12 but has R-134a on the truck. May he simply top the system off with R-134a?",
+              questionZh: "一台老式 R-12 冰箱缺氟。技师没有 R-12，但车上有 R-134a。可以直接用 R-134a 补进去吗？",
+              optionsEn: ["Yes, but only up to 50% of the charge","No; mixing refrigerants creates an unreclaimable blend, and R-134a is incompatible with the mineral oil in an R-12 system—a full retrofit with oil change is required","No; R-134a may never be used in any equipment originally built for R-12","Yes, because R-134a is the approved substitute for R-12"],
+              optionsZh: ["可以，但最多补到充注量的 50%","不可以；混合制冷剂会形成无法再生的混合物，而且 R-134a 与 R-12 系统的矿物油不兼容——必须做包括换油在内的完整改造","不可以；R-134a 永远不能用于原本为 R-12 设计的设备","可以，R-134a 是 R-12 的认可替代品"],
+              answer: 1,
+              explanationEn: "Topping off with a different refrigerant is never acceptable. R-134a can replace R-12 only through a proper retrofit: recover, change to POE oil, replace the drier, evacuate, recharge. There is no 50% allowance.",
+              explanationZh: "用另一种制冷剂补氟永远不可以。R-134a 只能通过正规改造替代 R-12：回收、换 POE 油、换干燥器、抽真空、重新充注。不存在 50% 的允许量。" }
+        ];
+        function getExamSetsData() {
+            return [
+                { id: 0, title: "试卷 1 · Set 1", questions: SET1 },
+                { id: 1, title: "试卷 2 · Set 2", questions: SET2 }
+            ];
+        }
+
+        const PAGE_SIZE = 10;
+        let allExamSets = [];
+        let currentSetIndex = 0; // 0 to 1
+        let currentQuestionsData = [];
+        
+        let currentPage = 0; // 0 to 4 (5 pages total)
+        let userAnswers = [];
+        let flaggedQuestions = [];
+        let isSubmitted = false;
+        let isStudyMode = false;
+        let timerInterval = null;
+        let secondsElapsed = 0;
+        let activeFilter = 'all'; // 'all', 'wrong', 'correct'
+        let pendingSetIndex = null;
+        let showChinese = true; // Global state for toggling Chinese translation
+
+        window.onload = function() {
+            allExamSets = getExamSetsData();
+            loadExamSet(0);
+        };
+
+        function loadExamSet(setIndex) {
+            currentSetIndex = parseInt(setIndex);
+            currentQuestionsData = allExamSets[currentSetIndex].questions;
+
+            // Update Header dropdown & label
+            document.getElementById('examSetSelect').value = currentSetIndex;
+            document.getElementById('activeSetLabel').innerText = allExamSets[currentSetIndex].title;
+
+            // Reset state for new set
+            userAnswers = new Array(currentQuestionsData.length).fill(null);
+            flaggedQuestions = new Array(currentQuestionsData.length).fill(false);
+            isSubmitted = false;
+            secondsElapsed = 0;
+            activeFilter = 'all';
+
+            // UI elements reset
+            document.getElementById('headerSubmitBtn').classList.remove('hidden');
+            document.getElementById('btnFilterAll').className = "px-3 py-1 text-xs font-semibold rounded-lg bg-indigo-100 text-indigo-700 font-bold border border-indigo-200";
+            document.getElementById('btnFilterWrong').classList.add('hidden');
+            document.getElementById('btnFilterCorrect').classList.add('hidden');
+            document.getElementById('scoreBadge').classList.add('hidden');
+            document.getElementById('legendResult').classList.add('hidden');
+            document.getElementById('weaknessSideWidget').classList.add('hidden');
+            document.getElementById('passStatus').innerText = "未提交";
+            document.getElementById('passStatus').className = "font-bold text-slate-600";
+
+            // Restart timer
+            if (timerInterval) clearInterval(timerInterval);
+            startTimer();
+
+            // Render view
+            renderPaginationDots();
+            switchPage(0);
+            updateProgressBar();
+        }
+
+        function promptSwitchExamSet(newIndex) {
+            if (parseInt(newIndex) === currentSetIndex) return;
+
+            const hasAnswered = userAnswers.some(a => a !== null);
+            if (hasAnswered && !isSubmitted) {
+                pendingSetIndex = newIndex;
+                document.getElementById('switchSetModal').classList.remove('hidden');
+                // Revert select dropdown temporarily until confirmed
+                document.getElementById('examSetSelect').value = currentSetIndex;
+            } else {
+                loadExamSet(newIndex);
+            }
+        }
+
+        function confirmSwitchExamSet() {
+            closeModal('switchSetModal');
+            if (pendingSetIndex !== null) {
+                loadExamSet(pendingSetIndex);
+                pendingSetIndex = null;
+            }
+        }
+
+        function cancelSwitchExamSet() {
+            closeModal('switchSetModal');
+            pendingSetIndex = null;
+            document.getElementById('examSetSelect').value = currentSetIndex;
+        }
+
+        function startTimer() {
+            timerInterval = setInterval(() => {
+                secondsElapsed++;
+                const hrs = String(Math.floor(secondsElapsed / 3600)).padStart(2, '0');
+                const mins = String(Math.floor((secondsElapsed % 3600) / 60)).padStart(2, '0');
+                const secs = String(secondsElapsed % 60).padStart(2, '0');
+                document.getElementById('timer').innerText = `${hrs}:${mins}:${secs}`;
+            }, 1000);
+        }
+
+        function switchPage(pageIndex) {
+            currentPage = pageIndex;
+            renderPage(pageIndex);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function prevPage() {
+            if (currentPage > 0) switchPage(currentPage - 1);
+        }
+
+        function nextPage() {
+            if (currentPage < 4) switchPage(currentPage + 1);
+        }
+
+        function renderPaginationDots() {
+            const dotsContainer = document.getElementById('paginationDots');
+            dotsContainer.innerHTML = '';
+            for (let i = 0; i < 5; i++) {
+                const btn = document.createElement('button');
+                btn.id = `dotBtn${i}`;
+                btn.onclick = () => switchPage(i);
+                btn.className = `w-8 h-8 rounded-lg text-xs font-bold transition ${i === currentPage ? 'bg-indigo-600 text-white shadow-sm' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`;
+                btn.innerText = i + 1;
+                dotsContainer.appendChild(btn);
+            }
+        }
+
+        function renderPage(pageIndex) {
+            currentPage = pageIndex;
+            
+            // Update Page Tags
+            document.getElementById('currentPageTag').innerText = `第 ${pageIndex + 1} 页`;
+            const startNum = pageIndex * PAGE_SIZE + 1;
+            const endNum = Math.min((pageIndex + 1) * PAGE_SIZE, currentQuestionsData.length);
+            document.getElementById('pageRangeText').innerText = `展示第 ${startNum} - ${endNum} 题 (Questions ${startNum} to ${endNum})`;
+            document.getElementById('pageNumSpan').innerText = pageIndex + 1;
+
+            // Update Tab Highlights
+            for (let i = 0; i < 5; i++) {
+                const tab = document.getElementById(`pageTab${i}`);
+                const dot = document.getElementById(`dotBtn${i}`);
+                if (i === pageIndex) {
+                    tab.className = "flex-1 py-1 text-center rounded-md transition font-bold bg-indigo-600 text-white shadow-sm";
+                    if (dot) dot.className = "w-8 h-8 rounded-lg text-xs font-bold transition bg-indigo-600 text-white shadow-sm";
+                } else {
+                    tab.className = "flex-1 py-1 text-center rounded-md transition text-slate-600 hover:bg-slate-200 font-medium";
+                    if (dot) dot.className = "w-8 h-8 rounded-lg text-xs font-bold transition bg-slate-100 text-slate-600 hover:bg-slate-200";
+                }
+            }
+
+            // Disable/Enable page prev/next buttons
+            document.getElementById('prevPageBtn').disabled = (pageIndex === 0);
+            document.getElementById('nextPageBtn').disabled = (pageIndex === 4);
+
+            // Render 10 Questions
+            const container = document.getElementById('questionsContainer');
+            container.innerHTML = '';
+
+            const pageQuestions = currentQuestionsData.slice(pageIndex * PAGE_SIZE, (pageIndex + 1) * PAGE_SIZE);
+
+            pageQuestions.forEach((q) => {
+                const realIndex = q.id - 1; // 0-indexed
+
+                if (!shouldDisplayInFilter(realIndex)) return;
+
+                const card = document.createElement('div');
+                card.id = `qCard-${realIndex}`;
+                card.className = "bg-white rounded-2xl shadow-sm border border-slate-200 p-4 sm:p-6 transition hover:border-slate-300";
+
+                const isFlagged = flaggedQuestions[realIndex];
+
+                // Options HTML
+                let optionsHtml = '';
+                const labels = ['A', 'B', 'C', 'D'];
+
+                q.optionsEn.forEach((optEn, optIdx) => {
+                    const optZh = q.optionsZh[optIdx];
+                    const isSelected = userAnswers[realIndex] === optIdx;
+
+                    let optClass = "p-3.5 rounded-xl border-2 transition cursor-pointer flex items-center justify-between ";
+
+                    if (isSubmitted) {
+                        const isCorrectAnswer = optIdx === q.answer;
+                        const isUserChoice = optIdx === userAnswers[realIndex];
+
+                        if (isCorrectAnswer) {
+                            optClass += "bg-emerald-50 border-emerald-500 text-emerald-900 font-medium";
+                        } else if (isUserChoice && !isCorrectAnswer) {
+                            optClass += "bg-rose-50 border-rose-500 text-rose-900 font-medium";
+                        } else {
+                            optClass += "bg-white border-slate-200 text-slate-400 opacity-60";
+                        }
+                    } else {
+                        if (isSelected) {
+                            optClass += "bg-indigo-50 border-indigo-600 text-indigo-900 font-medium shadow-sm";
+                        } else {
+                            optClass += "bg-white border-slate-200 hover:border-slate-300 hover:bg-slate-50 text-slate-700";
+                        }
+                    }
+
+                    let iconHtml = '';
+                    if (isSubmitted || isStudyMode) {
+                        if (optIdx === q.answer) {
+                            iconHtml = '<i class="fa-solid fa-circle-check text-emerald-600 text-xl"></i>';
+                        } else if (optIdx === userAnswers[realIndex]) {
+                            iconHtml = '<i class="fa-solid fa-circle-xmark text-rose-500 text-xl"></i>';
+                        }
+                    } else {
+                        iconHtml = isSelected 
+                            ? '<i class="fa-solid fa-circle-dot text-indigo-600 text-xl"></i>' 
+                            : '<i class="fa-regular fa-circle text-slate-300 text-xl"></i>';
+                    }
+
+                    optionsHtml += `
+                        <div onclick="selectOption(${realIndex}, ${optIdx})" class="${optClass}">
+                            <div class="flex items-start space-x-3 pr-2">
+                                <span class="w-7 h-7 rounded-lg bg-slate-100 border border-slate-200 flex items-center justify-center font-bold text-xs text-slate-600 shrink-0 mt-0.5">
+                                    ${labels[optIdx]}
+                                </span>
+                                <div>
+                                    <p class="text-sm font-semibold text-slate-800">${optEn}</p>
+                                    <p class="text-xs text-slate-500 mt-0.5 zh-text ${showChinese ? '' : 'hidden'}">${optZh}</p>
+                                </div>
+                            </div>
+                            <div class="shrink-0">${iconHtml}</div>
+                        </div>
+                    `;
+                });
+
+                // Explanation HTML post submit or in study mode
+                let expHtml = '';
+                if (isSubmitted || (isStudyMode && userAnswers[realIndex] !== null)) {
+                    const isCorrect = userAnswers[realIndex] === q.answer;
+                    const headerClass = isCorrect ? "text-emerald-700" : "text-rose-700";
+                    const headerIcon = isCorrect ? "fa-circle-check text-emerald-600" : "fa-triangle-exclamation text-rose-600";
+                    const statusTitle = isCorrect ? "回答正确 (Correct)" : "正确答案与解析 (Answer Explanation)";
+
+                    expHtml = `
+                        <div class="mt-5 p-4 rounded-xl bg-slate-50 border border-slate-200">
+                            <div class="flex items-center gap-2 font-bold text-sm mb-2 ${headerClass}">
+                                <i class="fa-solid ${headerIcon}"></i>
+                                <span>${statusTitle}</span>
+                            </div>
+                            <div class="space-y-1 text-xs leading-relaxed text-slate-700">
+                                <p class="font-medium"><strong>[EN]</strong> ${q.explanationEn}</p>
+                                <p class="text-slate-500 zh-text ${showChinese ? '' : 'hidden'}"><strong>[中文]</strong> ${q.explanationZh}</p>
+                            </div>
+                        </div>
+                    `;
+                }
+
+                card.innerHTML = `
+                    <div class="flex justify-between items-start gap-4 mb-3">
+                        <div>
+                            <span class="inline-block px-2.5 py-0.5 rounded-md text-xs font-semibold bg-indigo-50 text-indigo-700 border border-indigo-100 mb-2">
+                                ${q.category}
+                            </span>
+                            <h3 class="text-base font-bold text-slate-900 leading-snug">
+                                ${q.id}. ${q.questionEn}
+                            </h3>
+                            <p class="text-xs font-medium text-slate-500 mt-1 zh-text ${showChinese ? '' : 'hidden'}">
+                                ${q.questionZh}
+                            </p>
+                        </div>
+                        <button onclick="toggleFlag(${realIndex})" class="${isFlagged ? 'text-amber-500' : 'text-slate-300 hover:text-amber-500'} p-2 rounded-lg transition shrink-0" title="标记此题">
+                            <i class="fa-solid fa-bookmark text-xl"></i>
+                        </button>
+                    </div>
+
+                    <div class="space-y-2.5 my-4">
+                        ${optionsHtml}
+                    </div>
+
+                    ${expHtml}
+                `;
+
+                container.appendChild(card);
+            });
+
+            renderGrid();
+        }
+
+        function selectOption(qIdx, optIdx) {
+            if (isSubmitted) return;
+            userAnswers[qIdx] = optIdx;
+            
+            renderPage(currentPage);
+            updateProgressBar();
+        }
+
+        function toggleFlag(qIdx) {
+            flaggedQuestions[qIdx] = !flaggedQuestions[qIdx];
+            renderPage(currentPage);
+        }
+
+        function renderGrid() {
+            const gridContainer = document.getElementById('questionGrid');
+            gridContainer.innerHTML = '';
+
+            currentQuestionsData.forEach((q, idx) => {
+                const btn = document.createElement('button');
+                btn.id = `grid-btn-${idx}`;
+                btn.onclick = () => {
+                    const targetPage = Math.floor(idx / PAGE_SIZE);
+                    switchPage(targetPage);
+                    setTimeout(() => {
+                        const el = document.getElementById(`qCard-${idx}`);
+                        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }, 100);
+                };
+                
+                let base = "h-8 w-8 rounded-lg font-semibold text-xs transition flex items-center justify-center border ";
+                
+                if (isSubmitted) {
+                    const isCorrect = userAnswers[idx] === currentQuestionsData[idx].answer;
+                    if (isCorrect) {
+                        base += "bg-emerald-500 text-white border-emerald-600";
+                    } else {
+                        base += "bg-rose-500 text-white border-rose-600";
+                    }
+                } else {
+                    if (userAnswers[idx] !== null) {
+                        base += "bg-indigo-600 text-white border-indigo-700 ";
+                    } else {
+                        base += "bg-slate-100 text-slate-700 hover:bg-slate-200 border-slate-200 ";
+                    }
+
+                    if (flaggedQuestions[idx]) {
+                        base += "ring-2 ring-amber-400 border-amber-500 ";
+                    }
+                }
+
+                btn.className = base;
+                btn.innerText = idx + 1;
+                gridContainer.appendChild(btn);
+            });
+
+            const answeredNum = userAnswers.filter(a => a !== null).length;
+            document.getElementById('answeredCount').innerText = answeredNum;
+        }
+
+        function shouldDisplayInFilter(idx) {
+            if (!isSubmitted || activeFilter === 'all') return true;
+            const isCorrect = userAnswers[idx] === currentQuestionsData[idx].answer;
+            if (activeFilter === 'wrong') return !isCorrect;
+            if (activeFilter === 'correct') return isCorrect;
+            return true;
+        }
+
+        function updateProgressBar() {
+            const answeredCount = userAnswers.filter(a => a !== null).length;
+            const percent = (answeredCount / currentQuestionsData.length) * 100;
+            document.getElementById('progressBar').style.width = `${percent}%`;
+        }
+
+        function confirmSubmit() {
+            const unanswered = userAnswers.filter(a => a === null).length;
+            document.getElementById('unansweredNum').innerText = unanswered;
+            document.getElementById('confirmModal').classList.remove('hidden');
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.add('hidden');
+        }
+
+        function gradeExam() {
+            closeModal('confirmModal');
+            clearInterval(timerInterval);
+            isSubmitted = true;
+
+            let correctCount = 0;
+            currentQuestionsData.forEach((q, idx) => {
+                if (userAnswers[idx] === q.answer) {
+                    correctCount++;
+                }
+            });
+
+            const scorePercent = Math.round((correctCount / currentQuestionsData.length) * 100);
+            const PART_PASS = 18;
+            const partScore = { core: 0, type1: 0 };
+            currentQuestionsData.forEach((q, idx) => { if (userAnswers[idx] === q.answer) partScore[q.part]++; });
+            const corePassed = partScore.core >= PART_PASS;
+            const t1Passed = partScore.type1 >= PART_PASS;
+            const isPassed = corePassed && t1Passed; // 真实考试：两科各 18/25 才拿证
+
+            const paintPart = (box, score, badge, n, ok) => {
+                document.getElementById(score).innerText = `${n} / 25`;
+                document.getElementById(badge).innerText = ok ? "PASS" : "FAIL";
+                document.getElementById(box).className = "p-3 rounded-xl border text-left " + (ok ? "bg-emerald-50 border-emerald-300" : "bg-rose-50 border-rose-300");
+                document.getElementById(badge).className = "text-xs font-bold " + (ok ? "text-emerald-700" : "text-rose-700");
+                document.getElementById(score).className = "text-2xl font-extrabold " + (ok ? "text-emerald-700" : "text-rose-700");
+            };
+            paintPart("modalCoreBox", "modalCoreScore", "modalCoreBadge", partScore.core, corePassed);
+            paintPart("modalT1Box", "modalT1Score", "modalT1Badge", partScore.type1, t1Passed);
+
+            // Breakdown score by category for Weakness Analysis
+            const categoryStats = {};
+
+            currentQuestionsData.forEach((q, idx) => {
+                if (!categoryStats[q.category]) {
+                    categoryStats[q.category] = { total: 0, correct: 0 };
+                }
+                categoryStats[q.category].total++;
+                if (userAnswers[idx] === q.answer) {
+                    categoryStats[q.category].correct++;
+                }
+            });
+
+            // Find weakest category
+            let weakestCategory = '';
+            let lowestAcc = 101;
+
+            Object.keys(categoryStats).forEach(cat => {
+                const stat = categoryStats[cat];
+                const acc = Math.round((stat.correct / stat.total) * 100);
+                stat.acc = acc;
+                if (acc < lowestAcc) {
+                    lowestAcc = acc;
+                    weakestCategory = cat;
+                }
+            });
+
+            // Render Weakness Analysis in Modal
+            const modalCatList = document.getElementById('modalCategoryList');
+            const sideCatList = document.getElementById('categoryBreakdownList');
+            modalCatList.innerHTML = '';
+            sideCatList.innerHTML = '';
+
+            Object.keys(categoryStats).forEach(cat => {
+                const stat = categoryStats[cat];
+                const colorClass = stat.acc >= 70 ? 'bg-emerald-500' : (stat.acc >= 50 ? 'bg-amber-500' : 'bg-rose-500');
+
+                // Modal Item
+                const modalItem = document.createElement('div');
+                modalItem.innerHTML = `
+                    <div class="flex justify-between text-xs font-semibold mb-1 text-slate-700">
+                        <span>${cat}</span>
+                        <span>${stat.correct}/${stat.total} (${stat.acc}%)</span>
+                    </div>
+                    <div class="w-full bg-slate-200 rounded-full h-2 overflow-hidden">
+                        <div class="${colorClass} h-2 rounded-full" style="width: ${stat.acc}%"></div>
+                    </div>
+                `;
+                modalCatList.appendChild(modalItem);
+
+                // Side Widget Item
+                const sideItem = document.createElement('div');
+                sideItem.innerHTML = `
+                    <div class="flex justify-between text-xs font-medium text-slate-600 mb-0.5">
+                        <span class="truncate pr-2">${cat}</span>
+                        <span class="font-bold">${stat.acc}%</span>
+                    </div>
+                    <div class="w-full bg-slate-100 rounded-full h-1.5 overflow-hidden">
+                        <div class="${colorClass} h-1.5 rounded-full" style="width: ${stat.acc}%"></div>
+                    </div>
+                `;
+                sideCatList.appendChild(sideItem);
+            });
+
+            document.getElementById('weakestDomainCallout').innerHTML = `
+                📌 当前套题中最薄弱知识模块为：<span class="font-bold underline text-rose-700">${weakestCategory}</span> (正确率 <span class="font-bold text-rose-700">${lowestAcc}%</span>)。建议重点复习该模块涉及的 EPA 法规条款！
+            `;
+
+            // Display UI updates post-submit
+            document.getElementById('headerSubmitBtn').classList.add('hidden');
+            document.getElementById('btnFilterWrong').classList.remove('hidden');
+            document.getElementById('btnFilterCorrect').classList.remove('hidden');
+            document.getElementById('scoreBadge').classList.remove('hidden');
+            document.getElementById('legendResult').classList.remove('hidden');
+            document.getElementById('weaknessSideWidget').classList.remove('hidden');
+
+            document.getElementById('wrongCount').innerText = currentQuestionsData.length - correctCount;
+            document.getElementById('correctCount').innerText = correctCount;
+
+            const passStatus = document.getElementById('passStatus');
+            if (isPassed) {
+                passStatus.innerText = "PASS (合格)";
+                passStatus.className = "font-bold text-emerald-600";
+            } else {
+                passStatus.innerText = "FAIL (未通过)";
+                passStatus.className = "font-bold text-rose-600";
+            }
+
+            // Results Modal Details
+            document.getElementById('modalScorePercent').innerText = `${scorePercent}%`;
+            document.getElementById('modalScoreCorrect').innerText = `${correctCount} / 50`;
+
+            const resIcon = document.getElementById('resultIcon');
+            const resStatus = document.getElementById('resultStatusText');
+            const passBadge = document.getElementById('modalPassBadge');
+
+            if (isPassed) {
+                resIcon.className = "w-16 h-16 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center mx-auto mb-3 text-3xl";
+                resIcon.innerHTML = '<i class="fa-solid fa-trophy"></i>';
+                resStatus.innerText = `恭喜！您已通过 ${allExamSets[currentSetIndex].title}`;
+                resStatus.className = "text-xl sm:text-2xl font-black text-emerald-600 mb-1";
+                passBadge.innerText = "PASS (及格)";
+                passBadge.className = "text-sm sm:text-base font-extrabold text-emerald-600 mt-1";
+            } else {
+                resIcon.className = "w-16 h-16 rounded-full bg-rose-100 text-rose-600 flex items-center justify-center mx-auto mb-3 text-3xl";
+                resIcon.innerHTML = '<i class="fa-solid fa-circle-xmark"></i>';
+                resStatus.innerText = !corePassed && !t1Passed ? "Core 与 Type I 均未达 18/25，建议整体复习"
+                    : (!corePassed ? "Core 部分未达 18/25（Core 不过则任何认证都拿不到）" : "Type I 部分未达 18/25，重点复习回收百分比与回收设备规则");
+                resStatus.className = "text-xl sm:text-2xl font-black text-rose-600 mb-1";
+                passBadge.innerText = "FAIL (未及格)";
+                passBadge.className = "text-sm sm:text-base font-extrabold text-rose-600 mt-1";
+            }
+
+            document.getElementById('resultsModal').classList.remove('hidden');
+
+            renderPage(currentPage);
+        }
+
+        function setFilter(filterType) {
+            activeFilter = filterType;
+            
+            ['All', 'Wrong', 'Correct'].forEach(type => {
+                const btn = document.getElementById(`btnFilter${type}`);
+                if (type.toLowerCase() === filterType) {
+                    btn.className = "px-3 py-1 text-xs font-semibold rounded-lg bg-indigo-100 text-indigo-700 font-bold border border-indigo-200";
+                } else {
+                    btn.className = "px-3 py-1 text-xs font-semibold rounded-lg text-slate-600 hover:bg-slate-100";
+                }
+            });
+
+            renderPage(currentPage);
+        }
+
+        function toggleNavPanel() {
+            const body = document.getElementById('navPanelBody');
+            const open = !body.classList.toggle('hidden');
+            document.getElementById('navPanelToggleText').innerText = open ? '收起' : '展开';
+            document.getElementById('navPanelToggleIcon').className = 'fa-solid text-[10px] ' + (open ? 'fa-chevron-up' : 'fa-chevron-down');
+        }
+
+        function toggleChineseVisibility() {
+            showChinese = !showChinese;
+            const btnText = document.getElementById('chineseToggleText');
+            if (btnText) {
+                btnText.innerText = showChinese ? "隐藏中文" : "显示中文";
+            }
+
+            const zhElements = document.querySelectorAll('.zh-text');
+            zhElements.forEach(el => {
+                if (showChinese) {
+                    el.classList.remove('hidden');
+                } else {
+                    el.classList.add('hidden');
+                }
+            });
+        }
+
+        function toggleStudyMode() {
+            isStudyMode = !isStudyMode;
+            const btnText = document.getElementById('studyModeToggleText');
+            const btn = document.getElementById('btnToggleStudyMode');
+            if (isStudyMode) {
+                if (btnText) btnText.innerText = "切换为测验模式 (隐藏解析)";
+                if (btn) {
+                    btn.classList.remove('bg-amber-50', 'text-amber-800', 'border-amber-200');
+                    btn.classList.add('bg-amber-500', 'text-white', 'border-amber-600');
+                }
+            } else {
+                if (btnText) btnText.innerText = "开启背题模式 (即时解析)";
+                if (btn) {
+                    btn.classList.remove('bg-amber-500', 'text-white', 'border-amber-600');
+                    btn.classList.add('bg-amber-50', 'text-amber-800', 'border-amber-200');
+                }
+            }
+            renderPage(currentPage);
+        }
+
+        function resetExam() {
+            closeModal('resultsModal');
+            loadExamSet(currentSetIndex);
+        }
+    </script>
+</body>
+</html>
