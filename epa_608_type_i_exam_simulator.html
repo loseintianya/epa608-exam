@@ -1164,6 +1164,7 @@
         let activeFilter = 'all'; // 'all', 'wrong', 'correct'
         let pendingSetIndex = null;
         let showChinese = true; // Global state for toggling Chinese translation
+        let speakingIndex = null; // Currently speaking question index
 
         window.onload = function() {
             allExamSets = getExamSetsData();
@@ -1171,6 +1172,7 @@
         };
 
         function loadExamSet(setIndex) {
+            stopSpeaking();
             currentSetIndex = parseInt(setIndex);
             currentQuestionsData = allExamSets[currentSetIndex].questions;
 
@@ -1408,9 +1410,14 @@
                                 ${q.questionZh}
                             </p>
                         </div>
-                        <button onclick="toggleFlag(${realIndex})" class="${isFlagged ? 'text-amber-500' : 'text-slate-300 hover:text-amber-500'} p-2 rounded-lg transition shrink-0" title="标记此题">
-                            <i class="fa-solid fa-bookmark text-xl"></i>
-                        </button>
+                        <div class="flex items-center gap-1 shrink-0">
+                            <button id="speakBtn-${realIndex}" onclick="speakQuestion(${realIndex})" class="${speakingIndex === realIndex ? 'text-indigo-600 bg-indigo-50 ring-1 ring-indigo-200' : 'text-slate-400 hover:text-indigo-600 hover:bg-indigo-50'} p-2 rounded-lg transition" title="英语朗读题目与选项 (Play English Audio)">
+                                <i class="fa-solid ${speakingIndex === realIndex ? 'fa-volume-high animate-pulse' : 'fa-volume-high'} text-lg"></i>
+                            </button>
+                            <button onclick="toggleFlag(${realIndex})" class="${isFlagged ? 'text-amber-500' : 'text-slate-300 hover:text-amber-500'} p-2 rounded-lg transition" title="标记此题">
+                                <i class="fa-solid fa-bookmark text-xl"></i>
+                            </button>
+                        </div>
                     </div>
 
                     <div class="space-y-2.5 my-4">
@@ -1437,6 +1444,74 @@
         function toggleFlag(qIdx) {
             flaggedQuestions[qIdx] = !flaggedQuestions[qIdx];
             renderPage(currentPage);
+        }
+
+        function updateSpeakButtonUI(idx, active) {
+            const btn = document.getElementById(`speakBtn-${idx}`);
+            if (!btn) return;
+            btn.className = (active
+                ? 'text-indigo-600 bg-indigo-50 ring-1 ring-indigo-200'
+                : 'text-slate-400 hover:text-indigo-600 hover:bg-indigo-50') + ' p-2 rounded-lg transition';
+            const icon = btn.querySelector('i');
+            if (icon) {
+                icon.className = 'fa-solid fa-volume-high text-lg' + (active ? ' animate-pulse' : '');
+            }
+        }
+
+        function stopSpeaking() {
+            if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+            }
+            if (speakingIndex !== null) {
+                const prev = speakingIndex;
+                speakingIndex = null;
+                updateSpeakButtonUI(prev, false);
+            }
+        }
+
+        function speakQuestion(qIdx) {
+            if (!('speechSynthesis' in window)) {
+                alert('当前浏览器不支持英语语音朗读功能 (Web Speech API)。');
+                return;
+            }
+            if (speakingIndex === qIdx) {
+                stopSpeaking();
+                return;
+            }
+            stopSpeaking();
+
+            const q = currentQuestionsData[qIdx];
+            if (!q) return;
+
+            const labels = ['A', 'B', 'C', 'D'];
+            const optionsText = q.optionsEn.map((opt, i) => `Option ${labels[i]}. ${opt}`).join('. ');
+            const fullText = `Question ${q.id}. ${q.questionEn} ${optionsText}`;
+
+            const utterance = new SpeechSynthesisUtterance(fullText);
+            utterance.lang = 'en-US';
+            utterance.rate = 0.95;
+
+            const voices = window.speechSynthesis.getVoices();
+            const enVoice = voices.find(v => v.lang === 'en-US') || voices.find(v => v.lang && v.lang.startsWith('en'));
+            if (enVoice) utterance.voice = enVoice;
+
+            speakingIndex = qIdx;
+            updateSpeakButtonUI(qIdx, true);
+
+            utterance.onend = () => {
+                if (speakingIndex === qIdx) {
+                    speakingIndex = null;
+                    updateSpeakButtonUI(qIdx, false);
+                }
+            };
+            utterance.onerror = () => {
+                if (speakingIndex === qIdx) {
+                    speakingIndex = null;
+                    updateSpeakButtonUI(qIdx, false);
+                }
+            };
+
+            window.speechSynthesis.speak(utterance);
         }
 
         function renderGrid() {
