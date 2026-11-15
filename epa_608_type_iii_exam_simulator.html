@@ -14,6 +14,14 @@
         .custom-scrollbar::-webkit-scrollbar { width: 6px; }
         .custom-scrollbar::-webkit-scrollbar-track { background: #f1f5f9; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        .kw-highlight {
+            background-color: rgba(250, 204, 21, 0.35);
+            color: #854d0e;
+            font-weight: 700;
+            padding: 0 3px;
+            border-radius: 4px;
+            border-bottom: 2px solid #eab308;
+        }
     </style>
 </head>
 <body class="bg-slate-100 text-slate-800 min-h-screen flex flex-col">
@@ -32,8 +40,22 @@
                 </div>
             </div>
 
-            <!-- Header Controls: Exam Set Selector, Timer & Submit -->
-            <div class="flex flex-wrap items-center gap-1.5 sm:gap-3 w-full sm:w-auto">
+            <!-- Mode Tabs -->
+            <div class="flex bg-indigo-900/90 p-1 rounded-xl border border-indigo-700/80 text-xs font-semibold">
+                <button onclick="switchTab('quiz')" id="tab-quiz" class="px-2.5 sm:px-3 py-1.5 rounded-lg transition bg-cyan-500 text-indigo-950 font-bold">
+                    模拟刷题
+                </button>
+                <button onclick="switchTab('mistakes')" id="tab-mistakes" class="px-2.5 sm:px-3 py-1.5 rounded-lg transition text-indigo-200 hover:text-white flex items-center gap-1">
+                    <span>错题本</span>
+                    <span id="mistake-badge" class="bg-rose-500 text-white text-[10px] px-1.5 py-0.2 rounded-full hidden">0</span>
+                </button>
+                <button onclick="switchTab('cheatsheet')" id="tab-cheatsheet" class="px-2.5 sm:px-3 py-1.5 rounded-lg transition text-indigo-200 hover:text-white">
+                    考前速记卡
+                </button>
+            </div>
+
+            <!-- Header Controls: Exam Set Selector, Toggles, Timer & Submit -->
+            <div class="flex flex-wrap items-center gap-1.5 sm:gap-2.5 w-full lg:w-auto">
                 <!-- Exam Set Selector Dropdown -->
                 <div class="flex items-center bg-indigo-900/90 rounded-lg px-2 sm:px-2.5 py-1 border border-indigo-700">
                     <i class="fa-solid fa-layer-group text-cyan-400 text-xs mr-2 hidden sm:inline"></i>
@@ -47,6 +69,12 @@
                 <button id="btnToggleChinese" onclick="toggleChineseVisibility()" class="bg-indigo-900/90 hover:bg-indigo-800 text-white text-xs font-semibold px-2.5 sm:px-3 py-1.5 rounded-lg border border-indigo-700 transition flex items-center gap-1.5" title="显示/隐藏中文（考前建议隐藏中文进行闭卷英文演练）">
                     <i class="fa-solid fa-language text-cyan-400 text-sm"></i>
                     <span id="chineseToggleText" class="hidden sm:inline">隐藏中文</span>
+                </button>
+
+                <!-- Toggle Keyword Highlight Button -->
+                <button id="btnToggleKeywords" onclick="toggleKeywordsVisibility()" class="bg-amber-500/20 hover:bg-amber-500/30 text-amber-200 text-xs font-semibold px-2.5 sm:px-3 py-1.5 rounded-lg border border-amber-400/40 transition flex items-center gap-1.5" title="高亮英语秒杀关键词">
+                    <i class="fa-solid fa-highlighter text-amber-300 text-xs"></i>
+                    <span id="keywordsToggleText" class="hidden sm:inline">秒杀词: 开</span>
                 </button>
 
                 <!-- Timer -->
@@ -64,8 +92,8 @@
         </div>
     </header>
 
-    <!-- Main Container -->
-    <main class="max-w-7xl mx-auto px-3 sm:px-4 py-4 sm:py-6 flex-grow w-full grid grid-cols-1 lg:grid-cols-4 gap-4 sm:gap-6">
+    <!-- Main Container (Quiz View) -->
+    <main id="view-quiz" class="max-w-7xl mx-auto px-3 sm:px-4 py-4 sm:py-6 flex-grow w-full grid grid-cols-1 lg:grid-cols-4 gap-4 sm:gap-6">
 
         <!-- Left Column: Question Navigator & Weakness Summary Side Panel -->
         <div class="lg:col-span-1 space-y-4">
@@ -201,6 +229,143 @@
             </div>
         </div>
     </main>
+
+    <!-- VIEW 2: MISTAKES REVIEW -->
+    <section id="view-mistakes" class="hidden max-w-5xl mx-auto px-3 sm:px-4 py-6 flex-grow w-full space-y-6">
+        <div class="bg-rose-50 border border-rose-200 rounded-2xl p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+                <h2 class="text-base sm:text-lg font-bold text-rose-950 flex items-center gap-2">
+                    <i class="fa-solid fa-book-medical text-rose-600"></i> 错题本与薄弱点强化 (Mistakes Notebook)
+                </h2>
+                <p class="text-xs sm:text-sm text-rose-700 mt-0.5">在模拟交卷或背题模式中答错的题目会自动收录到这里（本地自动保存）。在错题本中重新做对即可移出！</p>
+            </div>
+            <button onclick="clearMistakes()" class="self-start sm:self-auto px-3.5 py-2 rounded-xl text-xs font-semibold bg-white text-rose-700 border border-rose-200 hover:bg-rose-100 transition">
+                清空错题记录
+            </button>
+        </div>
+        <div id="mistakes-container" class="space-y-5"></div>
+    </section>
+
+    <!-- VIEW 3: CHEAT SHEET (Type III) -->
+    <section id="view-cheatsheet" class="hidden max-w-5xl mx-auto px-3 sm:px-4 py-6 flex-grow w-full space-y-6">
+        <div class="bg-gradient-to-r from-indigo-600 to-blue-700 rounded-2xl p-5 sm:p-6 text-white shadow-md">
+            <h2 class="text-lg sm:text-xl font-bold">SkillCat EPA 608 Type III 考前速记卡（闭卷必背）</h2>
+            <p class="text-xs sm:text-sm text-indigo-100 mt-1">Type III 为闭卷监考，考前 10 分钟过一遍下面这 4 张核心数据表，直接锁定 85% 以上必考考点。</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+            <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm space-y-3">
+                <div class="flex items-center justify-between">
+                    <h3 class="font-bold text-slate-900 flex items-center gap-2">
+                        <span class="w-2.5 h-2.5 rounded-full bg-blue-600"></span>
+                        1. 必考核心数字 (Numbers to Memorize)
+                    </h3>
+                    <span class="text-xs font-semibold px-2 py-0.5 bg-blue-50 text-blue-700 rounded-md">闭卷高频</span>
+                </div>
+                <div class="divide-y divide-slate-100 text-sm">
+                    <div class="py-2.5 flex justify-between gap-2">
+                        <span class="text-slate-600">1993-11-15 <b>后</b>设备 · 抽真空标准</span>
+                        <span class="font-bold text-emerald-600">25 mm Hg absolute</span>
+                    </div>
+                    <div class="py-2.5 flex justify-between gap-2">
+                        <span class="text-slate-600">1993-11-15 <b>前</b>设备 · 抽真空标准</span>
+                        <span class="font-bold text-amber-600">25 in. Hg vacuum</span>
+                    </div>
+                    <div class="py-2.5 flex justify-between gap-2">
+                        <span class="text-slate-600">干氮气加压检漏<b>最高上限</b></span>
+                        <span class="font-bold text-rose-600">10 psig (绝不能超!)</span>
+                    </div>
+                    <div class="py-2.5 flex justify-between gap-2">
+                        <span class="text-slate-600">爆破片 (Rupture disc) 破裂压力</span>
+                        <span class="font-bold text-slate-900">15 psig (向室外泄压)</span>
+                    </div>
+                    <div class="py-2.5 flex justify-between gap-2">
+                        <span class="text-slate-600">抽完液态后残留气态制冷剂比例</span>
+                        <span class="font-bold text-slate-900">10% – 15%</span>
+                    </div>
+                    <div class="py-2.5 flex justify-between gap-2">
+                        <span class="text-slate-600">年泄漏率维修门槛 (≥50 lbs)</span>
+                        <span class="font-bold text-slate-900">舒适10% / 商20% / 工30%</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm space-y-3">
+                <div class="flex items-center justify-between">
+                    <h3 class="font-bold text-slate-900 flex items-center gap-2">
+                        <span class="w-2.5 h-2.5 rounded-full bg-emerald-600"></span>
+                        2. 低压制冷剂与负压特性 (Low-Pressure)
+                    </h3>
+                    <span class="text-xs font-semibold px-2 py-0.5 bg-emerald-50 text-emerald-700 rounded-md">必考</span>
+                </div>
+                <ul class="space-y-2.5 text-sm text-slate-700">
+                    <li class="bg-slate-50 p-2.5 rounded-xl border border-slate-100">
+                        <div class="font-semibold text-slate-900">常见低压制冷剂 (104°F 下饱和压 &lt; 45 psia)：</div>
+                        <div class="text-xs text-slate-600 mt-1">
+                            • <b>R-11</b> (CFC，已停产)、<b>R-113</b> (CFC)<br>
+                            • <b>R-123</b> (HCFC，安全等级 <b>B1 高毒不可燃</b>)<br>
+                            • 蒸发器及停机时处于<b>真空/负压</b>，泄漏会<b>吸入空气和水分</b>
+                        </div>
+                    </li>
+                    <li class="bg-slate-50 p-2.5 rounded-xl border border-slate-100">
+                        <div class="font-semibold text-slate-900">R-123 机房安全 (ASHRAE 15)：</div>
+                        <div class="text-xs text-slate-600 mt-1">
+                            • 传感器装在<b>低处/靠近地面</b>（蒸气比空气重）<br>
+                            • 配备泄漏声光报警 + 自动<b>机械事故排风</b> + 机房外 <b>SCBA 呼吸器</b>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm space-y-3">
+                <div class="flex items-center justify-between">
+                    <h3 class="font-bold text-slate-900 flex items-center gap-2">
+                        <span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span>
+                        3. 回收顺序与防冻铁律 (Recovery & Freeze)
+                    </h3>
+                    <span class="text-xs font-semibold px-2 py-0.5 bg-amber-50 text-amber-700 rounded-md">必考场景</span>
+                </div>
+                <ul class="space-y-2 text-sm text-slate-700">
+                    <li class="flex items-start gap-2">
+                        <span class="text-amber-600 font-bold">•</span>
+                        <span><b>回收顺序：</b>先从最低点回收 <b>Liquid (液态)</b>，再从最高点回收 <b>Vapor (气态)</b>；抽到 25 mm Hg abs 后关阀静置几分钟，若压力回升说明仍有液态未抽净。</span>
+                    </li>
+                    <li class="flex items-start gap-2">
+                        <span class="text-amber-600 font-bold">•</span>
+                        <span><b>防冻保护：</b>回收与抽真空全程必须保持<b>冷冻水泵与冷却水泵运行</b>（或排干管内水），否则降压沸点跌破 32°F 会冻裂铜管！</span>
+                    </li>
+                    <li class="flex items-start gap-2">
+                        <span class="text-amber-600 font-bold">•</span>
+                        <span><b>充注顺序：</b>大修后真空状态下先充 <b>Vapor (气态)</b> 抬高压力至 32°F 饱和压以上，再改用 <b>Liquid (液态)</b> 充注。</span>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm space-y-3">
+                <div class="flex items-center justify-between">
+                    <h3 class="font-bold text-slate-900 flex items-center gap-2">
+                        <span class="w-2.5 h-2.5 rounded-full bg-rose-500"></span>
+                        4. Purge 抽气装置与检漏 (Purge & Leaks)
+                    </h3>
+                    <span class="text-xs font-semibold px-2 py-0.5 bg-rose-50 text-rose-700 rounded-md">秒杀词对应</span>
+                </div>
+                <ul class="space-y-2 text-sm text-slate-700">
+                    <li class="flex items-start gap-2">
+                        <span class="text-rose-600 font-bold">•</span>
+                        <span><b>Purge Unit 位置与作用：</b>安装在<b>冷凝器顶部 (Top of condenser)</b>，排出空气等不凝性气体并将夹带的制冷剂冷凝回系统。</span>
+                    </li>
+                    <li class="flex items-start gap-2">
+                        <span class="text-rose-600 font-bold">•</span>
+                        <span>看到 <b>Purge 频繁工作 / 冷凝高压升高</b> ➔ 系统有<b>空气泄漏 (Air leak)</b>；看到 Purge 排出大量水 ➔ <b>换热器铜管漏水 (Tube leak)</b>。</span>
+                    </li>
+                    <li class="flex items-start gap-2">
+                        <span class="text-rose-600 font-bold">•</span>
+                        <span><b>铜管检漏前必做：</b>先排干<b>水室 (Drain water boxes)</b> 里的水，再用干氮气加压 (≤ 10 psig) 或循环热水 (100°F–110°F) 检漏。</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </section>
 
     <!-- Switch Exam Set Confirmation Modal -->
     <div id="switchSetModal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
@@ -1158,9 +1323,96 @@
         let pendingSetIndex = null;
         let showChinese = true; // Global state for toggling Chinese translation
         let speakingIndex = null; // Currently speaking question index
+        let showKeywords = true; // Global state for highlighting trigger keywords
+        let currentTab = 'quiz'; // 'quiz', 'mistakes', 'cheatsheet'
+        const MISTAKES_STORAGE_KEY = 'epa608_t3_sim_mistakes';
+        let mistakesSet = new Set();
+        let mistakeTempAnswers = {};
+
+        const HIGHLIGHT_TERMS = [
+            "AFTER November 15, 1993", "BEFORE November 15, 1993", "November 15, 1993",
+            "25 mm Hg absolute", "25 mm Hg abs", "25 inches of Hg vacuum", "25 in. Hg vacuum",
+            "45 psia at 104°F", "100°F–110°F", "10 psig", "15 psig", "16 psig", "32°F",
+            "10% to 15%", "10%–15%", "50 lb", "30 days", "10 days",
+            "AHRI Standard 700", "AHRI 700", "Section 608", "ASHRAE Standard 15", "ASHRAE 15", "ASHRAE 34",
+            "low-pressure", "centrifugal", "purge unit", "rupture disc", "water boxes", "drain the water",
+            "chilled water", "condenser water", "non-condensable", "non-condensables",
+            "compressor burnout", "liquid first", "vapor first", "stabilizes", "pressure rise",
+            "dry nitrogen", "de minimis", "yellow body", "gray top", "DOT-39", "80%",
+            "open flame", "phosgene", "Class B1", "SCBA", "mechanical ventilation",
+            "R-123", "R-113", "R-11", "R-410A", "R-22", "R-134a"
+        ].sort((a, b) => b.length - a.length);
+
+        const KW_REGEX = new RegExp(
+            '(' + HIGHLIGHT_TERMS.map(t => t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|') + ')',
+            'gi'
+        );
+
+        function formatEnglishText(text) {
+            if (!showKeywords || !text) return text;
+            return text.replace(KW_REGEX, '<span class="kw-highlight">$1</span>');
+        }
+
+        function loadMistakesFromStorage() {
+            try {
+                const raw = localStorage.getItem(MISTAKES_STORAGE_KEY);
+                if (raw) mistakesSet = new Set(JSON.parse(raw));
+            } catch (e) {}
+            updateMistakeBadge();
+        }
+
+        function saveMistakesToStorage() {
+            try {
+                localStorage.setItem(MISTAKES_STORAGE_KEY, JSON.stringify(Array.from(mistakesSet)));
+            } catch (e) {}
+            updateMistakeBadge();
+        }
+
+        function updateMistakeBadge() {
+            const badge = document.getElementById('mistake-badge');
+            if (!badge) return;
+            if (mistakesSet.size > 0) {
+                badge.textContent = mistakesSet.size;
+                badge.classList.remove('hidden');
+            } else {
+                badge.classList.add('hidden');
+            }
+        }
+
+        function switchTab(tab) {
+            stopSpeaking();
+            currentTab = tab;
+            ['quiz', 'mistakes', 'cheatsheet'].forEach(t => {
+                const btn = document.getElementById(`tab-${t}`);
+                const view = document.getElementById(`view-${t}`);
+                if (t === tab) {
+                    if (btn) btn.className = 'px-2.5 sm:px-3 py-1.5 rounded-lg transition bg-cyan-500 text-indigo-950 font-bold';
+                    if (view) view.classList.remove('hidden');
+                } else {
+                    if (btn) btn.className = 'px-2.5 sm:px-3 py-1.5 rounded-lg transition text-indigo-200 hover:text-white';
+                    if (view) view.classList.add('hidden');
+                }
+            });
+            if (tab === 'mistakes') renderMistakes();
+        }
+
+        function toggleKeywordsVisibility() {
+            showKeywords = !showKeywords;
+            const txt = document.getElementById('keywordsToggleText');
+            const btn = document.getElementById('btnToggleKeywords');
+            if (txt) txt.innerText = showKeywords ? '秒杀词: 开' : '秒杀词: 关';
+            if (btn) {
+                btn.className = showKeywords
+                    ? 'bg-amber-500/20 hover:bg-amber-500/30 text-amber-200 text-xs font-semibold px-2.5 sm:px-3 py-1.5 rounded-lg border border-amber-400/40 transition flex items-center gap-1.5'
+                    : 'bg-indigo-900/90 hover:bg-indigo-800 text-indigo-200 text-xs font-semibold px-2.5 sm:px-3 py-1.5 rounded-lg border border-indigo-700 transition flex items-center gap-1.5';
+            }
+            renderPage(currentPage);
+            if (currentTab === 'mistakes') renderMistakes();
+        }
 
         window.onload = function() {
             allExamSets = getExamSetsData();
+            loadMistakesFromStorage();
             loadExamSet(0);
         };
 
@@ -1359,7 +1611,7 @@
                                     ${labels[optIdx]}
                                 </span>
                                 <div>
-                                    <p class="text-sm font-semibold text-slate-800">${optEn}</p>
+                                    <p class="text-sm font-semibold text-slate-800">${formatEnglishText(optEn)}</p>
                                     <p class="text-xs text-slate-500 mt-0.5 zh-text ${showChinese ? '' : 'hidden'}">${optZh}</p>
                                 </div>
                             </div>
@@ -1397,7 +1649,7 @@
                                 ${q.category}
                             </span>
                             <h3 class="text-base font-bold text-slate-900 leading-snug">
-                                ${q.id}. ${q.questionEn}
+                                ${q.id}. ${formatEnglishText(q.questionEn)}
                             </h3>
                             <p class="text-xs font-medium text-slate-500 mt-1 zh-text ${showChinese ? '' : 'hidden'}">
                                 ${q.questionZh}
@@ -1429,9 +1681,133 @@
         function selectOption(qIdx, optIdx) {
             if (isSubmitted) return;
             userAnswers[qIdx] = optIdx;
-            
+            if (isStudyMode && currentQuestionsData[qIdx] && optIdx !== currentQuestionsData[qIdx].answer) {
+                mistakesSet.add(`${currentSetIndex}-${currentQuestionsData[qIdx].id}`);
+                saveMistakesToStorage();
+            }
             renderPage(currentPage);
             updateProgressBar();
+        }
+
+        function renderMistakes() {
+            const container = document.getElementById('mistakes-container');
+            if (!container) return;
+            const items = [];
+            mistakesSet.forEach(key => {
+                const [sIdxStr, qIdStr] = key.split('-');
+                const sIdx = parseInt(sIdxStr, 10);
+                const qId = parseInt(qIdStr, 10);
+                const setObj = allExamSets[sIdx];
+                if (!setObj) return;
+                const q = setObj.questions.find(item => item.id === qId);
+                if (q) items.push({ key, sIdx, setTitle: setObj.title, q });
+            });
+
+            if (items.length === 0) {
+                container.innerHTML = `
+                    <div class="bg-white rounded-2xl border border-slate-200 p-10 text-center space-y-2">
+                        <div class="text-3xl">🎉</div>
+                        <h3 class="text-base font-bold text-slate-800">目前没有错题记录</h3>
+                        <p class="text-xs text-slate-500">在模拟交卷或背题模式中答错的题目会自动出现在这里，答对后可一键移出。</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const labels = ['A', 'B', 'C', 'D'];
+            container.innerHTML = items.map(({ key, sIdx, setTitle, q }) => {
+                const chosen = mistakeTempAnswers[key];
+                const hasChosen = chosen !== undefined;
+                const isRight = hasChosen && chosen === q.answer;
+                const optionsHtml = q.optionsEn.map((optEn, idx) => {
+                    let cls = "p-3.5 rounded-xl border-2 transition cursor-pointer flex items-center justify-between ";
+                    if (hasChosen) {
+                        if (idx === q.answer) cls += "bg-emerald-50 border-emerald-500 text-emerald-900 font-medium";
+                        else if (idx === chosen) cls += "bg-rose-50 border-rose-500 text-rose-900 font-medium";
+                        else cls += "bg-white border-slate-200 text-slate-400 opacity-60";
+                    } else {
+                        cls += "bg-white border-slate-200 hover:border-indigo-300 hover:bg-slate-50 text-slate-700";
+                    }
+                    return `
+                        <div onclick="selectMistakeOption('${key}', ${idx})" class="${cls}">
+                            <div class="flex items-start space-x-3 pr-2">
+                                <span class="w-7 h-7 rounded-lg bg-slate-100 border border-slate-200 flex items-center justify-center font-bold text-xs text-slate-600 shrink-0 mt-0.5">${labels[idx]}</span>
+                                <div>
+                                    <p class="text-sm font-semibold text-slate-800">${formatEnglishText(optEn)}</p>
+                                    <p class="text-xs text-slate-500 mt-0.5 ${showChinese ? '' : 'hidden'}">${q.optionsZh[idx]}</p>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+
+                return `
+                    <div class="bg-white rounded-2xl shadow-sm border ${hasChosen ? (isRight ? 'border-emerald-300' : 'border-rose-300') : 'border-slate-200'} p-4 sm:p-6">
+                        <div class="flex justify-between items-start gap-3 mb-3">
+                            <div>
+                                <div class="flex flex-wrap items-center gap-2 mb-2">
+                                    <span class="px-2 py-0.5 rounded-md text-xs font-bold bg-slate-900 text-white">${setTitle} · Q${q.id}</span>
+                                    <span class="px-2.5 py-0.5 rounded-md text-xs font-semibold bg-indigo-50 text-indigo-700 border border-indigo-100">${q.category}</span>
+                                </div>
+                                <h3 class="text-base font-bold text-slate-900 leading-snug">${q.id}. ${formatEnglishText(q.questionEn)}</h3>
+                                <p class="text-xs font-medium text-slate-500 mt-1 ${showChinese ? '' : 'hidden'}">${q.questionZh}</p>
+                            </div>
+                            <div class="flex items-center gap-1 shrink-0">
+                                <button onclick="speakMistakeQuestion(${sIdx}, ${q.id})" class="text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 p-2 rounded-lg transition" title="英语朗读">
+                                    <i class="fa-solid fa-volume-high text-lg"></i>
+                                </button>
+                                <button onclick="removeMistake('${key}')" class="text-xs font-semibold px-2.5 py-1.5 rounded-lg bg-slate-100 hover:bg-emerald-100 text-slate-600 hover:text-emerald-800 transition" title="移出错题本">
+                                    已掌握 · 移出
+                                </button>
+                            </div>
+                        </div>
+                        <div class="space-y-2.5 my-4">${optionsHtml}</div>
+                        ${hasChosen ? `
+                            <div class="mt-4 p-4 rounded-xl bg-slate-50 border border-slate-200 text-xs leading-relaxed text-slate-700 space-y-1">
+                                <div class="font-bold ${isRight ? 'text-emerald-700' : 'text-rose-700'} mb-1">${isRight ? '✓ 回答正确！可点击右上角「已掌握 · 移出」' : '✗ 再看看解析：'}</div>
+                                <p><strong>[EN]</strong> ${q.explanationEn}</p>
+                                <p class="text-slate-500 ${showChinese ? '' : 'hidden'}"><strong>[中文]</strong> ${q.explanationZh}</p>
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function selectMistakeOption(key, optIdx) {
+            mistakeTempAnswers[key] = optIdx;
+            renderMistakes();
+        }
+
+        function removeMistake(key) {
+            mistakesSet.delete(key);
+            delete mistakeTempAnswers[key];
+            saveMistakesToStorage();
+            renderMistakes();
+        }
+
+        function clearMistakes() {
+            mistakesSet.clear();
+            mistakeTempAnswers = {};
+            saveMistakesToStorage();
+            renderMistakes();
+        }
+
+        function speakMistakeQuestion(sIdx, qId) {
+            const setObj = allExamSets[sIdx];
+            if (!setObj) return;
+            const q = setObj.questions.find(item => item.id === qId);
+            if (!q || !('speechSynthesis' in window)) return;
+            stopSpeaking();
+            const labels = ['A', 'B', 'C', 'D'];
+            const optionsText = q.optionsEn.map((opt, i) => `Option ${labels[i]}. ${opt}`).join('. ');
+            const utterance = new SpeechSynthesisUtterance(`Question ${q.id}. ${q.questionEn} ${optionsText}`);
+            utterance.lang = 'en-US';
+            utterance.rate = 0.95;
+            const voices = window.speechSynthesis.getVoices();
+            const enVoice = voices.find(v => v.lang === 'en-US') || voices.find(v => v.lang && v.lang.startsWith('en'));
+            if (enVoice) utterance.voice = enVoice;
+            window.speechSynthesis.speak(utterance);
         }
 
         function toggleFlag(qIdx) {
@@ -1586,8 +1962,11 @@
             currentQuestionsData.forEach((q, idx) => {
                 if (userAnswers[idx] === q.answer) {
                     correctCount++;
+                } else {
+                    mistakesSet.add(`${currentSetIndex}-${q.id}`);
                 }
             });
+            saveMistakesToStorage();
 
             const scorePercent = Math.round((correctCount / currentQuestionsData.length) * 100);
             const PART_PASS = 18;
