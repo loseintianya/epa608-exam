@@ -1,0 +1,1718 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EPA 608 Type III 双语模拟考试系统 (100题 2套 · Core+Type III)</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+        body { font-family: 'Inter', system-ui, -apple-system, sans-serif; overflow-x: hidden; }
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #f1f5f9; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+    </style>
+</head>
+<body class="bg-slate-100 text-slate-800 min-h-screen flex flex-col">
+
+    <!-- Navigation Bar -->
+    <header class="bg-indigo-950 text-white shadow-lg sticky top-0 z-50 border-b border-indigo-800">
+        <div class="max-w-7xl mx-auto px-3 sm:px-4 py-2 sm:py-3 flex flex-wrap justify-between items-center gap-2 sm:gap-3">
+            <div class="flex items-center space-x-3">
+                <i class="fa-solid fa-snowflake text-cyan-400 text-xl sm:text-2xl animate-pulse"></i>
+                <div>
+                    <h1 class="font-bold text-base sm:text-lg leading-tight flex items-center gap-2">
+                        EPA 608 Type III 模拟考试
+                        <span class="hidden md:inline text-xs bg-cyan-500/20 text-cyan-300 border border-cyan-400/30 px-2 py-0.5 rounded">100题 / 2套 · 每套 Core 25 + Type III 25</span>
+                    </h1>
+                    <p class="hidden sm:block text-xs text-indigo-200">Low-Pressure Chillers Certification Exam Simulator (Closed-Book Prep)</p>
+                </div>
+            </div>
+
+            <!-- Header Controls: Exam Set Selector, Timer & Submit -->
+            <div class="flex flex-wrap items-center gap-1.5 sm:gap-3 w-full sm:w-auto">
+                <!-- Exam Set Selector Dropdown -->
+                <div class="flex items-center bg-indigo-900/90 rounded-lg px-2 sm:px-2.5 py-1 border border-indigo-700">
+                    <i class="fa-solid fa-layer-group text-cyan-400 text-xs mr-2 hidden sm:inline"></i>
+                    <select id="examSetSelect" onchange="promptSwitchExamSet(this.value)" class="bg-transparent text-xs font-semibold text-white focus:outline-none cursor-pointer py-1 pr-1">
+                        <option value="0" class="bg-indigo-950 text-white">试卷 1 · Set 1</option>
+                        <option value="1" class="bg-indigo-950 text-white">试卷 2 · Set 2</option>
+                    </select>
+                </div>
+
+                <!-- Toggle Chinese Translation Button -->
+                <button id="btnToggleChinese" onclick="toggleChineseVisibility()" class="bg-indigo-900/90 hover:bg-indigo-800 text-white text-xs font-semibold px-2.5 sm:px-3 py-1.5 rounded-lg border border-indigo-700 transition flex items-center gap-1.5" title="显示/隐藏中文（考前建议隐藏中文进行闭卷英文演练）">
+                    <i class="fa-solid fa-language text-cyan-400 text-sm"></i>
+                    <span id="chineseToggleText" class="hidden sm:inline">隐藏中文</span>
+                </button>
+
+                <!-- Timer -->
+                <div class="bg-indigo-900/80 px-2 sm:px-3 py-1.5 rounded-lg flex items-center space-x-1.5 sm:space-x-2 text-xs sm:text-sm font-mono border border-indigo-700/60 shadow-inner">
+                    <i class="fa-regular fa-clock text-amber-400"></i>
+                    <span id="timer">00:00:00</span>
+                </div>
+
+                <!-- Submit Button in Header -->
+                <button id="headerSubmitBtn" onclick="confirmSubmit()" class="bg-emerald-600 hover:bg-emerald-500 text-white px-3 sm:px-4 py-1.5 rounded-lg text-xs sm:text-sm font-semibold transition flex items-center space-x-1 shadow-md ml-auto sm:ml-0">
+                    <i class="fa-solid fa-paper-plane"></i>
+                    <span class="hidden sm:inline">提交试卷</span><span class="sm:hidden">交卷</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="max-w-7xl mx-auto px-3 sm:px-4 py-4 sm:py-6 flex-grow w-full grid grid-cols-1 lg:grid-cols-4 gap-4 sm:gap-6">
+
+        <!-- Left Column: Question Navigator & Weakness Summary Side Panel -->
+        <div class="lg:col-span-1 space-y-4">
+            <!-- Question Grid Card -->
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4 lg:sticky lg:top-24">
+                <div class="flex justify-between items-center mb-3">
+                    <h2 class="font-bold text-slate-800 text-sm flex items-center gap-2">
+                        <i class="fa-solid fa-th text-indigo-600"></i> 答题卡 (<span id="answeredCount">0</span>/50)
+                    </h2>
+                    <div class="flex items-center gap-2">
+                        <span id="scoreBadge" class="hidden text-xs font-bold px-2 py-0.5 rounded bg-slate-100 text-slate-600">
+                            成绩评估
+                        </span>
+                        <button id="navPanelToggle" onclick="toggleNavPanel()" class="lg:hidden text-xs font-semibold text-indigo-700 bg-indigo-50 border border-indigo-100 px-2.5 py-1 rounded-lg flex items-center gap-1">
+                            <span id="navPanelToggleText">展开</span> <i id="navPanelToggleIcon" class="fa-solid fa-chevron-down text-[10px]"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Active Exam Set Title Badge -->
+                <div class="bg-indigo-50 border border-indigo-100 p-2 rounded-lg text-xs font-semibold text-indigo-800 mb-3 flex items-center justify-between">
+                    <span id="activeSetLabel">试卷 1 · Set 1</span>
+                    <span class="bg-indigo-200 text-indigo-900 px-1.5 py-0.5 rounded text-[10px]">50题</span>
+                </div>
+
+                <div id="navPanelBody" class="hidden lg:block">
+                <!-- Page Selector Pills -->
+                <div class="flex items-center justify-between bg-slate-100 p-1 rounded-lg mb-3 border border-slate-200 text-xs font-semibold">
+                    <button onclick="switchPage(0)" id="pageTab0" class="flex-1 py-1 text-center rounded-md transition text-slate-600">1-10</button>
+                    <button onclick="switchPage(1)" id="pageTab1" class="flex-1 py-1 text-center rounded-md transition text-slate-600">11-20</button>
+                    <button onclick="switchPage(2)" id="pageTab2" class="flex-1 py-1 text-center rounded-md transition text-slate-600">21-30</button>
+                    <button onclick="switchPage(3)" id="pageTab3" class="flex-1 py-1 text-center rounded-md transition text-slate-600">31-40</button>
+                    <button onclick="switchPage(4)" id="pageTab4" class="flex-1 py-1 text-center rounded-md transition text-slate-600">41-50</button>
+                </div>
+
+                <!-- Status Legend -->
+                <div class="grid grid-cols-2 gap-2 text-xs text-slate-500 mb-3 pb-3 border-b border-slate-100">
+                    <div class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-slate-200 border border-slate-300"></span> 未答</div>
+                    <div class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-indigo-600"></span> 已答</div>
+                    <div class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-amber-400"></span> 已标记</div>
+                    <div id="legendResult" class="hidden flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-rose-500"></span> 错题</div>
+                </div>
+
+                <!-- Grid Buttons (50 buttons) -->
+                <div id="questionGrid" class="grid grid-cols-5 gap-1.5 max-h-[260px] overflow-y-auto custom-scrollbar p-0.5">
+                    <!-- JS generated -->
+                </div>
+
+                </div><!-- /navPanelBody -->
+
+                <!-- Overall Progress -->
+                <div class="mt-3 lg:mt-4 pt-3 border-t border-slate-100 space-y-2">
+                    <div class="flex justify-between text-xs text-slate-500">
+                        <span>及格线: 两科各 18/25 (72%)</span>
+                        <span id="passStatus" class="font-bold text-slate-600">未提交</span>
+                    </div>
+                    <div class="w-full bg-slate-100 rounded-full h-2 overflow-hidden">
+                        <div id="progressBar" class="bg-indigo-600 h-2 w-0 transition-all duration-300"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Weakness Analytics Summary Box (Revealed after Submit) -->
+            <div id="weaknessSideWidget" class="hidden bg-white rounded-xl shadow-sm border border-rose-100 p-4">
+                <h3 class="font-bold text-sm text-slate-800 mb-3 flex items-center gap-2">
+                    <i class="fa-solid fa-chart-pie text-rose-500"></i> 薄弱考点诊断 (Weak Areas)
+                </h3>
+                <div id="categoryBreakdownList" class="space-y-2.5 text-xs">
+                    <!-- Category Accuracy Bars Rendered here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Column: 10 Questions Per Page List -->
+        <div class="lg:col-span-3 space-y-6">
+
+            <!-- Filter / Controls Bar -->
+            <div id="filterBar" class="bg-white p-3.5 rounded-xl border border-slate-200 shadow-sm flex flex-wrap items-center justify-between gap-3">
+                <div class="flex items-center space-x-2">
+                    <button id="btnToggleStudyMode" onclick="toggleStudyMode()" class="text-xs font-bold flex items-center gap-1.5 bg-amber-50 hover:bg-amber-100 text-amber-800 px-3 py-1.5 rounded-lg border border-amber-200 transition">
+                        <i class="fa-solid fa-lightbulb text-amber-500 text-sm"></i>
+                        <span id="studyModeToggleText">开启背题模式 (即时解析)</span>
+                    </button>
+                    <button onclick="resetExam()" class="text-xs text-indigo-600 hover:text-indigo-800 font-bold flex items-center gap-1 bg-indigo-50 px-3 py-1.5 rounded-lg border border-indigo-100">
+                        <i class="fa-solid fa-rotate-right"></i> 重新测试当前套题
+                    </button>
+                </div>
+
+                <!-- Result Filter Buttons (Wrong/Correct revealed after submit) -->
+                <div class="flex items-center space-x-1 bg-slate-50 p-1 rounded-lg border border-slate-200">
+                    <button id="btnFilterAll" onclick="setFilter('all')" class="px-3 py-1 text-xs font-semibold rounded-lg bg-indigo-100 text-indigo-700 font-bold border border-indigo-200">
+                        全部题目
+                    </button>
+                    <button id="btnFilterWrong" onclick="setFilter('wrong')" class="hidden px-3 py-1 text-xs font-semibold rounded-lg text-slate-600 hover:bg-slate-100">
+                        只看错题 (<span id="wrongCount">0</span>)
+                    </button>
+                    <button id="btnFilterCorrect" onclick="setFilter('correct')" class="hidden px-3 py-1 text-xs font-semibold rounded-lg text-slate-600 hover:bg-slate-100">
+                        只看对题 (<span id="correctCount">0</span>)
+                    </button>
+                </div>
+            </div>
+
+            <!-- Page Title Bar -->
+            <div class="flex flex-wrap justify-between items-center gap-2 px-1">
+                <h2 class="text-base sm:text-lg font-extrabold text-slate-800 flex items-center gap-2">
+                    <span class="bg-indigo-600 text-white text-xs px-2.5 py-1 rounded-md" id="currentPageTag">第 1 页</span>
+                    <span id="pageRangeText">展示第 1 - 10 题 (Questions 1 to 10)</span>
+                </h2>
+                <div class="text-xs font-semibold text-slate-500">
+                    共 5 页 (Page <span id="pageNumSpan">1</span> / 5)
+                </div>
+            </div>
+
+            <!-- Container for rendering 10 Question Cards -->
+            <div id="questionsContainer" class="space-y-6">
+                <!-- 10 Question cards will be injected here via JS -->
+            </div>
+
+            <!-- Page Navigation Bottom Controls -->
+            <div class="bg-white p-3 sm:p-4 rounded-xl shadow-sm border border-slate-200 flex flex-wrap items-center justify-between gap-3">
+                <button id="prevPageBtn" onclick="prevPage()" class="px-4 sm:px-5 py-2.5 rounded-lg border border-slate-300 text-slate-700 hover:bg-slate-50 font-semibold text-sm flex items-center gap-2 transition disabled:opacity-40">
+                    <i class="fa-solid fa-chevron-left"></i> 上一页<span class="hidden sm:inline"> (10题)</span>
+                </button>
+                
+                <!-- Page Numbers -->
+                <div class="flex items-center space-x-1 order-first w-full justify-center sm:order-none sm:w-auto" id="paginationDots">
+                    <!-- Page dots -->
+                </div>
+
+                <button id="nextPageBtn" onclick="nextPage()" class="px-4 sm:px-5 py-2.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-sm flex items-center gap-2 transition">
+                    下一页<span class="hidden sm:inline"> (10题)</span> <i class="fa-solid fa-chevron-right"></i>
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <!-- Switch Exam Set Confirmation Modal -->
+    <div id="switchSetModal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-md w-full p-5 sm:p-6 shadow-2xl border border-slate-100 text-center">
+            <div class="w-12 h-12 rounded-full bg-amber-50 text-amber-600 flex items-center justify-center mx-auto mb-4 text-xl">
+                <i class="fa-solid fa-arrows-rotate"></i>
+            </div>
+            <h3 class="text-lg font-bold text-slate-800 mb-2">确认切换考试套题？</h3>
+            <p class="text-sm text-slate-500 mb-6">
+                切换到新的试卷将重置您当前套题的答题进度和计时器。是否确定切换？
+            </p>
+            <div class="flex gap-3 justify-center">
+                <button onclick="cancelSwitchExamSet()" class="px-4 py-2.5 rounded-xl border border-slate-300 text-slate-600 font-medium text-sm hover:bg-slate-50 transition w-1/2">
+                    取消
+                </button>
+                <button onclick="confirmSwitchExamSet()" class="px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-sm transition w-1/2 shadow-md">
+                    确认切换
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Submit Confirmation Modal -->
+    <div id="confirmModal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-md w-full p-5 sm:p-6 shadow-2xl border border-slate-100 text-center">
+            <div class="w-12 h-12 rounded-full bg-indigo-50 text-indigo-600 flex items-center justify-center mx-auto mb-4 text-xl">
+                <i class="fa-solid fa-file-signature"></i>
+            </div>
+            <h3 class="text-lg font-bold text-slate-800 mb-2">确认提交 EPA 608 Type III 试卷？</h3>
+            <p id="unansweredWarning" class="text-sm text-slate-500 mb-6">
+                您还有 <span id="unansweredNum" class="font-bold text-amber-600">0</span> 道题未作答。提交后将生成详细的中英错题解析与薄弱知识点分析报告。
+            </p>
+            <div class="flex gap-3 justify-center">
+                <button onclick="closeModal('confirmModal')" class="px-4 py-2.5 rounded-xl border border-slate-300 text-slate-600 font-medium text-sm hover:bg-slate-50 transition w-1/2">
+                    继续答题
+                </button>
+                <button onclick="gradeExam()" class="px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-sm transition w-1/2 shadow-md">
+                    确认提交
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Enhanced Results & Weakness Diagnostic Modal -->
+    <div id="resultsModal" class="hidden fixed inset-0 bg-slate-900/70 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto">
+        <div class="bg-white rounded-2xl max-w-2xl w-full p-4 sm:p-6 shadow-2xl border border-slate-100 text-center my-4 sm:my-8 max-h-[92vh] overflow-y-auto custom-scrollbar">
+            <div id="resultIcon" class="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-3 text-3xl">
+                <!-- Icon via JS -->
+            </div>
+            <h2 id="resultStatusText" class="text-xl sm:text-2xl font-black mb-1">测试结果统计</h2>
+            <p id="resultSubText" class="text-sm text-slate-500 mb-5">EPA Section 608 Type III Certification Diagnostic Report</p>
+            
+            <div class="grid grid-cols-3 gap-2 sm:gap-3 bg-slate-50 p-3 sm:p-4 rounded-xl border border-slate-200 mb-4 sm:mb-6">
+                <div>
+                    <div class="text-xs text-slate-500 font-medium">综合正确率</div>
+                    <div id="modalScorePercent" class="text-2xl sm:text-3xl font-extrabold text-slate-800">0%</div>
+                </div>
+                <div>
+                    <div class="text-xs text-slate-500 font-medium">答对 / 总题数</div>
+                    <div id="modalScoreCorrect" class="text-2xl sm:text-3xl font-extrabold text-emerald-600">0 / 50</div>
+                </div>
+                <div>
+                    <div class="text-xs text-slate-500 font-medium">官方判定</div>
+                    <div id="modalPassBadge" class="text-sm sm:text-base font-extrabold mt-1">未判定</div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3 mb-6">
+                <div id="modalCoreBox" class="p-3 rounded-xl border text-left">
+                    <div class="text-xs font-semibold text-slate-500">Core 核心部分 · 及格 18/25</div>
+                    <div class="flex items-baseline gap-2 mt-1">
+                        <span id="modalCoreScore" class="text-2xl font-extrabold">0 / 25</span>
+                        <span id="modalCoreBadge" class="text-xs font-bold"></span>
+                    </div>
+                </div>
+                <div id="modalT3Box" class="p-3 rounded-xl border text-left">
+                    <div class="text-xs font-semibold text-slate-500">Type III 低压冷水机部分 · 及格 18/25</div>
+                    <div class="flex items-baseline gap-2 mt-1">
+                        <span id="modalT3Score" class="text-2xl font-extrabold">0 / 25</span>
+                        <span id="modalT3Badge" class="text-xs font-bold"></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Weak Knowledge Areas Analysis Box -->
+            <div class="bg-rose-50/70 border border-rose-200 p-4 rounded-xl mb-6 text-left">
+                <div class="flex items-center gap-2 text-rose-800 font-bold text-sm mb-2">
+                    <i class="fa-solid fa-triangle-exclamation text-rose-600"></i>
+                    <span>薄弱知识点诊断 (Weakest Knowledge Domain):</span>
+                </div>
+                <div id="weakestDomainCallout" class="text-sm text-rose-900 font-medium mb-3">
+                    计算中...
+                </div>
+                <div class="space-y-2" id="modalCategoryList">
+                    <!-- Progress bars of categories -->
+                </div>
+            </div>
+
+            <div class="flex gap-3">
+                <button onclick="resetExam()" class="px-4 py-2.5 rounded-xl border border-slate-300 text-slate-700 font-semibold text-sm hover:bg-slate-50 transition w-1/2">
+                    <i class="fa-solid fa-rotate-right mr-1"></i> 重新测试此套题
+                </button>
+                <button onclick="closeModal('resultsModal'); setFilter('wrong');" class="px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-sm transition w-1/2 shadow-md">
+                    <i class="fa-solid fa-magnifying-glass-chart mr-1"></i> 逐题排查错题解析
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ---------- 题库：2 套 × 50 题（每套 id 1-25 Core，26-50 Type III）----------
+        const CAT = {
+            REG:   "法规与臭氧层 (Regulations & Ozone)",
+            REC:   "回收·回用·再生 (Recovery / Recycling / Reclaim)",
+            CYL:   "钢瓶·安全·运输 (Cylinders, Safety & Shipping)",
+            BAS:   "制冷基础与制冷剂 (Refrigeration Basics & Refrigerants)",
+            LOWP:  "低压系统与制冷剂特性 (Low-Pressure Systems & Refrigerants)",
+            LEAK:  "检漏·加压·维修期限 (Leak Testing, Pressurization & Repair)",
+            EVAC:  "真空指标·液气回收顺序 (Evacuation Levels & Recovery Sequence)",
+            PURGE: "抽气装置·防冻·机房安全 (Purge Unit, Freeze Protection & Safety)"
+        };
+
+        const SET1 = [
+            // ---- Core (1-25) ----
+            { id: 1, part: "core", category: CAT.REG,
+              questionEn: "Which Clean Air Act Section 608 rule applies to taking the Type III certification exam on SkillCat or any EPA-approved provider?",
+              questionZh: "在 SkillCat 或任何 EPA 认证机构参加 Type III 认证考试时，适用哪项规定？",
+              optionsEn: ["It may be taken open-book without a proctor","It must be taken as a closed-book, proctored exam","It does not include Core questions","It is valid for only 5 years before renewal is required"],
+              optionsZh: ["可以无监考开卷考试","必须是闭卷、有监考的考试","不包含 Core 核心题","有效期只有 5 年，到期需续证"],
+              answer: 1,
+              explanationEn: "Only Type I may be taken open-book and non-proctored. Type II, Type III, and Universal exams must be closed-book and proctored, and EPA 608 certifications never expire.",
+              explanationZh: "只有 Type I 可以无监考开卷。Type II、Type III 和 Universal 必须是闭卷监考，且 EPA 608 证书终身有效、无需续证。" },
+            { id: 2, part: "core", category: CAT.REG,
+              questionEn: "Which refrigerant class has the highest Ozone Depletion Potential (ODP)?",
+              questionZh: "哪一类制冷剂的臭氧消耗潜能值（ODP）最高？",
+              optionsEn: ["HFCs","HCFCs","CFCs","HFOs"],
+              optionsZh: ["HFCs","HCFCs","CFCs","HFOs"],
+              answer: 2,
+              explanationEn: "CFCs (such as R-11 and R-12) contain chlorine and no hydrogen, making them very stable until they reach the stratosphere, giving them the highest ODP.",
+              explanationZh: "CFC（如 R-11、R-12）含氯且不含氢，极其稳定直到进入平流层才释放氯原子，因此 ODP 最高。" },
+            { id: 3, part: "core", category: CAT.REG,
+              questionEn: "Approximately how many ozone molecules can a single chlorine atom destroy in the stratosphere?",
+              questionZh: "平流层中一个氯原子大约可以破坏多少个臭氧分子？",
+              optionsEn: ["10","1,000","100,000","10,000,000"],
+              optionsZh: ["10 个","1,000 个","100,000 个","10,000,000 个"],
+              answer: 2,
+              explanationEn: "A single chlorine atom acts as a catalyst and can destroy roughly 100,000 ozone molecules before being removed from the stratosphere.",
+              explanationZh: "单个氯原子起催化作用，在离开平流层前大约可破坏 100,000 个臭氧分子。" },
+            { id: 4, part: "core", category: CAT.REG,
+              questionEn: "What is the primary evidence that CFCs and HCFCs reach the stratosphere and cause ozone depletion?",
+              questionZh: "证明 CFC 和 HCFC 进入平流层并破坏臭氧层的主要科学依据是什么？",
+              optionsEn: ["Measurements of chlorine monoxide (ClO) and CFCs in air samples collected from the stratosphere","Volcanic ash deposits in the ocean","Rising ground-level ozone in cities","Increased nitrogen levels in the troposphere"],
+              optionsZh: ["在平流层采集的空气样本中测得一氧化氯（ClO）和 CFC","海洋中的火山灰沉积","城市地面臭氧浓度升高","对流层氮气含量增加"],
+              answer: 0,
+              explanationEn: "High-altitude aircraft and balloon air samples directly detect CFCs and chlorine monoxide (ClO) in the stratosphere, proving man-made refrigerants—not volcanoes—are the primary source.",
+              explanationZh: "高空飞机与气球采样在平流层直接测得了 CFC 和一氧化氯（ClO），证明人为制冷剂（而非火山）是平流层氯的主要来源。" },
+            { id: 5, part: "core", category: CAT.REG,
+              questionEn: "Under EPA Section 608, which release of refrigerant is considered an allowable 'de minimis' release?",
+              questionZh: "根据 EPA 608 法规，哪种制冷剂释放属于允许的「微量（de minimis）」释放？",
+              optionsEn: ["Venting a system slowly so it cannot be seen","Releasing small amounts trapped in hoses during disconnection after a good-faith recovery attempt","Using R-22 to flush dirt out of a condenser coil","Releasing refrigerant from a catastrophic compressor failure while intentionally cutting the line"],
+              optionsZh: ["缓慢排放系统制冷剂以免被人看见","认真尝试回收后，在拆卸软管时释放管内残留的微量制冷剂","用 R-22 冲洗冷凝器盘管里的灰尘","故意剪断管路导致大量制冷剂喷出"],
+              answer: 1,
+              explanationEn: "Only tiny, unavoidable releases during hose connection/disconnection after good-faith recovery (or normal equipment operation) qualify as de minimis.",
+              explanationZh: "只有在认真回收后拆接软管时不可避免的极微量释放才属于 de minimis 例外。" },
+            { id: 6, part: "core", category: CAT.REG,
+              questionEn: "Which gas should NEVER be used to pressurize a refrigeration system for leak testing?",
+              questionZh: "绝对**不能**用哪种气体对制冷系统加压检漏？",
+              optionsEn: ["Dry nitrogen","Oxygen or compressed air","Trace refrigerant mixed with dry nitrogen","Helium"],
+              optionsZh: ["干氮气","氧气或压缩空气","干氮气混合微量示踪制冷剂","氦气"],
+              answer: 1,
+              explanationEn: "Oxygen or compressed air can react violently with compressor oil under pressure, causing a severe explosion.",
+              explanationZh: "氧气或压缩空气在压力下会与压缩机冷冻油剧烈反应引发严重爆炸，必须使用干氮气。" },
+            { id: 7, part: "core", category: CAT.REG,
+              questionEn: "Why must a pressure regulator and relief valve always be used when pressurizing a system with a dry nitrogen cylinder?",
+              questionZh: "用干氮气钢瓶给系统加压时，为什么必须使用调压阀和安全泄压阀？",
+              optionsEn: ["To keep nitrogen from freezing the oil","Because a full nitrogen cylinder is over 2,000 psig and can rupture system components","To remove moisture from the nitrogen","To convert nitrogen into a liquid"],
+              optionsZh: ["防止氮气冻住冷冻油","因为满瓶氮气压力超过 2,000 psig，直接接入会炸裂系统部件","去除氮气中的水分","把氮气变成液体"],
+              answer: 1,
+              explanationEn: "Nitrogen cylinders are pressurized above 2,000 psig; without a regulator, they will easily exceed system and rupture-disc limits.",
+              explanationZh: "氮气瓶压力超过 2,000 psig，不加调压阀会瞬间超过系统（尤其是低压机 10 psig 限制）耐压极限。" },
+            { id: 8, part: "core", category: CAT.REC,
+              questionEn: "What does 'recover' mean under EPA Section 608?",
+              questionZh: "EPA 608 法规中「回收（Recover）」的定义是什么？",
+              optionsEn: ["To clean refrigerant on-site through oil separation and filter-driers","To remove refrigerant in any condition from an appliance and store it in an external container without necessarily testing or processing it","To reprocess refrigerant to AHRI 700 purity standards","To destroy refrigerant by incineration"],
+              optionsZh: ["现场通过油分和干燥过滤器清洁制冷剂","将任意状态的制冷剂从设备中抽到外部容器储存，无需检测或处理","将制冷剂加工到 AHRI 700 纯度标准","焚烧销毁制冷剂"],
+              answer: 1,
+              explanationEn: "Recovering simply removes refrigerant into an external container without processing; recycling cleans it for same-owner reuse; reclaiming restores it to AHRI 700.",
+              explanationZh: "Recover 只是抽入外部钢瓶；Recycle 是现场过滤供同一业主回用；Reclaim 是送厂加工至 AHRI 700 标准。" },
+            { id: 9, part: "core", category: CAT.REC,
+              questionEn: "Before used refrigerant can be resold to a different owner, what must happen to it?",
+              questionZh: "用过的制冷剂在转售给不同业主之前，必须经过什么处理？",
+              optionsEn: ["It must be filtered once through a field drier","It must be reclaimed to AHRI Standard 700 purity by an EPA-certified reclaimer","It must be diluted 50% with virgin refrigerant","It only needs a visual clarity check"],
+              optionsZh: ["现场通过干燥过滤器过滤一次即可","必须由 EPA 认证再生商加工至 AHRI 700 纯度标准","用 50% 新制冷剂稀释","只需目视检查清澈度"],
+              answer: 1,
+              explanationEn: "Used refrigerant changing ownership must be reclaimed to AHRI 700 specifications by an EPA-certified reclaimer.",
+              explanationZh: "更换业主的旧制冷剂必须由 EPA 认证再生商精炼至 AHRI 700 标准。" },
+            { id: 10, part: "core", category: CAT.REC,
+              questionEn: "What is the purpose of an EPA-certified reclaimer testing recovered refrigerant chemically?",
+              questionZh: "EPA 认证再生商对回收制冷剂进行化学分析的目的是什么？",
+              optionsEn: ["To determine the age of the compressor","To verify that purity meets AHRI Standard 700","To calculate the system's SEER rating","To check whether the cylinder is DOT-39"],
+              optionsZh: ["判断压缩机使用年限","验证纯度是否达到 AHRI 700 标准","计算系统的能效比","检查钢瓶是否为 DOT-39"],
+              answer: 1,
+              explanationEn: "Reclaimers must chemically analyze each batch to prove it meets AHRI 700 purity before it can be resold.",
+              explanationZh: "再生商必须进行化学分析，确认达到 AHRI 700 纯度标准后才能重新销售。" },
+            { id: 11, part: "core", category: CAT.REC,
+              questionEn: "Why should a technician never mix two different refrigerants in the same recovery cylinder?",
+              questionZh: "为什么技师绝不能将两种不同的制冷剂混装在同一个回收钢瓶中？",
+              optionsEn: ["It causes the cylinder paint to peel","Mixed refrigerants usually cannot be reclaimed and must be destroyed at high cost","The mixture becomes pure R-410A","It doubles the recovery speed"],
+              optionsZh: ["会导致钢瓶掉漆","混合制冷剂通常无法再生，只能高价销毁","混合后会变成纯 R-410A","会让回收速度翻倍"],
+              answer: 1,
+              explanationEn: "Reclaimers cannot economically separate mixed refrigerants, so mixed cylinders are rejected or billed for destruction.",
+              explanationZh: "再生商无法经济地分离混合制冷剂，混装钢瓶会被拒收或收取高额销毁费。" },
+            { id: 12, part: "core", category: CAT.REC,
+              questionEn: "Which condition requires changing the oil in a recovery machine more frequently?",
+              questionZh: "哪种情况需要更频繁地更换回收机自身的冷冻油？",
+              optionsEn: ["Recovering from a system that suffered a compressor burnout","Recovering virgin refrigerant from a new unit","Using short recovery hoses","Working in cool ambient temperatures"],
+              optionsZh: ["从发生过压缩机烧毁（burnout）的系统回收后","从新机组回收原装制冷剂","使用短回收软管","在凉爽环境中作业"],
+              answer: 0,
+              explanationEn: "Burnout systems contain acid and sludge that contaminate recovery machine oil and damage its compressor if not changed.",
+              explanationZh: "烧毁系统含有酸性物质和油泥，会污染回收机冷冻油并损坏回收机压缩机。" },
+            { id: 13, part: "core", category: CAT.CYL,
+              questionEn: "How are DOT-approved refillable refrigerant recovery cylinders color-coded?",
+              questionZh: "DOT 认证的可重复充装回收钢瓶是如何颜色编码的？",
+              optionsEn: ["All green","Yellow body with a gray top (shoulder)","All blue","White body with a red top"],
+              optionsZh: ["全绿色","黄色瓶身配灰色瓶肩/顶部","全蓝色","白色瓶身配红色顶部"],
+              answer: 1,
+              explanationEn: "Recovery cylinders must have a gray top and a yellow body to distinguish them from virgin refrigerant cylinders.",
+              explanationZh: "回收钢瓶规定为黄身灰顶（Yellow body, Gray top），以区分原装新制冷剂钢瓶。" },
+            { id: 14, part: "core", category: CAT.CYL,
+              questionEn: "What is the maximum allowable fill level for a refrigerant recovery cylinder?",
+              questionZh: "制冷剂回收钢瓶的最高允许充装量是多少？",
+              optionsEn: ["50% of capacity","80% of capacity by weight","95% of capacity","100% of water capacity"],
+              optionsZh: ["容积的 50%","按重量不超过容量的 80%","容量的 95%","水容量的 100%"],
+              answer: 1,
+              explanationEn: "Never fill a recovery cylinder above 80% of its rated capacity; liquid refrigerant expands with heat and could burst the cylinder.",
+              explanationZh: "充装不得超过额定容量的 80%，必须留出液体热膨胀空间以防爆瓶。" },
+            { id: 15, part: "core", category: CAT.CYL,
+              questionEn: "How often must a refillable DOT recovery cylinder be hydrostatically tested?",
+              questionZh: "可重复充装的 DOT 回收钢瓶每隔多久必须进行一次水压测试（Hydrostatic test）？",
+              optionsEn: ["Every year","Every 3 years","Every 5 years","Every 10 years"],
+              optionsZh: ["每年","每 3 年","每 5 年","每 10 年"],
+              answer: 2,
+              explanationEn: "DOT recovery cylinders require hydrostatic re-testing every 5 years, with the test date stamped on the cylinder.",
+              explanationZh: "DOT 回收钢瓶每 5 年需做一次水压测试，日期会钢印在瓶肩上。" },
+            { id: 16, part: "core", category: CAT.CYL,
+              questionEn: "When shipping a cylinder of recovered refrigerant, which statement is true?",
+              questionZh: "运输装有回收制冷剂的钢瓶时，哪项做法是正确的？",
+              optionsEn: ["Place the cylinder on its side so it won't tip","Transport it upright, secured, with DOT classification tags and proper valve caps","Fill it to 95% to reduce the number of trips","Remove all labels so it is not flagged"],
+              optionsZh: ["把钢瓶横放以免倾倒","直立固定运输，贴好 DOT 分类标签并盖好阀帽","装到 95% 以减少运输次数","撕掉所有标签"],
+              answer: 1,
+              explanationEn: "Cylinders must be transported upright, secured, capped, and properly labeled under DOT hazardous materials rules.",
+              explanationZh: "必须直立固定、戴阀帽并按 DOT 危险品规定贴好标签。" },
+            { id: 17, part: "core", category: CAT.CYL,
+              questionEn: "What is the safest way to pinpoint the exact location of a suspected refrigerant leak after an electronic detector beeps in an area?",
+              questionZh: "电子检漏仪在某区域报警后，精确定位漏点最可靠的方法是什么？",
+              optionsEn: ["Halide torch","Soap bubbles","Smelling for oil","Pressurizing with oxygen"],
+              optionsZh: ["卤素灯","肥皂泡（Soap bubbles）","闻冷冻油味","用氧气加压"],
+              answer: 1,
+              explanationEn: "Electronic or ultrasonic detectors locate the general area, while soap bubbles pinpoint the exact leak site.",
+              explanationZh: "电子/超声检漏仪用于大范围排查，肥皂泡用于精确定位具体漏点。" },
+            { id: 18, part: "core", category: CAT.CYL,
+              questionEn: "What personal protective equipment (PPE) should always be worn when handling liquid refrigerant?",
+              questionZh: "操作液态制冷剂时，必须始终佩戴哪些个人防护装备（PPE）？",
+              optionsEn: ["Cotton gloves and sunglasses","Safety glasses/goggles and butyl-lined (or neoprene) gloves","Steel-toe boots only","Earplugs and dust mask"],
+              optionsZh: ["棉手套和墨镜","护目镜/安全眼镜和丁基（或氯丁橡胶）防冻手套","仅钢头鞋","耳塞和防尘口罩"],
+              answer: 1,
+              explanationEn: "Liquid refrigerant boils rapidly at skin temperature and causes severe frostbite; eye protection and proper insulated/chemical gloves are mandatory.",
+              explanationZh: "液态制冷剂接触皮肤会瞬间汽化导致严重冻伤，必须佩戴护目镜和防冻/防化手套。" },
+            { id: 19, part: "core", category: CAT.BAS,
+              questionEn: "What happens to the boiling point (saturation temperature) of a refrigerant when its pressure decreases?",
+              questionZh: "当制冷剂的压力降低时，它的沸点（饱和温度）会如何变化？",
+              optionsEn: ["It increases","It decreases","It stays constant","It becomes zero"],
+              optionsZh: ["升高","降低","保持不变","变为零"],
+              answer: 1,
+              explanationEn: "Pressure and saturation temperature move together: lowering pressure lowers the boiling point—critical in Type III chillers where vacuum can freeze water in tubes.",
+              explanationZh: "压力与饱和温度同步变化：降压会降低沸点——这正是 Type III 冷水机抽真空时容易冻裂铜管的原因。" },
+            { id: 20, part: "core", category: CAT.BAS,
+              questionEn: "In a vapor-compression refrigeration system, where does the refrigerant change from a high-pressure vapor to a high-pressure liquid?",
+              questionZh: "在蒸气压缩制冷循环中，制冷剂在哪个部件从高压气态变为高压液态？",
+              optionsEn: ["Evaporator","Compressor","Condenser","Metering device"],
+              optionsZh: ["蒸发器","压缩机","冷凝器","节流装置"],
+              answer: 2,
+              explanationEn: "The condenser rejects heat to the cooling medium (air or water), condensing high-pressure vapor into high-pressure liquid.",
+              explanationZh: "冷凝器向冷却介质（空气或水）放热，将高压气态冷凝为高压液态。" },
+            { id: 21, part: "core", category: CAT.BAS,
+              questionEn: "Why are POE (polyolester) oils used with HFC and HFO refrigerants especially challenging during service?",
+              questionZh: "为什么与 HFC/HFO 配合使用的 POE（多元醇酯）冷冻油在维修时特别需要小心？",
+              optionsEn: ["They are highly hygroscopic and absorb moisture rapidly from open air","They cannot mix with any refrigerant","They freeze at room temperature","They are completely non-conductive"],
+              optionsZh: ["具有极强的吸湿性，暴露在空气中会迅速吸收水分","无法与任何制冷剂混溶","在室温下会结冰","完全不导电"],
+              answer: 0,
+              explanationEn: "POE oil absorbs moisture much faster than mineral oil, forming acids and sludge; keep systems and oil containers sealed.",
+              explanationZh: "POE 油吸湿速度远快于矿物油，吸水后会生成酸和油泥，因此必须严格密封。" },
+            { id: 22, part: "core", category: CAT.BAS,
+              questionEn: "Under ASHRAE Standard 34, what does an 'A1' safety classification indicate?",
+              questionZh: "在 ASHRAE 34 标准中，安全等级「A1」代表什么？",
+              optionsEn: ["Higher toxicity, high flammability","Lower toxicity, no flame propagation (non-flammable)","Lower toxicity, mildly flammable","Higher toxicity, non-flammable"],
+              optionsZh: ["高毒性、高易燃性","低毒性、不传播火焰（不可燃）","低毒性、微可燃","高毒性、不可燃"],
+              answer: 1,
+              explanationEn: "In ASHRAE 34, 'A' = lower toxicity, 'B' = higher toxicity; '1' = no flame propagation, '2L' = mildly flammable, '3' = higher flammability.",
+              explanationZh: "A 代表低毒性，B 代表高毒性；1 代表不可燃，2L 微可燃，3 高易燃。" },
+            { id: 23, part: "core", category: CAT.BAS,
+              questionEn: "Which ASHRAE 34 classification describes R-123, a common low-pressure chiller refrigerant?",
+              questionZh: "常见低压冷水机制冷剂 R-123 属于 ASHRAE 34 的哪个安全等级？",
+              optionsEn: ["A1","A2L","B1","B3"],
+              optionsZh: ["A1","A2L","B1","B3"],
+              answer: 2,
+              explanationEn: "R-123 is classified as B1 (higher toxicity, non-flammable), which is why ASHRAE 15 requires refrigerant monitors and ventilation in chiller rooms.",
+              explanationZh: "R-123 属于 B1（高毒性、不可燃），因此机房必须配备泄漏监测报警和机械通风。" },
+            { id: 24, part: "core", category: CAT.BAS,
+              questionEn: "Why should recovery hoses be kept as short as possible and have shutoff valves (or low-loss fittings) at the ends?",
+              questionZh: "为什么回收软管应尽量短，并在两端装有截止阀（或低损接头）？",
+              optionsEn: ["To increase hose pressure drop","To minimize refrigerant loss during disconnection and reduce recovery time","To allow air to enter the recovery cylinder","To prevent the recovery machine from pulling a vacuum"],
+              optionsZh: ["增大软管压降","减少拆卸时的制冷剂残留排放并缩短回收时间","让空气进入回收钢瓶","防止回收机抽真空"],
+              answer: 1,
+              explanationEn: "Short hoses with low-loss fittings reduce flow restriction and trap minimal refrigerant when disconnecting.",
+              explanationZh: "短软管加低损接头能减小流阻、加快回收，并把拆管时的微量排放降到最低。" },
+            { id: 25, part: "core", category: CAT.BAS,
+              questionEn: "If you are recovering a zeotropic blend such as R-407C, how must it be charged back into a system?",
+              questionZh: "如果处理 R-407C 等非共沸混合制冷剂，重新充注时必须以什么状态加注？",
+              optionsEn: ["As a vapor from the top of the cylinder","As a liquid from the cylinder to prevent fractionation","Either liquid or vapor makes no difference","Mixed with mineral oil"],
+              optionsZh: ["从钢瓶顶部以气态加注","以液态从钢瓶加注，防止成分分馏（fractionation）","气态或液态没有区别","与矿物油混合加注"],
+              answer: 1,
+              explanationEn: "Zeotropic blends have temperature glide and must be charged as a liquid so the component ratios stay accurate.",
+              explanationZh: "非共沸混合制冷剂存在温度滑移，必须以液态充注以保证各组分比例不变。" },
+
+            // ---- Type III (26-50) ----
+            { id: 26, part: "type3", category: CAT.LOWP,
+              questionEn: "What defines a 'low-pressure' appliance under EPA Section 608?",
+              questionZh: "EPA 608 法规中「低压设备（Low-pressure appliance）」的定义是什么？",
+              optionsEn: ["An appliance using a refrigerant with a liquid-phase saturation pressure below 45 psia at 104°F (40°C)","An appliance operating below 100 psig at 70°F","An appliance holding less than 5 lb of refrigerant","Any system using R-410A"],
+              optionsZh: ["使用在 104°F（40°C）下液相饱和压力低于 45 psia 的制冷剂的设备","在 70°F 下低于 100 psig 的设备","充注量少于 5 磅的设备","任何使用 R-410A 的系统"],
+              answer: 0,
+              explanationEn: "EPA defines low-pressure refrigerants as having a liquid-phase saturation pressure below 45 psia at 104°F (such as R-11, R-113, R-123).",
+              explanationZh: "EPA 定义低压制冷剂为在 104°F（40°C）下饱和压力低于 45 psia（约 30 psig，常见实际远低于 10 psig）的制冷剂，如 R-11、R-113、R-123。" },
+            { id: 27, part: "type3", category: CAT.LOWP,
+              questionEn: "Which group of refrigerants is typically used in Type III low-pressure centrifugal chillers?",
+              questionZh: "以下哪组制冷剂通常用于 Type III 低压离心式冷水机？",
+              optionsEn: ["R-22, R-410A, R-407C","R-11, R-113, R-123","R-134a, R-404A, R-507","R-290, R-600a, R-32"],
+              optionsZh: ["R-22, R-410A, R-407C","R-11, R-113, R-123","R-134a, R-404A, R-507","R-290, R-600a, R-32"],
+              answer: 1,
+              explanationEn: "R-11, R-113, and R-123 are classic low-pressure chiller refrigerants.",
+              explanationZh: "R-11、R-113 和 R-123 是典型的低压离心式冷水机制冷剂。" },
+            { id: 28, part: "type3", category: CAT.LOWP,
+              questionEn: "Because a low-pressure chiller operates below atmospheric pressure (in a vacuum), what is the primary consequence of a leak in the evaporator or low side?",
+              questionZh: "由于低压冷水机在低于大气压（真空/负压）下运行，蒸发器或低压侧发生泄漏的主要后果是什么？",
+              optionsEn: ["Large clouds of refrigerant immediately spray out","Air and moisture are drawn into the system","The oil turns into solid ice","The compressor speed doubles"],
+              optionsZh: ["大量制冷剂立即向外喷出","空气和水分会被吸入系统内部","冷冻油变成固体冰","压缩机转速翻倍"],
+              answer: 1,
+              explanationEn: "Sub-atmospheric pressure pulls ambient air and moisture inward through leaks, raising head pressure and causing corrosion/acid.",
+              explanationZh: "负压运行会导致外部空气和水分被吸入系统，使冷凝压力升高并引起腐蚀与酸化。" },
+            { id: 29, part: "type3", category: CAT.LOWP,
+              questionEn: "What is the approximate saturation pressure of R-123 at a typical room temperature of 68°F (20°C)?",
+              questionZh: "在 68°F（20°C）典型室温下，R-123 的饱和压力大约是多少？",
+              optionsEn: ["About 120 psig","About 20 inches of Hg vacuum (below atmospheric pressure)","About 50 psig","About 0 psig (exactly atmospheric)"],
+              optionsZh: ["约 120 psig","约 20 in. Hg 真空（低于大气压）","约 50 psig","约 0 psig（刚好等于大气压）"],
+              answer: 1,
+              explanationEn: "R-123 boils around 82°F at atmospheric pressure, so at 68°F it sits in a vacuum (~19–20 in. Hg vac).",
+              explanationZh: "R-123 在标准大气压下沸点约 82°F，因此 68°F 停机时仍处于约 19–20 in. Hg 的真空状态。" },
+            { id: 30, part: "type3", category: CAT.LEAK,
+              questionEn: "What is the MAXIMUM pressure allowed when pressurizing a low-pressure chiller with dry nitrogen for leak testing?",
+              questionZh: "用干氮气对低压冷水机加压检漏时，允许的**最高压力**是多少？",
+              optionsEn: ["10 psig","15 psig","25 psig","50 psig"],
+              optionsZh: ["10 psig","15 psig","25 psig","50 psig"],
+              answer: 0,
+              explanationEn: "Never exceed 10 psig when leak-testing a low-pressure chiller, because the rupture disc is typically set to burst at 15 psig.",
+              explanationZh: "加压检漏绝不能超过 10 psig，因为低压冷水机的爆破片通常设定在 15 psig 破裂泄压。" },
+            { id: 31, part: "type3", category: CAT.LEAK,
+              questionEn: "At what pressure does the rupture disc on most low-pressure chillers relieve to protect the shell from overpressure?",
+              questionZh: "大多数低压冷水机上的爆破片（Rupture disc）通常在多少压力下破裂泄压？",
+              optionsEn: ["5 psig","10 psig","15 psig","30 psig"],
+              optionsZh: ["5 psig","10 psig","15 psig","30 psig"],
+              answer: 2,
+              explanationEn: "Low-pressure chiller rupture discs are typically rated at 15 psig and vent directly to the atmosphere if exceeded.",
+              explanationZh: "低压冷水机爆破片通常设定在 15 psig，一旦顶破会直接向大气排放制冷剂。" },
+            { id: 32, part: "type3", category: CAT.LEAK,
+              questionEn: "Besides using dry nitrogen, how else can a technician safely raise the pressure inside a low-pressure chiller for leak testing?",
+              questionZh: "除了用干氮气加压，技师还能用什么安全方法提高低压冷水机内部压力以进行检漏？",
+              optionsEn: ["Circulating hot water through the evaporator or condenser tubes (or using a heater blanket)","Applying an open oxy-acetylene torch to the shell","Connecting a high-pressure R-410A cylinder directly","Running the compressor with all valves closed"],
+              optionsZh: ["向蒸发器或冷凝器铜管内循环热水（或使用加热毯）","用氧乙炔焊枪直接烤外壳","直接接上高压 R-410A 钢瓶","关闭所有阀门强行运行压缩机"],
+              answer: 0,
+              explanationEn: "Warm water circulation or controlled heater blankets raise refrigerant temperature and vapor pressure safely (still keeping pressure ≤ 10 psig).",
+              explanationZh: "通入热水循环或使用加热毯可安全升高制冷剂温度与蒸气压力（仍需控制在 10 psig 以内）。" },
+            { id: 33, part: "type3", category: CAT.LEAK,
+              questionEn: "Before performing a leak test on the evaporator or condenser tubes of a water-cooled chiller, what must the technician do?",
+              questionZh: "对水冷式冷水机的蒸发器或冷凝器铜管进行检漏前，技师必须先做什么？",
+              optionsEn: ["Fill the water boxes with brine","Drain the water from the water boxes and tubes","Run the chilled water pump at maximum speed","Remove the rupture disc"],
+              optionsZh: ["向水室注满盐水","排空水室（Water boxes）和铜管中的水","最大转速运行冷冻水泵","拆掉爆破片"],
+              answer: 1,
+              explanationEn: "Water must be drained from the water boxes so refrigerant leaking through a tube can be detected by an electronic leak detector or hydrostatic test.",
+              explanationZh: "必须先排空水室里的水，才能用电子检漏仪或静水压测试发现铜管泄漏。" },
+            { id: 34, part: "type3", category: CAT.LEAK,
+              questionEn: "Where are leaks most commonly found on an older open-drive low-pressure centrifugal chiller?",
+              questionZh: "老式开启式低压离心冷水机最常见的漏点在哪里？",
+              optionsEn: ["Compressor shaft seal, purge unit, gaskets, and tube sheets","Expansion valve capillary only","Discharge muffler welds only","Thermostat bulb"],
+              optionsZh: ["压缩机轴封、抽气装置（Purge unit）、垫片和管板","仅膨胀阀毛细管","仅排气消音器焊缝","温控器感温包"],
+              answer: 0,
+              explanationEn: "Open-drive shaft seals, purge unit connections, water box/end-bell gaskets, and tube sheets are classic low-pressure leak points.",
+              explanationZh: "开启式压缩机的轴封、抽气装置接头、法兰垫片和换热器管板是最常见的漏点。" },
+            { id: 35, part: "type3", category: CAT.LEAK,
+              questionEn: "Under EPA leak repair rules for comfort cooling appliances containing 50 lb or more of refrigerant, what annual leak rate triggers mandatory repair?",
+              questionZh: "根据 EPA 泄漏维修规定，充注量 ≥ 50 磅的舒适性空调设备（Comfort cooling），年泄漏率达到多少必须强制维修？",
+              optionsEn: ["5%","10%","20%","30%"],
+              optionsZh: ["5%","10%","20%","30%"],
+              answer: 1,
+              explanationEn: "Updated EPA Section 608 leak-rate thresholds (for ≥ 50 lb appliances): 10% for comfort cooling, 20% for commercial refrigeration, and 30% for industrial process refrigeration.",
+              explanationZh: "EPA 608 现行门槛（≥50 磅设备）：舒适性空调 10%、商业制冷 20%、工业过程制冷 30%。" },
+            { id: 36, part: "type3", category: CAT.LEAK,
+              questionEn: "Once a comfort-cooling chiller exceeds the EPA annual leak rate threshold, within how many days must leaks be repaired (unless an extension or retrofit/retirement plan applies)?",
+              questionZh: "一旦舒适性冷水机超过 EPA 年泄漏率门槛，必须在多少天内完成维修（除非符合延期或改造/退役计划）？",
+              optionsEn: ["7 days","30 days","90 days","180 days"],
+              optionsZh: ["7 天","30 天","90 天","180 天"],
+              answer: 1,
+              explanationEn: "Repairs and initial verification tests must be completed within 30 days (120 days if an industrial process shutdown is required).",
+              explanationZh: "必须在 30 天内完成维修并通过初始验证测试（工业过程需停机时可延长至 120 天）。" },
+            { id: 37, part: "type3", category: CAT.EVAC,
+              questionEn: "What is the required evacuation level for a low-pressure appliance using a recovery machine manufactured AFTER November 15, 1993?",
+              questionZh: "使用 1993 年 11 月 15 日**之后**制造的回收机对低压设备回收时，必须抽到什么真空度？",
+              optionsEn: ["4 inches of Hg vacuum","15 inches of Hg vacuum","25 inches of Hg vacuum","25 mm Hg absolute"],
+              optionsZh: ["4 in. Hg 真空","15 in. Hg 真空","25 in. Hg 真空","25 mm Hg 绝对压力（absolute）"],
+              answer: 3,
+              explanationEn: "Post-1993 recovery equipment for low-pressure appliances must evacuate to 25 mm Hg absolute (roughly 29 in. Hg vacuum).",
+              explanationZh: "1993-11-15 之后制造的低压回收机必须抽至 **25 mm Hg absolute**（约合 29 in. Hg 真空）。" },
+            { id: 38, part: "type3", category: CAT.EVAC,
+              questionEn: "What is the required evacuation level for a low-pressure appliance using a recovery machine manufactured BEFORE November 15, 1993?",
+              questionZh: "使用 1993 年 11 月 15 日**之前**制造的回收机对低压设备回收时，要求的真空度是多少？",
+              optionsEn: ["25 inches of Hg vacuum","25 mm Hg absolute","10 inches of Hg vacuum","0 psig"],
+              optionsZh: ["25 in. Hg 真空","25 mm Hg 绝对压力","10 in. Hg 真空","0 psig"],
+              answer: 0,
+              explanationEn: "Pre-November 15, 1993 recovery machines are required to reach 25 inches of Hg vacuum (gauge), whereas newer machines must reach 25 mm Hg absolute.",
+              explanationZh: "1993-11-15 之前制造的设备要求为 **25 in. Hg vacuum**，之后制造的才要求 25 mm Hg absolute。" },
+            { id: 39, part: "type3", category: CAT.EVAC,
+              questionEn: "What is the correct sequence when recovering refrigerant from a low-pressure centrifugal chiller?",
+              questionZh: "从低压离心式冷水机回收制冷剂的正确顺序是什么？",
+              optionsEn: ["Recover vapor first, then liquid","Recover liquid first, then recover the remaining vapor","Open the purge unit to atmosphere first","Pump water into the refrigerant side"],
+              optionsZh: ["先回收气态，再回收液态","先回收液态制冷剂，再回收剩余的气态制冷剂","先向大气打开抽气装置","把水泵入制冷剂侧"],
+              answer: 1,
+              explanationEn: "Liquid recovery removes the bulk of the charge quickly; afterward, vapor recovery removes the remaining 10%–15% of the charge.",
+              explanationZh: "先抽液态可快速排空大部分制冷剂，随后再进行气态回收抽走剩余约 10%–15% 的制冷剂。" },
+            { id: 40, part: "type3", category: CAT.EVAC,
+              questionEn: "After all liquid refrigerant has been removed from a large low-pressure chiller, roughly what percentage of the original charge remains as vapor?",
+              questionZh: "大型低压冷水机抽完所有液态制冷剂后，大约还有多少比例的原充注量以气态形式留在系统内？",
+              optionsEn: ["Less than 1%","10% to 15%","40% to 50%","75%"],
+              optionsZh: ["不到 1%","10% 到 15%","40% 到 50%","75%"],
+              answer: 1,
+              explanationEn: "Because low-pressure chillers have large internal volumes, 10%–15% of the total charge remains as vapor after liquid removal, which can be 100+ lb on big machines.",
+              explanationZh: "低压冷水机容积巨大，液态抽完后仍有约 10%–15% 的气态制冷剂（大型机组可达上百磅），必须继续抽气态回收。" },
+            { id: 41, part: "type3", category: CAT.EVAC,
+              questionEn: "After reaching 25 mm Hg absolute during low-pressure recovery, why must the technician wait a few minutes with the valves closed before opening the system?",
+              questionZh: "低压回收达到 25 mm Hg 绝对压力后，为什么必须关闭阀门静置观察几分钟再拆机？",
+              optionsEn: ["To let the recovery cylinder cool down","To check if system pressure rises, indicating trapped liquid refrigerant is still boiling off or a leak exists","To allow air to enter slowly","To let the oil settle into the evaporator"],
+              optionsZh: ["让回收钢瓶冷却","观察系统压力是否回升——若回升说明仍有残留液态制冷剂蒸发或存在泄漏","让空气慢慢进入","让冷冻油沉入蒸发器"],
+              answer: 1,
+              explanationEn: "A pressure rise after isolating the recovery machine indicates either residual liquid boiling off or a leak; recovery must resume until pressure stays stable.",
+              explanationZh: "关阀静置后若压力回升，说明还有液态制冷剂未抽净或存在漏点，必须继续回收直至压力稳定。" },
+            { id: 42, part: "type3", category: CAT.EVAC,
+              questionEn: "Where is the recovery machine typically connected when removing vapor from a low-pressure chiller?",
+              questionZh: "从低压冷水机回收气态制冷剂时，回收机通常接在什么位置？",
+              optionsEn: ["The lowest drain valve on the evaporator","The highest access point (such as the condenser top or evaporator vapor space)","The oil sump drain","The chilled water supply pipe"],
+              optionsZh: ["蒸发器最底部的排液阀","系统最高处的接口（如冷凝器顶部或蒸发器气相空间）","油箱排油口","冷冻水供水管"],
+              answer: 1,
+              explanationEn: "Liquid is recovered from the lowest point (evaporator/condenser drain), while vapor is recovered from the highest point to avoid pulling liquid into the vapor port.",
+              explanationZh: "液态从最低点回收，气态则从最高点回收。" },
+            { id: 43, part: "type3", category: CAT.PURGE,
+              questionEn: "Where is the purge unit located on a low-pressure centrifugal chiller, and what is its function?",
+              questionZh: "低压离心式冷水机的抽气装置（Purge unit）安装在什么位置，起什么作用？",
+              optionsEn: ["Bottom of the evaporator; removes excess oil","Top of the condenser; removes air and moisture (non-condensables) while returning refrigerant to the chiller","Inside the compressor suction line; boosts superheat","On the cooling tower; cleans condenser water"],
+              optionsZh: ["蒸发器底部；排出多余冷冻油","冷凝器顶部；排出空气和水分（不凝性气体）并将夹带的制冷剂送回机组","压缩机吸气管内；提高过热度","冷却塔上；清洁冷却水"],
+              answer: 1,
+              explanationEn: "Non-condensable gases collect at the top of the condenser; the purge unit separates and vents air/water vapor while returning condensed refrigerant.",
+              explanationZh: "不凝性气体聚集在冷凝器顶部，Purge 装置将其分离排出，并把夹带的制冷剂冷凝送回系统。" },
+            { id: 44, part: "type3", category: CAT.PURGE,
+              questionEn: "What symptom strongly indicates that a low-pressure chiller has an air leak and the purge unit is working overtime?",
+              questionZh: "哪种现象强烈表明低压冷水机存在空气泄漏、且抽气装置正在超负荷工作？",
+              optionsEn: ["Unusually low condenser pressure","High condenser head pressure and frequent purge unit operation","Ice forming on the purge unit motor","Decreased chiller amperage"],
+              optionsZh: ["冷凝压力异常偏低","冷凝压力升高且抽气装置频繁启动运行","抽气装置电机结冰","冷水机电流下降"],
+              answer: 1,
+              explanationEn: "Air in the condenser raises total pressure (Dalton's Law) and reduces heat transfer, causing high head pressure and frequent purging.",
+              explanationZh: "空气进入冷凝器会抬高总压并恶化传热，导致冷凝压力升高和 Purge 频繁工作。" },
+            { id: 45, part: "type3", category: CAT.PURGE,
+              questionEn: "Why must the chilled water and condenser water pumps be kept running (or the tubes drained) while recovering refrigerant from a low-pressure chiller?",
+              questionZh: "从低压冷水机回收制冷剂时，为什么必须保持冷冻水泵和冷却水泵运行（或排空管内水）？",
+              optionsEn: ["To keep the refrigerant from overheating","To prevent water inside the heat exchanger tubes from freezing and bursting the tubes as pressure drops","To push refrigerant out of the purge unit","To keep the shaft seal lubricated"],
+              optionsZh: ["防止制冷剂过热","防止降压抽真空导致制冷剂沸点低于冰点，使铜管内静止的水结冰胀裂铜管","把制冷剂推出抽气装置","保持轴封润滑"],
+              answer: 1,
+              explanationEn: "Lowering system pressure drops the refrigerant's boiling point well below 32°F (0°C); stagnant water in the tubes will freeze and rupture the heat exchanger.",
+              explanationZh: "抽真空降压会使制冷剂沸点远低于 0°C，若水泵停转、管内水静止，极易结冰冻裂昂贵的换热器铜管。" },
+            { id: 46, part: "type3", category: CAT.PURGE,
+              questionEn: "When charging a low-pressure chiller that is in a deep vacuum, why must you introduce refrigerant VAPOR first instead of liquid?",
+              questionZh: "向处于深度真空的低压冷水机充注制冷剂时，为什么必须先充**气态**而不是液态？",
+              optionsEn: ["Liquid refrigerant cannot flow into a vacuum","Liquid flashed into a deep vacuum drops below 32°F and can freeze water in the evaporator tubes","Vapor weighs more than liquid","EPA prohibits liquid charging of any chiller"],
+              optionsZh: ["液态制冷剂无法流入真空","液态直接闪蒸入深度真空时温度会骤降至 0°C 以下，可能冻裂蒸发器铜管内的水","气态比液态重","EPA 禁止对任何冷水机液态充注"],
+              answer: 1,
+              explanationEn: "Charge vapor first until system pressure rises above the saturation pressure corresponding to 32°F (e.g., ~16.5 in. Hg vac for R-11 or ~20 in. Hg vac for R-123), then charge liquid.",
+              explanationZh: "必须先充气态把系统压力抬高到对应 32°F（0°C）以上的饱和压力，再改用液态充注，防止闪蒸结冰冻管。" },
+            { id: 47, part: "type3", category: CAT.PURGE,
+              questionEn: "What safety equipment is required in a chiller machinery room housing an R-123 (Class B1) chiller under ASHRAE Standard 15?",
+              questionZh: "根据 ASHRAE 15 标准，装有 R-123（B1 级）冷水机的机房内必须配备哪些安全设备？",
+              optionsEn: ["A refrigerant leak monitor/alarm, mechanical ventilation, and SCBA available outside the room","A halide torch mounted on the wall","An open-flame heater","No special safety equipment is required"],
+              optionsZh: ["制冷剂泄漏监测报警器、机械通风系统，并在机房外配备自给式呼吸器（SCBA）","墙上安装卤素灯","明火加热器","不需要任何特殊安全设备"],
+              answer: 0,
+              explanationEn: "Because R-123 is Class B1 (higher toxicity) and heavier than air, ASHRAE 15 requires refrigerant sensors/alarms, emergency exhaust ventilation, and SCBA outside the machinery room.",
+              explanationZh: "R-123 属于 B1 高毒类且比空气重，ASHRAE 15 要求机房配备泄漏传感器与声光报警、事故排风及机房外 SCBA 呼吸器。" },
+            { id: 48, part: "type3", category: CAT.PURGE,
+              questionEn: "What is the purpose of the oil heater in a low-pressure centrifugal chiller's oil sump?",
+              questionZh: "低压离心式冷水机油箱内加热器（Oil heater）的作用是什么？",
+              optionsEn: ["To boil water out of the condenser","To vaporize dissolved refrigerant out of the oil before startup so the oil retains proper viscosity","To increase condenser head pressure","To melt ice in the purge unit"],
+              optionsZh: ["把冷凝器里的水煮沸","在开机前把溶解在冷冻油中的制冷剂蒸出，保持油的正常黏度","提高冷凝压力","融化抽气装置里的冰"],
+              answer: 1,
+              explanationEn: "Keeping the oil warm prevents refrigerant from condensing and diluting the oil during off-cycles, protecting bearings at startup.",
+              explanationZh: "油加热器防止停机时制冷剂大量溶入冷冻油稀释油膜，保护开机时的轴承润滑。" },
+            { id: 49, part: "type3", category: CAT.PURGE,
+              questionEn: "Which factor most directly increases the efficiency of a high-efficiency purge unit on a modern low-pressure chiller?",
+              questionZh: "现代低压冷水机上的高效抽气装置（High-efficiency purge unit）主要通过什么方式减少制冷剂排放？",
+              optionsEn: ["Heating the purge tank with steam","Condensing refrigerant out of the air-refrigerant mixture at very low temperature before venting the air","Running the purge continuously 24/7","Mixing the purged air with nitrogen"],
+              optionsZh: ["用蒸汽加热抽气罐","在极低温度下将混合气体中的制冷剂充分冷凝回收后，再排出空气","每天 24 小时连续运行","将排出的空气与氮气混合"],
+              answer: 1,
+              explanationEn: "High-efficiency purges use a dedicated refrigeration coil to chill the mixture and condense nearly all refrigerant back into the chiller before venting air.",
+              explanationZh: "高效抽气装置内置独立小制冷盘管深度降温，把几乎全部制冷剂冷凝回系统后再排放纯空气。" },
+            { id: 50, part: "type3", category: CAT.PURGE,
+              questionEn: "If you are using hot water to pressurize an R-123 chiller for leak testing, what maximum water temperature is generally recommended so you don't exceed the 10 psig limit?",
+              questionZh: "如果用热水循环加热 R-123 冷水机进行检漏，通常建议最高水温不超过多少以免超过 10 psig 上限？",
+              optionsEn: ["212°F (100°C)","100°F–110°F (38°C–43°C)","50°F (10°C)","180°F (82°C)"],
+              optionsZh: ["212°F (100°C)","100°F–110°F (38°C–43°C)","50°F (10°C)","180°F (82°C)"],
+              answer: 1,
+              explanationEn: "At ~108°F, R-123 reaches about 10 psig; keeping circulating water around 100°F–110°F safely builds leak-test pressure without risking the 15 psig rupture disc.",
+              explanationZh: "R-123 在约 108°F 时饱和压力接近 10 psig，因此循环热水通常控制在 100°F–110°F 左右，既能检漏又不会顶破 15 psig 爆破片。" }
+        ];
+
+        const SET2 = [
+            // ---- Core (1-25) ----
+            { id: 1, part: "core", category: CAT.REG,
+              questionEn: "What is the primary purpose of the stratospheric ozone layer?",
+              questionZh: "平流层臭氧层的主要作用是什么？",
+              optionsEn: ["To trap heat and warm Earth's surface","To absorb harmful ultraviolet (UV-B) radiation from the sun","To produce oxygen for breathing at sea level","To prevent acid rain"],
+              optionsZh: ["锁住热量使地球表面变暖","吸收来自太阳的有害紫外线（UV-B）辐射","在海平面产生供呼吸的氧气","防止酸雨"],
+              answer: 1,
+              explanationEn: "Stratospheric ozone absorbs UV-B radiation, protecting humans from skin cancer, cataracts, and immune suppression, and protecting crops and marine life.",
+              explanationZh: "平流层臭氧吸收太阳 UV-B 紫外线，减少人类皮肤癌、白内障风险并保护生态系统。" },
+            { id: 2, part: "core", category: CAT.REG,
+              questionEn: "Which international treaty phased out the production of CFCs and HCFCs?",
+              questionZh: "哪项国际条约规定逐步淘汰 CFC 和 HCFC 的生产？",
+              optionsEn: ["The Kyoto Protocol","The Montreal Protocol","The Paris Agreement","The Geneva Convention"],
+              optionsZh: ["《京都议定书》","《蒙特利尔议定书》","《巴黎协定》","《日内瓦公约》"],
+              answer: 1,
+              explanationEn: "The Montreal Protocol (1987) is the landmark international treaty phasing out ozone-depleting substances.",
+              explanationZh: "1987 年《蒙特利尔议定书》是淘汰消耗臭氧层物质（ODS）的里程碑国际条约。" },
+            { id: 3, part: "core", category: CAT.REG,
+              questionEn: "Under Clean Air Act Section 608, who is responsible for ensuring refrigerant is recovered before an appliance is disposed of?",
+              questionZh: "根据《清洁空气法》608 节，设备报废处置前确保制冷剂被回收的责任归谁？",
+              optionsEn: ["Only the original manufacturer","The final person in the disposal chain (such as the scrap metal recycler or landfill operator), unless signed verification is obtained","Only the local fire department","No one, if the unit is over 20 years old"],
+              optionsZh: ["仅原制造商","处置链条上的最后一环（如废金属回收商或填埋场），除非获得已回收的书面签字证明","仅当地消防部门","设备超过 20 年就无人负责"],
+              answer: 1,
+              explanationEn: "The final person in the disposal chain must either recover the remaining refrigerant or obtain a signed statement verifying it was already recovered.",
+              explanationZh: "处置链条最后一环必须负责回收残留制冷剂，或取得前手签署的已回收证明文件。" },
+            { id: 4, part: "core", category: CAT.REG,
+              questionEn: "If you pass Type II on SkillCat and later pass Type I and Type III on SkillCat, what happens to your Core requirement?",
+              questionZh: "在 SkillCat 上考取 Type I 和 Type III 时，关于 Core 部分的规则是什么？",
+              optionsEn: ["Core is skipped automatically","Each SkillCat exam (Type I, II, and III) includes 25 Core questions plus 25 Type-specific questions","Core is only tested in Type I","You must pass 100 Core questions"],
+              optionsZh: ["会自动跳过 Core","SkillCat 的每个单科考试（Type I、II、III）都包含 25 道 Core 题 + 25 道对应类型题","只有 Type I 考 Core","必须考 100 道 Core 题"],
+              answer: 1,
+              explanationEn: "On SkillCat, Type I, Type II, and Type III exams each consist of 50 questions (25 Core + 25 Type-specific) with a 1-hour limit and 70% passing score.",
+              explanationZh: "在 SkillCat 平台上，Type I、II、III 单科考试均为 50 题（25 Core + 25 专项），限时 1 小时，及格线 70%。" },
+            { id: 5, part: "core", category: CAT.REG,
+              questionEn: "Why are HFCs (like R-134a and R-410A) subject to phasedown under the U.S. AIM Act?",
+              questionZh: "为什么 HFC 类制冷剂（如 R-134a、R-410A）在美国 AIM 法案下也要被逐步削减？",
+              optionsEn: ["They have high Ozone Depletion Potential","They have high Global Warming Potential (GWP)","They are all Class B3 toxic","They destroy copper tubing"],
+              optionsZh: ["它们具有高臭氧消耗潜能","它们具有高全球变暖潜能（GWP）","它们全都是 B3 剧毒","它们会腐蚀铜管"],
+              answer: 1,
+              explanationEn: "HFCs have ODP = 0, but high GWP; the AIM Act mandates an 85% phasedown in HFC production and consumption by 2036.",
+              explanationZh: "HFC 的 ODP 为 0 但 GWP 很高，AIM 法案要求逐步削减 HFC 的生产与消费。" },
+            { id: 6, part: "core", category: CAT.REG,
+              questionEn: "Since November 14, 1994, who may legally purchase regulated refrigerants (including CFCs, HCFCs, and non-exempt HFCs)?",
+              questionZh: "合法购买受控制冷剂（含 CFC、HCFC 及非豁免 HFC）的资质要求是什么？",
+              optionsEn: ["Anyone with a driver's license","EPA Section 608 (or Section 609 for MVAC) certified technicians or their authorized employers","Any homeowner repairing their own house","Only licensed plumbers"],
+              optionsZh: ["任何有驾照的人","持有 EPA 608（或汽车空调 609）认证的技师或其授权雇主","任何修理自家房屋的房主","仅限持证水管工"],
+              answer: 1,
+              explanationEn: "Sales restrictions require EPA-certified technicians (or employers providing proof of employing certified technicians) to purchase regulated refrigerants.",
+              explanationZh: "受控制冷剂实行销售限制，仅限持证技师或能提供持证技师雇佣证明的雇主购买。" },
+            { id: 7, part: "core", category: CAT.REG,
+              questionEn: "What does 'GWP' stand for in HVACR refrigerant regulations?",
+              questionZh: "HVACR 制冷剂法规中的「GWP」代表什么？",
+              optionsEn: ["Gas Weight Percentage","Global Warming Potential","General Working Pressure","Gauge Water Pressure"],
+              optionsZh: ["气体重量百分比","全球变暖潜能值（Global Warming Potential）","常规工作压力","表压水柱"],
+              answer: 1,
+              explanationEn: "GWP measures how much heat a greenhouse gas traps in the atmosphere compared to carbon dioxide (CO2 = 1).",
+              explanationZh: "GWP 衡量温室气体相对于二氧化碳（CO2 = 1）的温室效应强弱。" },
+            { id: 8, part: "core", category: CAT.REC,
+              questionEn: "When may recycled refrigerant be used without being reclaimed to AHRI 700?",
+              questionZh: "回用（Recycled）制冷剂在什么情况下可以不经再生（Reclaim）直接使用？",
+              optionsEn: ["When sold on an online marketplace","When reused in the same appliance or another appliance owned by the same owner","When mixed with another refrigerant","When given away for free to a neighbor"],
+              optionsZh: ["在网上二手平台出售时","回充到同一台设备或同一业主名下的其他设备时","与另一种制冷剂混合后","免费送给邻居时"],
+              answer: 1,
+              explanationEn: "Recycled refrigerant may only be reused in equipment owned by the same owner; transferring ownership requires reclaiming to AHRI 700.",
+              explanationZh: "Recycle 后的制冷剂只能用于同一业主的设备，一旦转让给他人就必须先 Reclaim 至 AHRI 700。" },
+            { id: 9, part: "core", category: CAT.REC,
+              questionEn: "What must you do to a recovery machine before switching from recovering R-22 to recovering R-123 or R-134a?",
+              questionZh: "用同一台回收机从回收 R-22 切换到回收 R-123 或 R-134a 之前，必须做什么？",
+              optionsEn: ["Purge it with dry nitrogen into the air","Evacuate the recovery machine to remove residual R-22 and prevent cross-contamination","Fill it with fresh mineral oil","Heat the recovery hoses with a torch"],
+              optionsZh: ["用干氮气直接吹扫排入空气","对回收机抽真空以清除残留 R-22，防止交叉污染","加满新鲜矿物油","用焊枪加热软管"],
+              answer: 1,
+              explanationEn: "Evacuating the recovery machine (and changing filter-drier/oil if needed) prevents mixing different refrigerants.",
+              explanationZh: "切换制冷剂前必须对回收机抽真空，防止不同制冷剂混杂。" },
+            { id: 10, part: "core", category: CAT.REC,
+              questionEn: "Why does EPA require recovery machines manufactured after November 15, 1993 to be certified by an EPA-approved laboratory?",
+              questionZh: "为什么 EPA 要求 1993 年 11 月 15 日后生产的回收机必须经 EPA 认可实验室认证？",
+              optionsEn: ["To verify they are painted yellow and gray","To verify they can achieve required vacuum levels and have low-loss fittings","To ensure they run on solar power","To confirm they can also reclaim refrigerant to AHRI 700"],
+              optionsZh: ["验证机身是否为黄灰色","验证其能达到规定的真空度并配有低损接头","确保其能用太阳能供电","确认其能直接将制冷剂再生到 AHRI 700"],
+              answer: 1,
+              explanationEn: "Labs (like UL or AHRI) test recovery machines to certify evacuation performance, recovery rate, and minimal refrigerant loss.",
+              explanationZh: "认证实验室（如 UL、AHRI）负责测试回收机的抽真空能力、回收速度和低排放性能。" },
+            { id: 11, part: "core", category: CAT.REC,
+              questionEn: "What is the fastest way to recover refrigerant from a large system containing a large pool of liquid?",
+              questionZh: "从含有大量液态制冷剂的大型系统中回收时，哪种方法最快？",
+              optionsEn: ["Vapor-only recovery through the suction port","Liquid recovery (or push-pull method) first, followed by vapor recovery","Letting it sit overnight with valves open","Cooling the system shell with ice"],
+              optionsZh: ["仅从吸气口做气态回收","先进行液态回收（或推拉法），再进行气态回收","打开阀门静置一夜","用冰块冷却外壳"],
+              answer: 1,
+              explanationEn: "Removing liquid first is orders of magnitude faster than vapor recovery; vapor recovery then finishes the remaining charge.",
+              explanationZh: "先抽液态速度远快于抽气态，抽完液体后再用气态回收抽净剩余制冷剂。" },
+            { id: 12, part: "core", category: CAT.REC,
+              questionEn: "What happens to a system's compressor oil if you recover refrigerant too rapidly in liquid form without separating oil?",
+              questionZh: "如果高速液态回收制冷剂而不经过油分离，系统中的冷冻油会怎样？",
+              optionsEn: ["It turns into water","Large amounts of oil can be pulled out of the system into the recovery cylinder","It becomes acidic immediately","It freezes inside the condenser"],
+              optionsZh: ["变成水","大量冷冻油会被带出系统进入回收钢瓶","立即酸化","在冷凝器内结冰"],
+              answer: 1,
+              explanationEn: "Fast liquid recovery can entrain oil; measure oil removed or use an oil separator so the system is not left oil-starved.",
+              explanationZh: "快速抽液容易带出冷冻油，需注意计量或使用油分离器，避免设备回油不足。" },
+            { id: 13, part: "core", category: CAT.CYL,
+              questionEn: "How can you tell if a refrigerant cylinder is a disposable (DOT-39) cylinder versus a refillable recovery cylinder?",
+              questionZh: "如何区分一次性钢瓶（DOT-39）和可重复充装的回收钢瓶？",
+              optionsEn: ["DOT-39 cylinders are always heavier","Refillable recovery cylinders are yellow with a gray top and have a DOT-4BA/4BW rating; DOT-39 are non-refillable","DOT-39 cylinders have two valves","Refillable cylinders have no pressure relief valve"],
+              optionsZh: ["DOT-39 钢瓶总是更重","可重装回收钢瓶为黄身灰顶且标注 DOT-4BA/4BW 等可重装规格；DOT-39 不可重装","DOT-39 钢瓶有两个阀门","可重装钢瓶没有安全泄压阀"],
+              answer: 1,
+              explanationEn: "DOT-39 cylinders are strictly one-time-use virgin refrigerant containers and must never be refilled.",
+              explanationZh: "DOT-39 为一次性钢瓶，严禁重复充装回收制冷剂。" },
+            { id: 14, part: "core", category: CAT.CYL,
+              questionEn: "How do you check the actual fill level of a recovery cylinder safely?",
+              questionZh: "如何安全地确认回收钢瓶内的实际充装量？",
+              optionsEn: ["Shake the cylinder and listen","Use a calibrated refrigerant scale (or a mechanical float switch / overfill sensor) and never exceed 80% capacity","Look at the gauge pressure alone","Submerge it in hot water"],
+              optionsZh: ["摇晃钢瓶听声音","使用经过校准的电子秤（或浮球液位开关/防过充传感器），确保不超过 80%","只看压力表读数","放进热水里试"],
+              answer: 1,
+              explanationEn: "Pressure only indicates temperature, not liquid level; always weigh the cylinder on a scale or use a certified 80% overfill shutoff.",
+              explanationZh: "压力只反映温度而不反映液位，必须用电子秤称重或使用 80% 防过充开关控制。" },
+            { id: 15, part: "core", category: CAT.CYL,
+              questionEn: "Before disposing of an empty disposable (DOT-39) refrigerant cylinder, what must be done?",
+              questionZh: "废弃处理空的一次性（DOT-39）制冷剂钢瓶前，必须先做什么？",
+              optionsEn: ["Fill it with water","Recover any remaining refrigerant to 0 psig (or vacuum), then render the cylinder useless (e.g., puncture or open valve) before recycling scrap","Leave 10 psig inside to prevent rust","Paint it gray and yellow"],
+              optionsZh: ["灌满水","将残留制冷剂抽至 0 psig（或真空），然后破坏其密闭性（如刺穿或打开阀门）再作为废金属回收","留 10 psig 防止生锈","涂成灰黄色"],
+              answer: 1,
+              explanationEn: "Recover remaining refrigerant to 0 psig, then puncture/render the cylinder unusable so nobody tries to refill it.",
+              explanationZh: "抽空至 0 psig 后刺穿或破坏钢瓶，确保无人再误用充装。" },
+            { id: 16, part: "core", category: CAT.CYL,
+              questionEn: "What is the danger of using a nitrogen cylinder without a pressure regulator?",
+              questionZh: "不使用调压阀直接接氮气钢瓶加压有什么危险？",
+              optionsEn: ["The nitrogen will freeze","Extreme pressure (over 2,000 psig) can explode the equipment and injure the technician","Nitrogen will turn into ozone","It will lower the system pressure"],
+              optionsZh: ["氮气会结冰","超高压（超过 2,000 psig）会炸裂设备并伤人","氮气会变成臭氧","会降低系统压力"],
+              answer: 1,
+              explanationEn: "Always use a regulator and safety relief valve when pressurizing any HVACR system with nitrogen.",
+              explanationZh: "任何时候用氮气加压都必须通过调压阀，严禁直接连接。" },
+            { id: 17, part: "core", category: CAT.CYL,
+              questionEn: "When servicing a system with a compressor motor burnout, what should you check in the oil?",
+              questionZh: "维修发生压缩机电机烧毁的系统时，应检查冷冻油的什么指标？",
+              optionsEn: ["Color only","Acid content using an acid test kit","Boiling point","Viscosity at 0°F"],
+              optionsZh: ["只看颜色","用测酸试剂盒检查含酸量","沸点","0°F 下的黏度"],
+              answer: 1,
+              explanationEn: "Motor burnouts produce hydrofluoric and hydrochloric acids; always test for acid and install suction/liquid burnout filter-driers.",
+              explanationZh: "电机烧毁会产生强酸，必须做酸度测试并更换油和安装除酸干燥过滤器。" },
+            { id: 18, part: "core", category: CAT.CYL,
+              questionEn: "If a large refrigerant leak occurs in an enclosed mechanical room, what should you do FIRST?",
+              questionZh: "如果在密闭机房发生大量制冷剂泄漏，第一时间应该做什么？",
+              optionsEn: ["Try to find the leak with a soap bottle","Evacuate the area immediately and ventilate; only re-enter with proper SCBA if required","Turn on all electrical switches","Seal all doors and windows"],
+              optionsZh: ["拿肥皂水找漏点","立即撤离现场并开启通风；如需进入必须佩戴 SCBA 呼吸器","打开所有电源开关","封死所有门窗"],
+              answer: 1,
+              explanationEn: "Refrigerants are heavier than air and displace oxygen, causing asphyxiation; evacuate and ventilate immediately.",
+              explanationZh: "制冷剂比空气重会排挤氧气导致窒息（B1 类还有毒性），必须立即撤离并通风。" },
+            { id: 19, part: "core", category: CAT.BAS,
+              questionEn: "What does a compound gauge on a manifold gauge set measure?",
+              questionZh: "歧管压力表组上的复合表（Compound gauge，通常为蓝色低压表）能测量什么？",
+              optionsEn: ["Only pressures above 100 psig","Both positive pressure (psig) and vacuum (inches of Hg below atmospheric pressure)","Only temperature","Only liquid flow rate"],
+              optionsZh: ["仅 100 psig 以上的压力","既能测正压（psig）又能测真空（in. Hg）","仅温度","仅液体流量"],
+              answer: 1,
+              explanationEn: "The blue low-side compound gauge reads both psig above atmospheric and inches of Hg vacuum below atmospheric.",
+              explanationZh: "蓝色复合表既读正压 psig，也读负压真空（in. Hg）。" },
+            { id: 20, part: "core", category: CAT.BAS,
+              questionEn: "Why is a thermistor (micron) vacuum gauge much more accurate than a manifold compound gauge during deep evacuation?",
+              questionZh: "为什么深度抽真空时热敏电阻（微米）真空计比普通歧管复合表准确得多？",
+              optionsEn: ["A compound gauge cannot accurately resolve deep vacuum levels near 500 microns or 25 mm Hg absolute","Micron gauges also measure refrigerant weight","Compound gauges only read R-410A","Micron gauges do not require batteries"],
+              optionsZh: ["普通复合表无法精确分辨 500 微米或 25 mm Hg 绝对压力这样的深度真空","微米计还能称制冷剂重量","复合表只读 R-410A","微米计不需要电池"],
+              answer: 0,
+              explanationEn: "A standard compound gauge is far too coarse near 29–30 in. Hg; an electronic micron or absolute vacuum gauge is needed to verify deep evacuation.",
+              explanationZh: "普通指针表在接近 29–30 in. Hg 时精度极差，必须用电子微米计或绝对压力真空计。" },
+            { id: 21, part: "core", category: CAT.BAS,
+              questionEn: "What is 'superheat' in a refrigeration system?",
+              questionZh: "制冷系统中的「过热度（Superheat）」是什么？",
+              optionsEn: ["Temperature of liquid below its condensing temperature","Temperature of refrigerant vapor above its saturation (boiling) temperature at a given pressure","Heat rejected by the cooling tower","Temperature difference across the air filter"],
+              optionsZh: ["液体低于冷凝温度的差值","在给定压力下，制冷剂蒸气温度高于其饱和（沸腾）温度的差值","冷却塔排出的热量","空气过滤网两侧的温差"],
+              answer: 1,
+              explanationEn: "Superheat = actual vapor temperature minus saturation temperature; it ensures no liquid enters the compressor.",
+              explanationZh: "过热度 = 实际蒸气温度 − 饱和温度，用于确保没有液态制冷剂进入压缩机造成液击。" },
+            { id: 22, part: "core", category: CAT.BAS,
+              questionEn: "What is 'subcooling' in a refrigeration system?",
+              questionZh: "制冷系统中的「过冷度（Subcooling）」是什么？",
+              optionsEn: ["Temperature of liquid refrigerant below its saturation (condensing) temperature at a given pressure","Temperature of vapor above saturation","Freezing of chilled water","Moisture inside the evaporator"],
+              optionsZh: ["在给定压力下，液态制冷剂温度低于其饱和（冷凝）温度的差值","蒸气高于饱和温度的值","冷冻水结冰","蒸发器内的水分"],
+              answer: 0,
+              explanationEn: "Subcooling = saturation temperature minus actual liquid line temperature; it ensures solid liquid reaches the metering device.",
+              explanationZh: "过冷度 = 饱和温度 − 实际液管温度，保证纯液态制冷剂进入节流装置。" },
+            { id: 23, part: "core", category: CAT.BAS,
+              questionEn: "Which component separates the high-pressure side from the low-pressure side of a refrigeration system?",
+              questionZh: "哪两个部件将制冷系统划分为高压侧和低压侧？",
+              optionsEn: ["Evaporator and condenser","Compressor and metering device (expansion valve)","Purge unit and oil sump","Sight glass and filter-drier"],
+              optionsZh: ["蒸发器和冷凝器","压缩机和节流装置（膨胀阀）","抽气装置和油箱","视液镜和干燥过滤器"],
+              answer: 1,
+              explanationEn: "The compressor raises pressure from low to high, and the metering device drops pressure from high to low.",
+              explanationZh: "压缩机将低压升为高压，节流装置将高压降为低压，两者构成高低压分界。" },
+            { id: 24, part: "core", category: CAT.BAS,
+              questionEn: "What happens if moisture remains inside a refrigeration system?",
+              questionZh: "如果制冷系统内残留水分，会发生什么问题？",
+              optionsEn: ["It increases cooling capacity","It can freeze at the metering device and react with refrigerant/oil to form corrosive acids","It turns into R-123","It improves compressor lubrication"],
+              optionsZh: ["提高制冷量","可能在节流口结冰堵塞，并与制冷剂和油反应生成腐蚀性酸","变成 R-123","改善压缩机润滑"],
+              answer: 1,
+              explanationEn: "Moisture causes ice blockage, copper plating, acid formation, and eventual compressor failure.",
+              explanationZh: "水分会导致冰堵、镀铜和酸化，最终损坏压缩机。" },
+            { id: 25, part: "core", category: CAT.BAS,
+              questionEn: "Why must a recovery cylinder NEVER be heated with an open flame to speed up refrigerant transfer?",
+              questionZh: "为什么绝不能用明火加热回收钢瓶来加快制冷剂转移？",
+              optionsEn: ["It changes the refrigerant color","Overheating raises pressure rapidly, risking cylinder rupture or decomposing refrigerant into toxic phosgene gas","It makes the scale inaccurate","It voids the manifold warranty"],
+              optionsZh: ["会改变制冷剂颜色","过热会使压力骤增引发爆瓶，且制冷剂遇高温明火会分解出剧毒光气（Phosgene）","导致电子秤不准","使表组失去保修"],
+              answer: 1,
+              explanationEn: "Open flames can cause violent cylinder rupture and decompose halocarbon refrigerants into deadly phosgene and acid gases.",
+              explanationZh: "明火加热不仅可能引起钢瓶爆炸，还会使氟利昂分解生成剧毒光气和酸性气体。" },
+
+            // ---- Type III (26-50) ----
+            { id: 26, part: "type3", category: CAT.LOWP,
+              questionEn: "Why do low-pressure chillers use centrifugal compressors instead of small reciprocating compressors?",
+              questionZh: "为什么低压冷水机通常采用离心式压缩机而非小型往复式压缩机？",
+              optionsEn: ["Because low-pressure refrigerants have very large specific vapor volumes requiring high-volume centrifugal flow","Because centrifugal compressors cannot pump high-pressure refrigerants","Because reciprocating compressors cannot run on electricity","Because centrifugal compressors require no oil"],
+              optionsZh: ["因为低压制冷剂比容极大，需要大流量的离心式压缩机","因为离心机不能压缩高压制冷剂","因为往复机不能用电","因为离心机不需要油"],
+              answer: 0,
+              explanationEn: "At vacuum pressures, refrigerant vapor is very low-density (large volume per pound), ideal for high-flow centrifugal impellers.",
+              explanationZh: "负压下制冷剂蒸气密度极低、体积流量巨大，最适合大流量的离心叶轮压缩。" },
+            { id: 27, part: "type3", category: CAT.LOWP,
+              questionEn: "Which statement is true about R-11 and R-123?",
+              questionZh: "关于 R-11 和 R-123 的说法哪项正确？",
+              optionsEn: ["Both are CFCs","R-11 is a CFC (high ODP, banned from production) and R-123 is an HCFC (much lower ODP, phased out for new equipment)","Both are HFCs with zero ODP","Both are flammable Class A3 refrigerants"],
+              optionsZh: ["两者都是 CFC","R-11 是 CFC（高 ODP，已停产），R-123 是 HCFC（ODP 低得多，新设备已淘汰）","两者都是 ODP 为 0 的 HFC","两者都是 A3 易燃制冷剂"],
+              answer: 1,
+              explanationEn: "R-11 is a CFC; R-123 is an HCFC replacement with ~98% lower ODP, though HCFCs are also phased out for new production.",
+              explanationZh: "R-11 是 CFC，R-123 是 HCFC 过渡替代物（ODP 远低于 R-11）。" },
+            { id: 28, part: "type3", category: CAT.LOWP,
+              questionEn: "During normal operation of an R-123 chiller, what is the pressure inside the evaporator?",
+              questionZh: "R-123 冷水机正常运行时，蒸发器内部的压力通常处于什么状态？",
+              optionsEn: ["Above 100 psig","In a vacuum (sub-atmospheric pressure)","Exactly 50 psig","Above 250 psig"],
+              optionsZh: ["高于 100 psig","处于真空（低于大气压）","正好 50 psig","高于 250 psig"],
+              answer: 1,
+              explanationEn: "At ~38–40°F evaporator temperature, R-123 is at roughly 18–20 inches of Hg vacuum.",
+              explanationZh: "在约 38–40°F 蒸发温度下，R-123 处于约 18–20 in. Hg 的真空状态。" },
+            { id: 29, part: "type3", category: CAT.LOWP,
+              questionEn: "Why can't R-123 be used as a simple 'drop-in' replacement in an older R-11 chiller without modifications?",
+              questionZh: "为什么不能把 R-123 直接「直接替换（drop-in）」加进老式 R-11 冷水机而不做任何改造？",
+              optionsEn: ["R-123 is incompatible with certain older elastomers, gaskets, and motor insulation materials","R-123 is heavier than R-11 so it sinks","R-123 operates at 400 psig","R-123 is an A3 flammable gas"],
+              optionsZh: ["R-123 会腐蚀或溶胀某些老式橡胶密封圈、垫片和电机绝缘材料","R-123 比 R-11 重会沉底","R-123 工作压力高达 400 psig","R-123 是 A3 易燃气体"],
+              answer: 0,
+              explanationEn: "R-123 acts as a solvent on older seals, O-rings, and motor windings; gasket/seal upgrades and impeller/orifice adjustments are typically needed.",
+              explanationZh: "R-123 对老式密封件和电机绝缘漆有溶解作用，改造时通常需更换兼容垫片/密封件。" },
+            { id: 30, part: "type3", category: CAT.LEAK,
+              questionEn: "If a technician pressurizes a low-pressure chiller to 16 psig with dry nitrogen for leak testing, what will happen?",
+              questionZh: "如果技师用干氮气将低压冷水机加压到 16 psig 检漏，会发生什么？",
+              optionsEn: ["The chiller will cool down rapidly","The 15 psig rupture disc will burst, releasing nitrogen and refrigerant to the atmosphere","The purge unit will compress it back to liquid","Nothing; chillers are tested at 300 psig"],
+              optionsZh: ["冷水机会迅速降温","15 psig 爆破片会破裂，导致氮气和制冷剂排入大气","抽气装置会把它压回液体","没事；冷水机测试压力是 300 psig"],
+              answer: 1,
+              explanationEn: "Exceeding 15 psig blows the rupture disc; that is why the maximum test pressure is 10 psig.",
+              explanationZh: "超过 15 psig 会顶破爆破片造成违法排放，因此检漏加压严禁超过 10 psig。" },
+            { id: 31, part: "type3", category: CAT.LEAK,
+              questionEn: "How can a technician check for a water-to-refrigerant tube leak inside an evaporator or condenser?",
+              questionZh: "如何检查蒸发器或冷凝器内部铜管是否发生水侧与制冷剂侧串漏？",
+              optionsEn: ["Drain the water boxes, pressurize the refrigerant side (≤10 psig), and probe the tube sheets/drains with an electronic leak detector (or perform a hydrostatic test)","Listen to the cooling tower fan","Check the room thermostat","Add dye to the oil sump only"],
+              optionsZh: ["排空水室的水，制冷剂侧加压（≤10 psig），用电子检漏仪探查管板/排水口（或做静水压测试）","听冷却塔风机声音","检查室内温控器","仅向油箱加荧光剂"],
+              answer: 0,
+              explanationEn: "Draining the water boxes exposes the tube ends and tube sheets so escaping refrigerant can be detected accurately.",
+              explanationZh: "排空水室后，用电子检漏仪探查铜管口和管板即可发现漏入水侧的制冷剂。" },
+            { id: 32, part: "type3", category: CAT.LEAK,
+              questionEn: "If a low-pressure chiller's water-cooled condenser tubes develop a leak while the system is shut down, what can happen?",
+              questionZh: "如果低压冷水机在停机状态下水冷冷凝器铜管发生泄漏，会发生什么？",
+              optionsEn: ["Water from the cooling tower/condenser water loop can be forced into the vacuum-side refrigerant shell","Refrigerant will freeze the cooling tower fan","Oil will flow into the thermostat","The compressor will start automatically"],
+              optionsZh: ["水侧的高压水会被压入处于负压真空的制冷剂壳体内","制冷剂会冻住冷却塔风机","冷冻油会流进温控器","压缩机会自动启动"],
+              answer: 0,
+              explanationEn: "Water loop pressure (often 20–50 psig) is much higher than the chiller's vacuum, forcing water into the refrigerant side.",
+              explanationZh: "水侧通常有正压，而停机时制冷剂侧是负压真空，水会倒灌进制冷剂系统造成严重进水故障。" },
+            { id: 33, part: "type3", category: CAT.LEAK,
+              questionEn: "Under EPA leak repair rules, what is the annual leak rate threshold for Commercial Refrigeration appliances (≥50 lb charge)?",
+              questionZh: "根据 EPA 泄漏维修规定，充注量 ≥ 50 磅的商业制冷设备（Commercial Refrigeration），年泄漏率门槛是多少？",
+              optionsEn: ["10%","20%","30%","50%"],
+              optionsZh: ["10%","20%","30%","50%"],
+              answer: 1,
+              explanationEn: "The thresholds are: Comfort cooling 10%, Commercial refrigeration 20%, Industrial process refrigeration 30%.",
+              explanationZh: "记住口诀：舒适 10%、商业 20%、工业 30%。" },
+            { id: 34, part: "type3", category: CAT.LEAK,
+              questionEn: "After repairing a leak on an appliance with ≥50 lb of refrigerant that exceeded the leak rate threshold, what verification tests are required?",
+              questionZh: "充注量 ≥ 50 磅且超标泄漏的设备完成修漏后，必须进行哪些验证测试？",
+              optionsEn: ["No tests are required","An initial verification test before/during recharging, and a follow-up verification test within 10 days after the appliance returns to normal operation","Only an annual test 1 year later","Only a soap-bubble test on the cylinder"],
+              optionsZh: ["不需要测试","在充注前/过程中做初始验证测试，并在设备恢复正常运行后 10 天内做跟踪验证测试","只需一年后测一次","只需对钢瓶做肥皂泡测试"],
+              answer: 1,
+              explanationEn: "Both an initial verification test (before/at recharge) and a follow-up verification test (within 10 days of normal operation) are required.",
+              explanationZh: "必须完成「初始验证」和「恢复运行 10 天内跟踪验证」两次测试并记录。" },
+            { id: 35, part: "type3", category: CAT.LEAK,
+              questionEn: "Why should you NEVER use a leak-stop additive in a low-pressure centrifugal chiller?",
+              questionZh: "为什么绝不应向低压离心冷水机中加入堵漏剂（Leak-stop）？",
+              optionsEn: ["It can foul heat exchanger surfaces, plug oil passages/orifices, and contaminate refrigerant","It turns R-123 into R-410A","It lowers the rupture disc rating","It is only for ammonia systems"],
+              optionsZh: ["它会污染换热表面、堵塞油路/节流孔并污染制冷剂","它会把 R-123 变成 R-410A","它会降低爆破片额定值","它只用于氨系统"],
+              answer: 0,
+              explanationEn: "Chemical leak sealants are not a substitute for mechanical repair and can damage chiller bearings, purge units, and heat transfer surfaces.",
+              explanationZh: "化学堵漏剂会堵塞精密油路和抽气装置，绝不能替代正规机械修漏。" },
+            { id: 36, part: "type3", category: CAT.EVAC,
+              questionEn: "Which unit is used to specify the required EPA evacuation level for post-1993 low-pressure recovery equipment?",
+              questionZh: "1993 年之后生产的低压回收设备，其 EPA 强制抽真空指标使用什么单位表示？",
+              optionsEn: ["psig","25 mm Hg absolute","25 in. Hg gauge","100 microns"],
+              optionsZh: ["psig","25 mm Hg absolute（毫米汞柱绝对压力）","25 in. Hg 表压","100 微米"],
+              answer: 1,
+              explanationEn: "Post-November 15, 1993 low-pressure recovery machines must evacuate to 25 mm Hg absolute.",
+              explanationZh: "1993 年 11 月 15 日后制造的低压回收机统一使用 **25 mm Hg absolute**。" },
+            { id: 37, part: "type3", category: CAT.EVAC,
+              questionEn: "Why is 25 mm Hg absolute specified as an absolute pressure rather than a vacuum gauge reading?",
+              questionZh: "为什么 25 mm Hg absolute 用「绝对压力」而不是「真空表压」来规定？",
+              optionsEn: ["Because barometric pressure changes with altitude and weather, whereas absolute pressure is independent of local atmospheric pressure","Because vacuum gauges cannot read in inches","Because mm Hg is only used in Europe","Because it equals 25 psig"],
+              optionsZh: ["因为当地大气压会随海拔和天气变化，而绝对压力不受大气压变化影响","因为真空表不能用英寸读数","因为毫米汞柱只在欧洲使用","因为它等于 25 psig"],
+              answer: 0,
+              explanationEn: "At high altitude (like Denver), 29 in. Hg vacuum is impossible to read on a gauge referenced to local atmosphere; absolute pressure is universal.",
+              explanationZh: "在高海拔地区表压读数会受当地大气压影响，绝对压力（mm Hg abs）在任何海拔都一致。" },
+            { id: 38, part: "type3", category: CAT.EVAC,
+              questionEn: "When recovering refrigerant from a low-pressure chiller, why is the recovery machine's condenser often water-cooled?",
+              questionZh: "从低压冷水机回收制冷剂时，为什么回收机本身经常采用水冷式冷凝器？",
+              optionsEn: ["To reject heat efficiently and condense low-pressure vapor into the recovery cylinder without excessive discharge pressure","To add water into the recovery cylinder","To freeze the refrigerant","To eliminate the need for a recovery cylinder"],
+              optionsZh: ["高效散热并将低压蒸气冷凝进回收钢瓶，避免排气压力过高","向回收钢瓶里加水","把制冷剂冻成冰","省去回收钢瓶"],
+              answer: 0,
+              explanationEn: "Water-cooled recovery condensers improve heat rejection and speed up condensation of large volumes of low-pressure refrigerant.",
+              explanationZh: "水冷冷凝器散热效率高，能加快大流量低压制冷剂的冷凝回收。" },
+            { id: 39, part: "type3", category: CAT.EVAC,
+              questionEn: "If you are recovering refrigerant from a chiller with a 'major repair' planned, when is the ONLY time you may stop before reaching 25 mm Hg absolute?",
+              questionZh: "对冷水机进行大修前回收制冷剂，什么情况下允许不抽到 25 mm Hg absolute？",
+              optionsEn: ["Whenever you are in a hurry","Never, unless using a certified pre-1993 machine (which must still reach 25 in. Hg vac) or the system is being opened only for a non-major repair that doesn't require full evacuation? Wait—under EPA rules, any major repair on a low-pressure system requires full evacuation to the applicable level (25 mm Hg abs or 25 in. Hg vac)","Whenever ambient temperature is below 70°F","Whenever the chiller holds less than 200 lb"],
+              optionsZh: ["只要时间赶就可以","只有使用 1993 年前的合规老设备时按 25 in. Hg 真空标准；凡属大修都必须抽到对应标准真空度","只要室温低于 70°F","只要充注量不到 200 磅"],
+              answer: 1,
+              explanationEn: "Every major repair (replacing compressor, condenser, evaporator, or major heat exchanger) requires full evacuation to 25 mm Hg absolute (or 25 in. Hg vac for pre-1993 machines).",
+              explanationZh: "凡涉及大修（如更换压缩机、蒸发器、冷凝器），都必须抽到规定的完整真空度（25 mm Hg abs 或老机 25 in. Hg vac）。" },
+            { id: 40, part: "type3", category: CAT.EVAC,
+              questionEn: "During vapor recovery from a low-pressure chiller, what happens if the system pressure drops too quickly while water is sitting stagnant in the evaporator tubes?",
+              questionZh: "气态回收过程中，如果蒸发器铜管内有静止的水而系统压力下降过快，会发生什么？",
+              optionsEn: ["The water will boil","The refrigerant temperature drops below 32°F, freezing the stagnant water and potentially splitting the copper tubes","The water will turn into refrigerant","The oil will evaporate"],
+              optionsZh: ["水会沸腾","制冷剂温度骤降至 0°C 以下，使静止的水结冰并胀裂铜管","水会变成制冷剂","冷冻油会蒸发"],
+              answer: 1,
+              explanationEn: "Always circulate water through the evaporator and condenser (or drain them completely) during recovery and evacuation.",
+              explanationZh: "回收与抽真空期间必须保持水泵循环，或彻底排空管内积水。" },
+            { id: 41, part: "type3", category: CAT.EVAC,
+              questionEn: "What should you do if, during the post-recovery standing vacuum check, the chiller pressure rises from 25 mm Hg abs back up to 50 mm Hg abs?",
+              questionZh: "回收完成关阀静置检查时，如果冷水机压力从 25 mm Hg abs 回升到 50 mm Hg abs，应该怎么办？",
+              optionsEn: ["Open the chiller immediately","Continue recovery until the pressure stabilizes at or below 25 mm Hg absolute (indicating no trapped liquid boiling off)","Add dry nitrogen to 20 psig","Ignore it because 50 mm Hg is close enough"],
+              optionsZh: ["立即拆开冷水机","继续运行回收机抽真空，直到压力稳定在 25 mm Hg abs 以下","充入 20 psig 干氮气","忽略它"],
+              answer: 1,
+              explanationEn: "Trapped liquid refrigerant in oil or cold spots continues boiling off; you must keep recovering until the pressure holds steady.",
+              explanationZh: "压力回升说明油中或冷点处仍有液态制冷剂在蒸发，必须继续回收直至压力稳定。" },
+            { id: 42, part: "type3", category: CAT.EVAC,
+              questionEn: "Which valve on a low-pressure chiller is used to remove liquid refrigerant during recovery?",
+              questionZh: "回收低压冷水机内的液态制冷剂时，通常使用哪个接口？",
+              optionsEn: ["The lowest liquid drain/charging valve on the evaporator or condenser","The purge exhaust vent","The rupture disc port","The oil fill plug"],
+              optionsZh: ["蒸发器或冷凝器最底部的排液/充注阀","抽气装置排气口","爆破片接口","加油口"],
+              answer: 0,
+              explanationEn: "Liquid settles at the bottom of the evaporator/condenser; connecting to the lowest charging/drain valve allows liquid transfer.",
+              explanationZh: "液体聚集在蒸发器或冷凝器底部，接底部排液/充注阀才能高效抽液。" },
+            { id: 43, part: "type3", category: CAT.PURGE,
+              questionEn: "Why does a purge unit sit at the top of the condenser rather than at the bottom of the evaporator?",
+              questionZh: "为什么抽气装置（Purge unit）接在冷凝器顶部，而不是蒸发器底部？",
+              optionsEn: ["Because air and other non-condensable gases are lighter than refrigerant vapor (or collect at the top of the condenser where refrigerant condenses)","Because liquid refrigerant floats on top of air","Because the evaporator has no pressure","To save electrical wiring"],
+              optionsZh: ["因为空气等不凝性气体会聚集在冷凝器顶部（制冷剂冷凝后，不凝气留在最上方）","因为液态制冷剂浮在空气上面","因为蒸发器没有压力","为了省电线"],
+              answer: 0,
+              explanationEn: "As refrigerant vapor condenses into liquid and falls to the bottom of the condenser, non-condensable gases (air, nitrogen, water vapor) accumulate at the top.",
+              explanationZh: "制冷剂在冷凝器内冷凝成液体往下流，而不能冷凝的空气和水蒸气会聚集在冷凝器顶部。" },
+            { id: 44, part: "type3", category: CAT.PURGE,
+              questionEn: "What should a technician check if a purge unit is discharging excessive water into its drain/sight glass?",
+              questionZh: "如果发现冷水机抽气装置的排水口或视液镜中排出大量水分，技师应重点排查什么？",
+              optionsEn: ["A tube leak in the evaporator or condenser allowing water into the refrigerant side","Low room humidity","Too much R-123 in the purge tank","A clogged air filter in the hallway"],
+              optionsZh: ["蒸发器或冷凝器铜管泄漏，导致水渗入制冷剂侧","室内湿度过低","抽气罐里 R-123 太多","走廊空调滤网堵塞"],
+              answer: 0,
+              explanationEn: "Excessive water separated by the purge unit is a classic warning sign of a leaking heat-exchanger tube.",
+              explanationZh: "Purge 排出大量水分通常是换热器铜管穿孔漏水的典型警报。" },
+            { id: 45, part: "type3", category: CAT.PURGE,
+              questionEn: "When charging a low-pressure chiller after a major repair, at what point is it safe to switch from vapor charging to liquid charging?",
+              questionZh: "大修后给低压冷水机充注制冷剂时，何时可以从气态充注切换为液态充注？",
+              optionsEn: ["Immediately at 29 in. Hg vacuum","Once vapor charging has raised the chiller pressure above the saturation pressure corresponding to 32°F (freezing point of water)","Only after the compressor has run for 24 hours","Never; low-pressure chillers can only be charged with vapor"],
+              optionsZh: ["在 29 in. Hg 真空时立即切换","当气态充注使系统压力升高到 32°F（水的冰点）对应的饱和压力以上时","必须等压缩机运行 24 小时后","永远不能；低压机只能充气态"],
+              answer: 1,
+              explanationEn: "Raising pressure above the 32°F saturation point ensures liquid refrigerant entering the evaporator will not flash below freezing and ice up the water tubes.",
+              explanationZh: "压力升至 32°F 饱和点以上后，再加液态才不会闪蒸结冰冻裂水管。" },
+            { id: 46, part: "type3", category: CAT.PURGE,
+              questionEn: "Why are older purge units on R-11 chillers a significant source of refrigerant emissions compared to modern high-efficiency purge units?",
+              questionZh: "为什么老式 R-11 冷水机的抽气装置比现代高效抽气装置更容易排放制冷剂？",
+              optionsEn: ["Older purges vent air without deeply chilling it, allowing much more refrigerant vapor to escape with the air","Older purges run on R-410A","Older purges have no exhaust port","Older purges intentionally dump liquid refrigerant"],
+              optionsZh: ["老式抽气装置冷却分离不充分，排空气时会夹带大量制冷剂蒸气一起排掉","老式抽气装置用 R-410A","老式抽气装置没有排气口","老式抽气装置故意排放液态制冷剂"],
+              answer: 0,
+              explanationEn: "High-efficiency purges condense out up to 99%+ of refrigerant before venting air, whereas older designs vented much higher ratios of refrigerant.",
+              explanationZh: "高效抽气装置能深度冷凝回收几乎所有制冷剂，而老式装置排空气时带走大量制冷剂。" },
+            { id: 47, part: "type3", category: CAT.PURGE,
+              questionEn: "What must be installed on the vent line of a low-pressure chiller's rupture disc when the chiller is located indoors?",
+              questionZh: "室内安装的低压冷水机，其爆破片（Rupture disc）的泄压出口必须如何处理？",
+              optionsEn: ["Capped tightly with a brass plug","Piped to the outdoors (in a safe location away from air intakes) so any emergency relief does not fill the machinery room","Connected back to the evaporator","Vented directly onto the electrical panel"],
+              optionsZh: ["用铜堵头拧死","通过管道引到室外安全位置（远离新风口），避免紧急泄压充满机房","接回蒸发器","直接对着配电柜排放"],
+              answer: 1,
+              explanationEn: "ASHRAE 15 requires pressure-relief and rupture-disc vent lines to discharge outdoors safely, preventing asphyxiation or toxic exposure inside.",
+              explanationZh: "ASHRAE 15 要求安全阀和爆破片排气管必须引至室外安全处，防止室内人员窒息或中毒。" },
+            { id: 48, part: "type3", category: CAT.PURGE,
+              questionEn: "In a chiller machinery room with an R-123 leak alarm, what action should the room ventilation system take automatically when the sensor trips?",
+              questionZh: "装有 R-123 冷水机的机房，当泄漏报警传感器触发时，机房通风系统应自动执行什么动作？",
+              optionsEn: ["Shut off all fans","Activate high-volume mechanical exhaust ventilation","Start the chiller compressor","Close all dampers permanently"],
+              optionsZh: ["关闭所有风机","自动启动大风量机械事故排风","启动冷水机压缩机","永久关闭所有风阀"],
+              answer: 1,
+              explanationEn: "ASHRAE 15 requires automatic activation of mechanical exhaust ventilation when the refrigerant detector reaches the alarm setpoint.",
+              explanationZh: "ASHRAE 15 规定一旦泄漏传感器报警，必须自动开启机械事故排风。" },
+            { id: 49, part: "type3", category: CAT.PURGE,
+              questionEn: "Where should refrigerant leak sensors be mounted in a chiller machinery room?",
+              questionZh: "机房内的制冷剂泄漏检测传感器应安装在什么高度？",
+              optionsEn: ["Near the ceiling only","Near the floor (close to the chiller), because refrigerant vapors are heavier than air","Inside the chilled water supply pipe","Outside the building"],
+              optionsZh: ["仅安装在天花板附近","靠近地面（冷水机周围低处），因为制冷剂蒸气比空气重","安装在冷冻水供水管内","安装在室外"],
+              answer: 1,
+              explanationEn: "Halocarbon refrigerant vapors (like R-123 and R-11) are much heavier than air and sink to the floor first.",
+              explanationZh: "卤代烃制冷剂蒸气比空气重，泄漏后会先沉积在地面低处。" },
+            { id: 50, part: "type3", category: CAT.PURGE,
+              questionEn: "What is the purpose of a chiller's 'oil return' (oil recovery / eductor) system?",
+              questionZh: "低压冷水机上「回油系统（Oil return / eductor）」的作用是什么？",
+              optionsEn: ["To pump oil into the cooling tower","To return oil that migrates into the evaporator back to the compressor oil sump","To mix water with oil","To vent non-condensables from the oil"],
+              optionsZh: ["把油泵入冷却塔","将随制冷剂进入蒸发器的冷冻油抽回压缩机油箱","把水和油混合","从油中排出不凝性气体"],
+              answer: 1,
+              explanationEn: "Oil gradually carries over into the evaporator; the oil return system skims and returns it to the compressor sump to maintain proper lubrication.",
+              explanationZh: "少量冷冻油会随制冷剂进入蒸发器，回油系统负责将其抽回压缩机油箱保证润滑。" }
+        ];
+
+        function getExamSetsData() {
+            return [
+                { id: 0, title: "试卷 1 · Set 1", questions: SET1 },
+                { id: 1, title: "试卷 2 · Set 2", questions: SET2 }
+            ];
+        }
+
+        const PAGE_SIZE = 10;
+        let allExamSets = [];
+        let currentSetIndex = 0; // 0 to 1
+        let currentQuestionsData = [];
+        
+        let currentPage = 0; // 0 to 4 (5 pages total)
+        let userAnswers = [];
+        let flaggedQuestions = [];
+        let isSubmitted = false;
+        let isStudyMode = false;
+        let timerInterval = null;
+        let secondsElapsed = 0;
+        let activeFilter = 'all'; // 'all', 'wrong', 'correct'
+        let pendingSetIndex = null;
+        let showChinese = true; // Global state for toggling Chinese translation
+
+        window.onload = function() {
+            allExamSets = getExamSetsData();
+            loadExamSet(0);
+        };
+
+        function loadExamSet(setIndex) {
+            currentSetIndex = parseInt(setIndex);
+            currentQuestionsData = allExamSets[currentSetIndex].questions;
+
+            // Update Header dropdown & label
+            document.getElementById('examSetSelect').value = currentSetIndex;
+            document.getElementById('activeSetLabel').innerText = allExamSets[currentSetIndex].title;
+
+            // Reset state for new set
+            userAnswers = new Array(currentQuestionsData.length).fill(null);
+            flaggedQuestions = new Array(currentQuestionsData.length).fill(false);
+            isSubmitted = false;
+            secondsElapsed = 0;
+            activeFilter = 'all';
+
+            // UI elements reset
+            document.getElementById('headerSubmitBtn').classList.remove('hidden');
+            document.getElementById('btnFilterAll').className = "px-3 py-1 text-xs font-semibold rounded-lg bg-indigo-100 text-indigo-700 font-bold border border-indigo-200";
+            document.getElementById('btnFilterWrong').classList.add('hidden');
+            document.getElementById('btnFilterCorrect').classList.add('hidden');
+            document.getElementById('scoreBadge').classList.add('hidden');
+            document.getElementById('legendResult').classList.add('hidden');
+            document.getElementById('weaknessSideWidget').classList.add('hidden');
+            document.getElementById('passStatus').innerText = "未提交";
+            document.getElementById('passStatus').className = "font-bold text-slate-600";
+
+            // Restart timer
+            if (timerInterval) clearInterval(timerInterval);
+            startTimer();
+
+            // Render view
+            renderPaginationDots();
+            switchPage(0);
+            updateProgressBar();
+        }
+
+        function promptSwitchExamSet(newIndex) {
+            if (parseInt(newIndex) === currentSetIndex) return;
+
+            const hasAnswered = userAnswers.some(a => a !== null);
+            if (hasAnswered && !isSubmitted) {
+                pendingSetIndex = newIndex;
+                document.getElementById('switchSetModal').classList.remove('hidden');
+                // Revert select dropdown temporarily until confirmed
+                document.getElementById('examSetSelect').value = currentSetIndex;
+            } else {
+                loadExamSet(newIndex);
+            }
+        }
+
+        function confirmSwitchExamSet() {
+            closeModal('switchSetModal');
+            if (pendingSetIndex !== null) {
+                loadExamSet(pendingSetIndex);
+                pendingSetIndex = null;
+            }
+        }
+
+        function cancelSwitchExamSet() {
+            closeModal('switchSetModal');
+            pendingSetIndex = null;
+            document.getElementById('examSetSelect').value = currentSetIndex;
+        }
+
+        function startTimer() {
+            timerInterval = setInterval(() => {
+                secondsElapsed++;
+                const hrs = String(Math.floor(secondsElapsed / 3600)).padStart(2, '0');
+                const mins = String(Math.floor((secondsElapsed % 3600) / 60)).padStart(2, '0');
+                const secs = String(secondsElapsed % 60).padStart(2, '0');
+                document.getElementById('timer').innerText = `${hrs}:${mins}:${secs}`;
+            }, 1000);
+        }
+
+        function switchPage(pageIndex) {
+            currentPage = pageIndex;
+            renderPage(pageIndex);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function prevPage() {
+            if (currentPage > 0) switchPage(currentPage - 1);
+        }
+
+        function nextPage() {
+            if (currentPage < 4) switchPage(currentPage + 1);
+        }
+
+        function renderPaginationDots() {
+            const dotsContainer = document.getElementById('paginationDots');
+            dotsContainer.innerHTML = '';
+            for (let i = 0; i < 5; i++) {
+                const btn = document.createElement('button');
+                btn.id = `dotBtn${i}`;
+                btn.onclick = () => switchPage(i);
+                btn.className = `w-8 h-8 rounded-lg text-xs font-bold transition ${i === currentPage ? 'bg-indigo-600 text-white shadow-sm' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`;
+                btn.innerText = i + 1;
+                dotsContainer.appendChild(btn);
+            }
+        }
+
+        function renderPage(pageIndex) {
+            currentPage = pageIndex;
+            
+            // Update Page Tags
+            document.getElementById('currentPageTag').innerText = `第 ${pageIndex + 1} 页`;
+            const startNum = pageIndex * PAGE_SIZE + 1;
+            const endNum = Math.min((pageIndex + 1) * PAGE_SIZE, currentQuestionsData.length);
+            document.getElementById('pageRangeText').innerText = `展示第 ${startNum} - ${endNum} 题 (Questions ${startNum} to ${endNum})`;
+            document.getElementById('pageNumSpan').innerText = pageIndex + 1;
+
+            // Update Tab Highlights
+            for (let i = 0; i < 5; i++) {
+                const tab = document.getElementById(`pageTab${i}`);
+                const dot = document.getElementById(`dotBtn${i}`);
+                if (i === pageIndex) {
+                    tab.className = "flex-1 py-1 text-center rounded-md transition font-bold bg-indigo-600 text-white shadow-sm";
+                    if (dot) dot.className = "w-8 h-8 rounded-lg text-xs font-bold transition bg-indigo-600 text-white shadow-sm";
+                } else {
+                    tab.className = "flex-1 py-1 text-center rounded-md transition text-slate-600 hover:bg-slate-200 font-medium";
+                    if (dot) dot.className = "w-8 h-8 rounded-lg text-xs font-bold transition bg-slate-100 text-slate-600 hover:bg-slate-200";
+                }
+            }
+
+            // Disable/Enable page prev/next buttons
+            document.getElementById('prevPageBtn').disabled = (pageIndex === 0);
+            document.getElementById('nextPageBtn').disabled = (pageIndex === 4);
+
+            // Render 10 Questions
+            const container = document.getElementById('questionsContainer');
+            container.innerHTML = '';
+
+            const pageQuestions = currentQuestionsData.slice(pageIndex * PAGE_SIZE, (pageIndex + 1) * PAGE_SIZE);
+
+            pageQuestions.forEach((q) => {
+                const realIndex = q.id - 1; // 0-indexed
+
+                if (!shouldDisplayInFilter(realIndex)) return;
+
+                const card = document.createElement('div');
+                card.id = `qCard-${realIndex}`;
+                card.className = "bg-white rounded-2xl shadow-sm border border-slate-200 p-4 sm:p-6 transition hover:border-slate-300";
+
+                const isFlagged = flaggedQuestions[realIndex];
+
+                // Options HTML
+                let optionsHtml = '';
+                const labels = ['A', 'B', 'C', 'D'];
+
+                q.optionsEn.forEach((optEn, optIdx) => {
+                    const optZh = q.optionsZh[optIdx];
+                    const isSelected = userAnswers[realIndex] === optIdx;
+
+                    let optClass = "p-3.5 rounded-xl border-2 transition cursor-pointer flex items-center justify-between ";
+
+                    if (isSubmitted) {
+                        const isCorrectAnswer = optIdx === q.answer;
+                        const isUserChoice = optIdx === userAnswers[realIndex];
+
+                        if (isCorrectAnswer) {
+                            optClass += "bg-emerald-50 border-emerald-500 text-emerald-900 font-medium";
+                        } else if (isUserChoice && !isCorrectAnswer) {
+                            optClass += "bg-rose-50 border-rose-500 text-rose-900 font-medium";
+                        } else {
+                            optClass += "bg-white border-slate-200 text-slate-400 opacity-60";
+                        }
+                    } else {
+                        if (isSelected) {
+                            optClass += "bg-indigo-50 border-indigo-600 text-indigo-900 font-medium shadow-sm";
+                        } else {
+                            optClass += "bg-white border-slate-200 hover:border-slate-300 hover:bg-slate-50 text-slate-700";
+                        }
+                    }
+
+                    let iconHtml = '';
+                    if (isSubmitted || isStudyMode) {
+                        if (optIdx === q.answer) {
+                            iconHtml = '<i class="fa-solid fa-circle-check text-emerald-600 text-xl"></i>';
+                        } else if (optIdx === userAnswers[realIndex]) {
+                            iconHtml = '<i class="fa-solid fa-circle-xmark text-rose-500 text-xl"></i>';
+                        }
+                    } else {
+                        iconHtml = isSelected 
+                            ? '<i class="fa-solid fa-circle-dot text-indigo-600 text-xl"></i>' 
+                            : '<i class="fa-regular fa-circle text-slate-300 text-xl"></i>';
+                    }
+
+                    optionsHtml += `
+                        <div onclick="selectOption(${realIndex}, ${optIdx})" class="${optClass}">
+                            <div class="flex items-start space-x-3 pr-2">
+                                <span class="w-7 h-7 rounded-lg bg-slate-100 border border-slate-200 flex items-center justify-center font-bold text-xs text-slate-600 shrink-0 mt-0.5">
+                                    ${labels[optIdx]}
+                                </span>
+                                <div>
+                                    <p class="text-sm font-semibold text-slate-800">${optEn}</p>
+                                    <p class="text-xs text-slate-500 mt-0.5 zh-text ${showChinese ? '' : 'hidden'}">${optZh}</p>
+                                </div>
+                            </div>
+                            <div class="shrink-0">${iconHtml}</div>
+                        </div>
+                    `;
+                });
+
+                // Explanation HTML post submit or in study mode
+                let expHtml = '';
+                if (isSubmitted || (isStudyMode && userAnswers[realIndex] !== null)) {
+                    const isCorrect = userAnswers[realIndex] === q.answer;
+                    const headerClass = isCorrect ? "text-emerald-700" : "text-rose-700";
+                    const headerIcon = isCorrect ? "fa-circle-check text-emerald-600" : "fa-triangle-exclamation text-rose-600";
+                    const statusTitle = isCorrect ? "回答正确 (Correct)" : "正确答案与解析 (Answer Explanation)";
+
+                    expHtml = `
+                        <div class="mt-5 p-4 rounded-xl bg-slate-50 border border-slate-200">
+                            <div class="flex items-center gap-2 font-bold text-sm mb-2 ${headerClass}">
+                                <i class="fa-solid ${headerIcon}"></i>
+                                <span>${statusTitle}</span>
+                            </div>
+                            <div class="space-y-1 text-xs leading-relaxed text-slate-700">
+                                <p class="font-medium"><strong>[EN]</strong> ${q.explanationEn}</p>
+                                <p class="text-slate-500 zh-text ${showChinese ? '' : 'hidden'}"><strong>[中文]</strong> ${q.explanationZh}</p>
+                            </div>
+                        </div>
+                    `;
+                }
+
+                card.innerHTML = `
+                    <div class="flex justify-between items-start gap-4 mb-3">
+                        <div>
+                            <span class="inline-block px-2.5 py-0.5 rounded-md text-xs font-semibold bg-indigo-50 text-indigo-700 border border-indigo-100 mb-2">
+                                ${q.category}
+                            </span>
+                            <h3 class="text-base font-bold text-slate-900 leading-snug">
+                                ${q.id}. ${q.questionEn}
+                            </h3>
+                            <p class="text-xs font-medium text-slate-500 mt-1 zh-text ${showChinese ? '' : 'hidden'}">
+                                ${q.questionZh}
+                            </p>
+                        </div>
+                        <button onclick="toggleFlag(${realIndex})" class="${isFlagged ? 'text-amber-500' : 'text-slate-300 hover:text-amber-500'} p-2 rounded-lg transition shrink-0" title="标记此题">
+                            <i class="fa-solid fa-bookmark text-xl"></i>
+                        </button>
+                    </div>
+
+                    <div class="space-y-2.5 my-4">
+                        ${optionsHtml}
+                    </div>
+
+                    ${expHtml}
+                `;
+
+                container.appendChild(card);
+            });
+
+            renderGrid();
+        }
+
+        function selectOption(qIdx, optIdx) {
+            if (isSubmitted) return;
+            userAnswers[qIdx] = optIdx;
+            
+            renderPage(currentPage);
+            updateProgressBar();
+        }
+
+        function toggleFlag(qIdx) {
+            flaggedQuestions[qIdx] = !flaggedQuestions[qIdx];
+            renderPage(currentPage);
+        }
+
+        function renderGrid() {
+            const gridContainer = document.getElementById('questionGrid');
+            gridContainer.innerHTML = '';
+
+            currentQuestionsData.forEach((q, idx) => {
+                const btn = document.createElement('button');
+                btn.id = `grid-btn-${idx}`;
+                btn.onclick = () => {
+                    const targetPage = Math.floor(idx / PAGE_SIZE);
+                    switchPage(targetPage);
+                    setTimeout(() => {
+                        const el = document.getElementById(`qCard-${idx}`);
+                        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }, 100);
+                };
+                
+                let base = "h-8 w-8 rounded-lg font-semibold text-xs transition flex items-center justify-center border ";
+                
+                if (isSubmitted) {
+                    const isCorrect = userAnswers[idx] === currentQuestionsData[idx].answer;
+                    if (isCorrect) {
+                        base += "bg-emerald-500 text-white border-emerald-600";
+                    } else {
+                        base += "bg-rose-500 text-white border-rose-600";
+                    }
+                } else {
+                    if (userAnswers[idx] !== null) {
+                        base += "bg-indigo-600 text-white border-indigo-700 ";
+                    } else {
+                        base += "bg-slate-100 text-slate-700 hover:bg-slate-200 border-slate-200 ";
+                    }
+
+                    if (flaggedQuestions[idx]) {
+                        base += "ring-2 ring-amber-400 border-amber-500 ";
+                    }
+                }
+
+                btn.className = base;
+                btn.innerText = idx + 1;
+                gridContainer.appendChild(btn);
+            });
+
+            const answeredNum = userAnswers.filter(a => a !== null).length;
+            document.getElementById('answeredCount').innerText = answeredNum;
+        }
+
+        function shouldDisplayInFilter(idx) {
+            if (!isSubmitted || activeFilter === 'all') return true;
+            const isCorrect = userAnswers[idx] === currentQuestionsData[idx].answer;
+            if (activeFilter === 'wrong') return !isCorrect;
+            if (activeFilter === 'correct') return isCorrect;
+            return true;
+        }
+
+        function updateProgressBar() {
+            const answeredCount = userAnswers.filter(a => a !== null).length;
+            const percent = (answeredCount / currentQuestionsData.length) * 100;
+            document.getElementById('progressBar').style.width = `${percent}%`;
+        }
+
+        function confirmSubmit() {
+            const unanswered = userAnswers.filter(a => a === null).length;
+            document.getElementById('unansweredNum').innerText = unanswered;
+            document.getElementById('confirmModal').classList.remove('hidden');
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.add('hidden');
+        }
+
+        function gradeExam() {
+            closeModal('confirmModal');
+            clearInterval(timerInterval);
+            isSubmitted = true;
+
+            let correctCount = 0;
+            currentQuestionsData.forEach((q, idx) => {
+                if (userAnswers[idx] === q.answer) {
+                    correctCount++;
+                }
+            });
+
+            const scorePercent = Math.round((correctCount / currentQuestionsData.length) * 100);
+            const PART_PASS = 18;
+            const partScore = { core: 0, type3: 0 };
+            currentQuestionsData.forEach((q, idx) => { if (userAnswers[idx] === q.answer) partScore[q.part]++; });
+            const corePassed = partScore.core >= PART_PASS;
+            const t3Passed = partScore.type3 >= PART_PASS;
+            const isPassed = corePassed && t3Passed;
+
+            const paintPart = (box, score, badge, n, ok) => {
+                document.getElementById(score).innerText = `${n} / 25`;
+                document.getElementById(badge).innerText = ok ? "PASS" : "FAIL";
+                document.getElementById(box).className = "p-3 rounded-xl border text-left " + (ok ? "bg-emerald-50 border-emerald-300" : "bg-rose-50 border-rose-300");
+                document.getElementById(badge).className = "text-xs font-bold " + (ok ? "text-emerald-700" : "text-rose-700");
+                document.getElementById(score).className = "text-2xl font-extrabold " + (ok ? "text-emerald-700" : "text-rose-700");
+            };
+            paintPart("modalCoreBox", "modalCoreScore", "modalCoreBadge", partScore.core, corePassed);
+            paintPart("modalT3Box", "modalT3Score", "modalT3Badge", partScore.type3, t3Passed);
+
+            // Breakdown score by category for Weakness Analysis
+            const categoryStats = {};
+
+            currentQuestionsData.forEach((q, idx) => {
+                if (!categoryStats[q.category]) {
+                    categoryStats[q.category] = { total: 0, correct: 0 };
+                }
+                categoryStats[q.category].total++;
+                if (userAnswers[idx] === q.answer) {
+                    categoryStats[q.category].correct++;
+                }
+            });
+
+            // Find weakest category
+            let weakestCategory = '';
+            let lowestAcc = 101;
+
+            Object.keys(categoryStats).forEach(cat => {
+                const stat = categoryStats[cat];
+                const acc = Math.round((stat.correct / stat.total) * 100);
+                stat.acc = acc;
+                if (acc < lowestAcc) {
+                    lowestAcc = acc;
+                    weakestCategory = cat;
+                }
+            });
+
+            // Render Weakness Analysis in Modal
+            const modalCatList = document.getElementById('modalCategoryList');
+            const sideCatList = document.getElementById('categoryBreakdownList');
+            modalCatList.innerHTML = '';
+            sideCatList.innerHTML = '';
+
+            Object.keys(categoryStats).forEach(cat => {
+                const stat = categoryStats[cat];
+                const colorClass = stat.acc >= 70 ? 'bg-emerald-500' : (stat.acc >= 50 ? 'bg-amber-500' : 'bg-rose-500');
+
+                // Modal Item
+                const modalItem = document.createElement('div');
+                modalItem.innerHTML = `
+                    <div class="flex justify-between text-xs font-semibold mb-1 text-slate-700">
+                        <span>${cat}</span>
+                        <span>${stat.correct}/${stat.total} (${stat.acc}%)</span>
+                    </div>
+                    <div class="w-full bg-slate-200 rounded-full h-2 overflow-hidden">
+                        <div class="${colorClass} h-2 rounded-full" style="width: ${stat.acc}%"></div>
+                    </div>
+                `;
+                modalCatList.appendChild(modalItem);
+
+                // Side Widget Item
+                const sideItem = document.createElement('div');
+                sideItem.innerHTML = `
+                    <div class="flex justify-between text-xs font-medium text-slate-600 mb-0.5">
+                        <span class="truncate pr-2">${cat}</span>
+                        <span class="font-bold">${stat.acc}%</span>
+                    </div>
+                    <div class="w-full bg-slate-100 rounded-full h-1.5 overflow-hidden">
+                        <div class="${colorClass} h-1.5 rounded-full" style="width: ${stat.acc}%"></div>
+                    </div>
+                `;
+                sideCatList.appendChild(sideItem);
+            });
+
+            document.getElementById('weakestDomainCallout').innerHTML = `
+                📌 当前套题中最薄弱知识模块为：<span class="font-bold underline text-rose-700">${weakestCategory}</span> (正确率 <span class="font-bold text-rose-700">${lowestAcc}%</span>)。建议重点复习该模块涉及的 EPA 法规条款！
+            `;
+
+            // Display UI updates post-submit
+            document.getElementById('headerSubmitBtn').classList.add('hidden');
+            document.getElementById('btnFilterWrong').classList.remove('hidden');
+            document.getElementById('btnFilterCorrect').classList.remove('hidden');
+            document.getElementById('scoreBadge').classList.remove('hidden');
+            document.getElementById('legendResult').classList.remove('hidden');
+            document.getElementById('weaknessSideWidget').classList.remove('hidden');
+
+            document.getElementById('wrongCount').innerText = currentQuestionsData.length - correctCount;
+            document.getElementById('correctCount').innerText = correctCount;
+
+            const passStatus = document.getElementById('passStatus');
+            if (isPassed) {
+                passStatus.innerText = "PASS (合格)";
+                passStatus.className = "font-bold text-emerald-600";
+            } else {
+                passStatus.innerText = "FAIL (未通过)";
+                passStatus.className = "font-bold text-rose-600";
+            }
+
+            // Results Modal Details
+            document.getElementById('modalScorePercent').innerText = `${scorePercent}%`;
+            document.getElementById('modalScoreCorrect').innerText = `${correctCount} / 50`;
+
+            const resIcon = document.getElementById('resultIcon');
+            const resStatus = document.getElementById('resultStatusText');
+            const passBadge = document.getElementById('modalPassBadge');
+
+            if (isPassed) {
+                resIcon.className = "w-16 h-16 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center mx-auto mb-3 text-3xl";
+                resIcon.innerHTML = '<i class="fa-solid fa-trophy"></i>';
+                resStatus.innerText = `恭喜！您已通过 ${allExamSets[currentSetIndex].title}`;
+                resStatus.className = "text-xl sm:text-2xl font-black text-emerald-600 mb-1";
+                passBadge.innerText = "PASS (及格)";
+                passBadge.className = "text-sm sm:text-base font-extrabold text-emerald-600 mt-1";
+            } else {
+                resIcon.className = "w-16 h-16 rounded-full bg-rose-100 text-rose-600 flex items-center justify-center mx-auto mb-3 text-3xl";
+                resIcon.innerHTML = '<i class="fa-solid fa-circle-xmark"></i>';
+                resStatus.innerText = !corePassed && !t3Passed ? "Core 与 Type III 均未达 18/25，建议整体复习"
+                    : (!corePassed ? "Core 部分未达 18/25（Core 不过则任何认证都拿不到）" : "Type III 部分未达 18/25，重点复习 25 mm Hg abs、10 psig 加压上限与 Purge 规则");
+                resStatus.className = "text-xl sm:text-2xl font-black text-rose-600 mb-1";
+                passBadge.innerText = "FAIL (未及格)";
+                passBadge.className = "text-sm sm:text-base font-extrabold text-rose-600 mt-1";
+            }
+
+            document.getElementById('resultsModal').classList.remove('hidden');
+
+            renderPage(currentPage);
+        }
+
+        function setFilter(filterType) {
+            activeFilter = filterType;
+            
+            ['All', 'Wrong', 'Correct'].forEach(type => {
+                const btn = document.getElementById(`btnFilter${type}`);
+                if (type.toLowerCase() === filterType) {
+                    btn.className = "px-3 py-1 text-xs font-semibold rounded-lg bg-indigo-100 text-indigo-700 font-bold border border-indigo-200";
+                } else {
+                    btn.className = "px-3 py-1 text-xs font-semibold rounded-lg text-slate-600 hover:bg-slate-100";
+                }
+            });
+
+            renderPage(currentPage);
+        }
+
+        function toggleNavPanel() {
+            const body = document.getElementById('navPanelBody');
+            const open = !body.classList.toggle('hidden');
+            document.getElementById('navPanelToggleText').innerText = open ? '收起' : '展开';
+            document.getElementById('navPanelToggleIcon').className = 'fa-solid text-[10px] ' + (open ? 'fa-chevron-up' : 'fa-chevron-down');
+        }
+
+        function toggleChineseVisibility() {
+            showChinese = !showChinese;
+            const btnText = document.getElementById('chineseToggleText');
+            if (btnText) {
+                btnText.innerText = showChinese ? "隐藏中文" : "显示中文";
+            }
+
+            const zhElements = document.querySelectorAll('.zh-text');
+            zhElements.forEach(el => {
+                if (showChinese) {
+                    el.classList.remove('hidden');
+                } else {
+                    el.classList.add('hidden');
+                }
+            });
+        }
+
+        function toggleStudyMode() {
+            isStudyMode = !isStudyMode;
+            const btnText = document.getElementById('studyModeToggleText');
+            const btn = document.getElementById('btnToggleStudyMode');
+            if (isStudyMode) {
+                if (btnText) btnText.innerText = "切换为测验模式 (隐藏解析)";
+                if (btn) {
+                    btn.classList.remove('bg-amber-50', 'text-amber-800', 'border-amber-200');
+                    btn.classList.add('bg-amber-500', 'text-white', 'border-amber-600');
+                }
+            } else {
+                if (btnText) btnText.innerText = "开启背题模式 (即时解析)";
+                if (btn) {
+                    btn.classList.remove('bg-amber-500', 'text-white', 'border-amber-600');
+                    btn.classList.add('bg-amber-50', 'text-amber-800', 'border-amber-200');
+                }
+            }
+            renderPage(currentPage);
+        }
+
+        function resetExam() {
+            closeModal('resultsModal');
+            loadExamSet(currentSetIndex);
+        }
+    </script>
+</body>
+</html>
