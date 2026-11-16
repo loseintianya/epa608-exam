@@ -9,7 +9,7 @@ import os
 import subprocess
 import sys
 
-VOICE = os.environ.get("EDGE_TTS_VOICE", "en-US-AndrewNeural")
+VOICE = os.environ.get("EDGE_TTS_VOICE", "en-US-AriaNeural")
 RATE = os.environ.get("EDGE_TTS_RATE", "-5%")  # 0.95x natural exam pace
 
 TARGETS = [
@@ -46,24 +46,39 @@ process.stdout.write(JSON.stringify(sets.map((s, idx) => ({
     return json.loads(res.stdout)
 
 
+def clean_tts_text(text: str) -> str:
+    return (
+        text.replace("—", ", ")
+        .replace("–", " to ")
+        .replace("≤", "less than or equal to ")
+        .replace("≥", "greater than or equal to ")
+        .replace("°F", " degrees Fahrenheit")
+        .replace("°C", " degrees Celsius")
+    )
+
+
 async def synth_one(sem: asyncio.Semaphore, text: str, out_path: str):
     import edge_tts
     if os.path.exists(out_path) and os.path.getsize(out_path) > 1000:
         return "skipped"
+    text = clean_tts_text(text)
     async with sem:
-        for attempt in range(3):
+        for attempt in range(5):
             try:
+                await asyncio.sleep(0.2)
                 communicate = edge_tts.Communicate(text, VOICE, rate=RATE)
                 await communicate.save(out_path)
-                return "ok"
+                if os.path.exists(out_path) and os.path.getsize(out_path) > 1000:
+                    return "ok"
             except Exception as exc:
-                if attempt == 2:
-                    raise RuntimeError(f"Failed {out_path}: {exc}") from exc
-                await asyncio.sleep(1.5 * (attempt + 1))
+                print(f"Retry {attempt + 1}/5 for {out_path}: {exc}")
+            await asyncio.sleep(2.0 * (attempt + 1))
+        print(f"WARNING: Failed after 5 attempts: {out_path}")
+        return "failed"
 
 
 async def main():
-    sem = asyncio.Semaphore(8)
+    sem = asyncio.Semaphore(2)
     tasks = []
     for exam_key, html_file in TARGETS:
         if not os.path.exists(html_file):
@@ -85,7 +100,10 @@ async def main():
     results = await asyncio.gather(*tasks)
     generated = sum(1 for r in results if r == "ok")
     skipped = sum(1 for r in results if r == "skipped")
-    print(f"Done! Generated: {generated}, Skipped (existing): {skipped}, Total: {len(results)}")
+    failed = sum(1 for r in results if r == "failed")
+    print(f"Done! Generated: {generated}, Skipped: {skipped}, Failed: {failed}, Total: {len(results)}")
+    if generated == 0 and skipped == 0 and failed > 0:
+        sys.exit(1)
 
 
 if __name__ == "__main__":

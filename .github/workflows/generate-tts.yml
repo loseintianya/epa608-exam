@@ -6,7 +6,7 @@ on:
       voice:
         description: "Microsoft Edge Neural Voice"
         required: false
-        default: "en-US-AndrewNeural"
+        default: "en-US-AriaNeural"
 
 permissions:
   contents: write
@@ -33,7 +33,7 @@ jobs:
 
       - name: Generate MP3 audio files
         env:
-          EDGE_TTS_VOICE: ${{ github.event.inputs.voice || 'en-US-AndrewNeural' }}
+          EDGE_TTS_VOICE: ${{ github.event.inputs.voice || 'en-US-AriaNeural' }}
         run: python3 scripts/generate_tts.py
 
       - name: Commit and push generated audio
