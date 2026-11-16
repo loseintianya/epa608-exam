@@ -286,123 +286,146 @@
     <!-- VIEW 3: CHEAT SHEET (Type I) -->
     <section id="view-cheatsheet" class="hidden max-w-5xl mx-auto px-3 sm:px-4 py-6 flex-grow w-full space-y-6">
         <div class="bg-gradient-to-r from-indigo-600 to-blue-700 rounded-2xl p-5 sm:p-6 text-white shadow-md">
-            <h2 class="text-lg sm:text-xl font-bold">SkillCat EPA 608 Type I 考前速记卡</h2>
-            <p class="text-xs sm:text-sm text-indigo-100 mt-1">考前 10 分钟过一遍下面这 4 张核心数据表，Type I 考试中 85% 的题目可以直接秒选。</p>
+            <h2 class="text-lg sm:text-xl font-bold">SkillCat EPA 608 Type I 考前速记卡（与本套模拟题 100% 同步）</h2>
+            <p class="text-xs sm:text-sm text-indigo-100 mt-1">涵盖本页面 Set 1 & Set 2 全部 100 道真题的核心考点（前 25 题 Core 通用基础 + 后 25 题 Type I 小型电器）。</p>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+            <!-- Card 1: Scope & Key Numbers -->
             <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm space-y-3">
                 <div class="flex items-center justify-between">
                     <h3 class="font-bold text-slate-900 flex items-center gap-2">
                         <span class="w-2.5 h-2.5 rounded-full bg-blue-600"></span>
-                        1. 必考核心数字 (Numbers to Memorize)
+                        1. 小型电器范围与必考数字 (Scope & Numbers)
                     </h3>
-                    <span class="text-xs font-semibold px-2 py-0.5 bg-blue-50 text-blue-700 rounded-md">高频必考</span>
+                    <span class="text-xs font-semibold px-2 py-0.5 bg-blue-50 text-blue-700 rounded-md">Type I 核心</span>
                 </div>
                 <div class="divide-y divide-slate-100 text-sm">
-                    <div class="py-2.5 flex justify-between gap-2">
-                        <span class="text-slate-600">Type I 小型家电定义充注量上限</span>
-                        <span class="font-bold text-slate-900">≤ 5 lbs (5磅或以下)</span>
+                    <div class="py-2 flex justify-between gap-2">
+                        <span class="text-slate-600">小型电器定义 (工厂密封预充注)</span>
+                        <span class="font-bold text-slate-900 text-right">≤ 5 lb (含双独立 3 lb 回路)</span>
                     </div>
-                    <div class="py-2.5 flex justify-between gap-2">
-                        <span class="text-slate-600">1993年11月15日<b>后</b>设备 · 压缩机<b>运转</b></span>
-                        <span class="font-bold text-emerald-600">90% 或 4" Hg vacuum</span>
+                    <div class="py-2 flex justify-between gap-2">
+                        <span class="text-slate-600">非监考 Type I 及格线 (低风险免监考)</span>
+                        <span class="font-bold text-indigo-600">84% (21 / 25 题)</span>
                     </div>
-                    <div class="py-2.5 flex justify-between gap-2">
-                        <span class="text-slate-600">1993年11月15日<b>后</b>设备 · 压缩机<b>不转</b></span>
+                    <div class="py-2 flex justify-between gap-2">
+                        <span class="text-slate-600"><b>1993-11-15 后</b>制造的回收机 · 压缩机<b>运转</b></span>
+                        <span class="font-bold text-emerald-600">90% (如 6 oz 收 5.4 oz) 或 4" Hg</span>
+                    </div>
+                    <div class="py-2 flex justify-between gap-2">
+                        <span class="text-slate-600"><b>1993-11-15 后</b>制造的回收机 · 压缩机<b>不转</b></span>
                         <span class="font-bold text-amber-600">80% 或 4" Hg vacuum</span>
                     </div>
-                    <div class="py-2.5 flex justify-between gap-2">
-                        <span class="text-slate-600">1993年11月15日<b>前</b>设备 (无论是否运转)</span>
+                    <div class="py-2 flex justify-between gap-2">
+                        <span class="text-slate-600"><b>1993-11-15 前</b>制造的回收机 (Grandfathered)</span>
                         <span class="font-bold text-slate-800">80% 或 4" Hg vacuum</span>
                     </div>
-                    <div class="py-2.5 flex justify-between gap-2">
+                    <div class="py-2 flex justify-between gap-2">
                         <span class="text-slate-600">被动回收 (System-dependent) 适用上限</span>
-                        <span class="font-bold text-slate-900">≤ 15 lbs</span>
+                        <span class="font-bold text-slate-900">≤ 15 lb (20 lb 冷库不可用)</span>
                     </div>
-                    <div class="py-2.5 flex justify-between gap-2">
-                        <span class="text-slate-600">回收袋/回收钢瓶安全充装上限</span>
-                        <span class="font-bold text-slate-900">80% 容量 (黄身灰顶)</span>
+                    <div class="py-2 flex justify-between gap-2">
+                        <span class="text-slate-600">家用冰箱制冷剂演进 / 铭牌充注单位</span>
+                        <span class="font-bold text-slate-900 text-right">R-12 → R-134a → R-600a · oz / g</span>
                     </div>
                 </div>
+                <p class="text-xs text-slate-500 bg-slate-50 p-2.5 rounded-xl border border-slate-100">
+                    <b>范围边界：</b>汽车/皮卡空调属 <b>Section 609 (MVAC)</b>，Type I 不可修；6 lb PTAC 或 7 lb 分体热泵需 <b>Type II/Universal</b>；含 R-410A 或 R-22 的窗机仍属 Type I（R-22 只能用回收/再生剂）。
+                </p>
             </div>
 
+            <!-- Card 2: Recovery & Disposal Rules -->
             <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm space-y-3">
                 <div class="flex items-center justify-between">
                     <h3 class="font-bold text-slate-900 flex items-center gap-2">
                         <span class="w-2.5 h-2.5 rounded-full bg-emerald-600"></span>
-                        2. 免回收与碳氢制冷剂 (Exempt & HC)
+                        2. 回收实操与处置法规 (Recovery & Disposal)
                     </h3>
-                    <span class="text-xs font-semibold px-2 py-0.5 bg-emerald-50 text-emerald-700 rounded-md">必考</span>
+                    <span class="text-xs font-semibold px-2 py-0.5 bg-emerald-50 text-emerald-700 rounded-md">高频必考</span>
                 </div>
-                <ul class="space-y-2.5 text-sm text-slate-700">
-                    <li class="bg-slate-50 p-2.5 rounded-xl border border-slate-100">
-                        <div class="font-semibold text-slate-900">允许直接排空/免回收 (Exempt from Recovery)：</div>
-                        <div class="text-xs text-slate-600 mt-1">
-                            • <b>R-290 (Propane 丙烷)</b> & <b>R-600a (Isobutane 异丁烷)</b><br>
-                            • <b>R-717 (Ammonia 氨)</b> & <b>R-744 (CO₂ 二氧化碳)</b><br>
-                            • <b>Water / Lithium Bromide</b> (水/溴化锂吸收式系统)
-                        </div>
+                <ul class="space-y-2 text-sm text-slate-700">
+                    <li class="flex items-start gap-2">
+                        <span class="text-emerald-600 font-bold">•</span>
+                        <span><b>被动 vs 主动回收：</b>被动式无自带泵/压缩机，靠电器压缩机或内部压力；主动式自带压缩机。换收不同制冷剂前，必须先<b>抽真空排空</b>主动回收机。</span>
                     </li>
-                    <li class="bg-slate-50 p-2.5 rounded-xl border border-slate-100">
-                        <div class="font-semibold text-slate-900">碳氢制冷剂 (R-290 / R-600a) 三大铁律：</div>
-                        <div class="text-xs text-slate-600 mt-1">
-                            1. 家用冰箱最大充注量约为 <b>2 ounces (57 grams / 0.125 lbs)</b><br>
-                            2. 属于 <b>A3 级别 (高易燃)</b>，气瓶带<b>红色 (Red)</b> 标记<br>
-                            3. <b>严禁用于改装 (Never retrofit)</b> 原本用 R-134a 的旧冰箱
-                        </div>
+                    <li class="flex items-start gap-2">
+                        <span class="text-emerald-600 font-bold">•</span>
+                        <span><b>接口接法：</b>压缩机<b>运转</b>时被动回收接<b>高压侧 (High side)</b>；压缩机<b>烧毁不转</b>时<b>高低压两侧同时接</b>，可轻加热并用锤轻敲压缩机释放油中制冷剂，<b>严禁</b>先放气泄压。</span>
+                    </li>
+                    <li class="flex items-start gap-2">
+                        <span class="text-emerald-600 font-bold">•</span>
+                        <span><b>无焊穿刺阀 (Piercing valve)：</b>内部橡胶圈易老化漏气，修完后<b>必须拆除并焊装永久维修阀</b> (Braze permanent access fitting)。</span>
+                    </li>
+                    <li class="flex items-start gap-2">
+                        <span class="text-emerald-600 font-bold">•</span>
+                        <span><b>修漏与归属：</b>小型电器<b>无强制修漏要求</b>（但禁止排空，房主自行剪管放气亦违法）。多客户混收的制冷剂未经 <b>Reclaim (再生)</b> 不得给新客户使用；不同制冷剂严禁混瓶。</span>
+                    </li>
+                    <li class="flex items-start gap-2">
+                        <span class="text-emerald-600 font-bold">•</span>
+                        <span><b>报废处置链：</b><b>最终处置人 (如废品回收站/拆解厂)</b> 必须在压碎前确保制冷剂已回收；接收时若凭“已回收书面声明”，声明中<b>无需</b>填写回收机序列号。</span>
                     </li>
                 </ul>
             </div>
 
+            <!-- Card 3: Servicing, Safety & HC -->
             <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm space-y-3">
                 <div class="flex items-center justify-between">
                     <h3 class="font-bold text-slate-900 flex items-center gap-2">
                         <span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span>
-                        3. 实操与压缩机损坏对策 (Field Techniques)
+                        3. 维修排障、安全与碳氢制冷剂 (Servicing & Safety)
                     </h3>
-                    <span class="text-xs font-semibold px-2 py-0.5 bg-amber-50 text-amber-700 rounded-md">必考场景</span>
+                    <span class="text-xs font-semibold px-2 py-0.5 bg-amber-50 text-amber-700 rounded-md">实操场景</span>
                 </div>
                 <ul class="space-y-2 text-sm text-slate-700">
                     <li class="flex items-start gap-2">
                         <span class="text-amber-600 font-bold">•</span>
-                        <span><b>压缩机不转时怎么达到 80% 回收率？</b><br>开启<b>除霜加热器 (Defrost heater)</b> 或加热蒸发器以升高压力；用橡胶锤<b>轻敲压缩机 (Tap the compressor with a rubber mallet)</b> 震出油里的制冷剂；必要时<b>高低压两侧同时接入 (Access both high and low sides)</b>。</span>
+                        <span><b>试压检漏禁区：</b>只能用<b>干燥氮气 (Dry nitrogen)</b>，<b>严禁使用压缩空气或氧气</b>（高压氧气遇冷冻油会剧烈爆炸，空气含水分）。</span>
                     </li>
                     <li class="flex items-start gap-2">
                         <span class="text-amber-600 font-bold">•</span>
-                        <span><b>无焊刺破阀 (Solderless Piercing Valve)：</b><br>仅可用于<b>铜管或铝管 (Copper or aluminum tubing)</b>，且容易日久漏气，<b>严禁留在系统上当作永久维修口</b>。</span>
+                        <span><b>间歇性冰堵秒杀：</b>制冷正常 1 小时后蒸发器回温、压缩机连转，断电几小时又短暂恢复 ➔ <b>系统含水分在毛细管出口结冰堵塞</b> (Moisture freezing at capillary tube outlet)。</span>
                     </li>
                     <li class="flex items-start gap-2">
                         <span class="text-amber-600 font-bold">•</span>
-                        <span><b>被动回收接哪一侧？</b><br>如果压缩机还能转，接在<b>高压侧/排气阀 (High side)</b>，直接利用冰箱自带压缩机把制冷剂泵进回收袋。</span>
+                        <span><b>压缩机烧毁 (Burnout)：</b>更换新压缩机后，必须<b>冲洗/清洗系统去酸与积碳</b>、更换<b>干燥过滤器</b>（重度污染加吸气管过滤器）、深抽真空并充注新剂；酸化的旧制冷剂应送去<b>再生或销毁</b>。</span>
+                    </li>
+                    <li class="flex items-start gap-2">
+                        <span class="text-amber-600 font-bold">•</span>
+                        <span><b>油品与改装：</b>R-134a 家用冰箱使用 <b>POE 酯类油</b>（极易吸湿，开盖后需尽快用完并拧紧）。R-12（矿物油）老冰箱<b>严禁直接补加 R-134a</b>，必须完整改装换油（无需换蒸发器盘管）。</span>
+                    </li>
+                    <li class="flex items-start gap-2">
+                        <span class="text-amber-600 font-bold">•</span>
+                        <span><b>R-290 / R-600a 易燃剂：</b>需保持<b>良好通风、消除所有火源、使用适用于易燃制冷剂的回收设备</b>（不需要全程佩戴 SCBA 呼吸器）。</span>
                     </li>
                 </ul>
             </div>
 
+            <!-- Card 4: Core Q1-Q25 Essentials -->
             <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm space-y-3">
                 <div class="flex items-center justify-between">
                     <h3 class="font-bold text-slate-900 flex items-center gap-2">
                         <span class="w-2.5 h-2.5 rounded-full bg-rose-500"></span>
-                        4. 故障判别与安全法则 (Safety & Diagnosis)
+                        4. Core 通用基础必考考点 (对应前 25 题)
                     </h3>
-                    <span class="text-xs font-semibold px-2 py-0.5 bg-rose-50 text-rose-700 rounded-md">秒杀词对应</span>
+                    <span class="text-xs font-semibold px-2 py-0.5 bg-rose-50 text-rose-700 rounded-md">占考卷 50%</span>
                 </div>
                 <ul class="space-y-2 text-sm text-slate-700">
                     <li class="flex items-start gap-2">
                         <span class="text-rose-600 font-bold">•</span>
-                        <span>看到 <b>Pungent odor (刺鼻酸臭味)</b> ➔ 立即选 <b>Compressor burnout (压缩机烧毁)</b> + <b>Acid (酸性物质)</b>，维修时必须清洗系统并更换干燥过滤器。</span>
+                        <span><b>臭氧与法规：</b>臭氧层位于<b>平流层 (Stratosphere)</b>；破坏臭氧的元凶是<b>氯 (Chlorine)</b>；《蒙特利尔议定书》淘汰 ODS；Section 608 禁止故意排空（仅允许极少量 <i>De minimis</i> 正常损耗）。</span>
                     </li>
                     <li class="flex items-start gap-2">
                         <span class="text-rose-600 font-bold">•</span>
-                        <span>看到 <b>Abnormally high pressure (压力异常偏高)</b> ➔ 立即选 <b>Non-condensable gases / Air (混入不凝性气体/空气)</b> 或混合了两种制冷剂。检测方法：静置至室温后对比 <b>P-T Chart (压温表)</b>。</span>
+                        <span><b>3R 区分：</b><b>Recover</b> 仅回收不处理；<b>Recycle</b> 现场过滤去油水（仅限同一所有者）；<b>Reclaim</b> 送工厂提纯至 <b>AHRI 700</b> 新剂标准（可转售）。</span>
                     </li>
                     <li class="flex items-start gap-2">
                         <span class="text-rose-600 font-bold">•</span>
-                        <span>看到 <b>Open flame (明火)</b> 接触制冷剂 ➔ 立即选分解产生剧毒 <b>Phosgene gas (光气)</b> 和氢氟酸/盐酸。</span>
+                        <span><b>钢瓶安全：</b>最高充装 <b>80% 水容积</b>防热胀爆裂；DOT 回收瓶每 <b>5 年</b>水压测试；<b>严禁明火/喷灯加热钢瓶</b>；一次性钢瓶丢弃前需<b>抽至真空并刺破销毁</b>；运输须直立固定。</span>
                     </li>
                     <li class="flex items-start gap-2">
                         <span class="text-rose-600 font-bold">•</span>
-                        <span><b>强制修漏豁免：</b>Type I (≤5 lbs) 设备如果泄漏，EPA <b>不强制要求修漏 (Not mandatory to repair)</b>。</span>
+                        <span><b>制冷基础：</b>冰箱用<b>毛细管</b>节流；<b>400 系列</b>（非共沸）有<b>温度滑移</b>须液相充注；<b>500 系列</b>为共沸；蒸发器内温度不变吸热为<b>潜热 (Latent heat)</b>；R-134a 沸点约 −15°F，属<b>高压制冷剂</b>。</span>
                     </li>
                 </ul>
             </div>
