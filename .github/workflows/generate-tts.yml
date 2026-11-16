@@ -1,0 +1,49 @@
+name: Generate Microsoft Edge Neural TTS Audio
+
+on:
+  workflow_dispatch:
+    inputs:
+      voice:
+        description: "Microsoft Edge Neural Voice"
+        required: false
+        default: "en-US-AndrewNeural"
+
+permissions:
+  contents: write
+
+jobs:
+  build-audio:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install edge-tts
+        run: pip install --no-cache-dir edge-tts
+
+      - name: Generate MP3 audio files
+        env:
+          EDGE_TTS_VOICE: ${{ github.event.inputs.voice || 'en-US-AndrewNeural' }}
+        run: python3 scripts/generate_tts.py
+
+      - name: Commit and push generated audio
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add audio/
+          if git diff --staged --quiet; then
+            echo "No new audio files to commit."
+          else
+            git commit -m "Generate Microsoft Edge Neural TTS MP3 audio files"
+            git push
+          fi

@@ -2270,7 +2270,11 @@
             renderPage(currentPage);
         }
 
+        const AUDIO_EXAM_KEY = 'type2';
+        let currentAudio = null;
+
         function updateSpeakButtonUI(idx, active) {
+            if (idx === null || idx === undefined) return;
             const btn = document.getElementById(`speakBtn-${idx}`);
             if (!btn) return;
             btn.className = (active
@@ -2283,6 +2287,12 @@
         }
 
         function stopSpeaking() {
+            if (currentAudio) {
+                currentAudio.onended = null;
+                currentAudio.onerror = null;
+                currentAudio.pause();
+                currentAudio = null;
+            }
             if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
                 window.speechSynthesis.cancel();
             }
@@ -2293,11 +2303,68 @@
             }
         }
 
-        function speakQuestion(qIdx) {
+        function fallbackSpeechSynthesis(fullText, uiIdx) {
             if (!('speechSynthesis' in window)) {
-                alert('当前浏览器不支持英语语音朗读功能 (Web Speech API)。');
+                if (speakingIndex === uiIdx) {
+                    speakingIndex = null;
+                    updateSpeakButtonUI(uiIdx, false);
+                }
+                alert('当前浏览器不支持英语语音朗读功能。');
                 return;
             }
+            const utterance = new SpeechSynthesisUtterance(fullText);
+            utterance.lang = 'en-US';
+            utterance.rate = 0.95;
+
+            const voices = window.speechSynthesis.getVoices();
+            const enVoice = voices.find(v => v.lang === 'en-US') || voices.find(v => v.lang && v.lang.startsWith('en'));
+            if (enVoice) utterance.voice = enVoice;
+
+            utterance.onend = () => {
+                if (speakingIndex === uiIdx) {
+                    speakingIndex = null;
+                    updateSpeakButtonUI(uiIdx, false);
+                }
+            };
+            utterance.onerror = () => {
+                if (speakingIndex === uiIdx) {
+                    speakingIndex = null;
+                    updateSpeakButtonUI(uiIdx, false);
+                }
+            };
+
+            window.speechSynthesis.speak(utterance);
+        }
+
+        function playNeuralOrFallback(audioUrl, fullText, uiIdx) {
+            speakingIndex = uiIdx;
+            updateSpeakButtonUI(uiIdx, true);
+
+            const audio = new Audio(audioUrl);
+            currentAudio = audio;
+            let fellBack = false;
+
+            const triggerFallback = () => {
+                if (fellBack || currentAudio !== audio) return;
+                fellBack = true;
+                currentAudio = null;
+                fallbackSpeechSynthesis(fullText, uiIdx);
+            };
+
+            audio.onended = () => {
+                if (currentAudio === audio) {
+                    currentAudio = null;
+                    if (speakingIndex === uiIdx) {
+                        speakingIndex = null;
+                        updateSpeakButtonUI(uiIdx, false);
+                    }
+                }
+            };
+            audio.onerror = triggerFallback;
+            audio.play().catch(triggerFallback);
+        }
+
+        function speakQuestion(qIdx) {
             if (speakingIndex === qIdx) {
                 stopSpeaking();
                 return;
@@ -2310,32 +2377,9 @@
             const labels = ['A', 'B', 'C', 'D'];
             const optionsText = q.optionsEn.map((opt, i) => `Option ${labels[i]}. ${opt}`).join('. ');
             const fullText = `Question ${q.id}. ${q.questionEn} ${optionsText}`;
+            const audioUrl = `./audio/${AUDIO_EXAM_KEY}/set${currentSetIndex + 1}_q${q.id}.mp3`;
 
-            const utterance = new SpeechSynthesisUtterance(fullText);
-            utterance.lang = 'en-US';
-            utterance.rate = 0.95;
-
-            const voices = window.speechSynthesis.getVoices();
-            const enVoice = voices.find(v => v.lang === 'en-US') || voices.find(v => v.lang && v.lang.startsWith('en'));
-            if (enVoice) utterance.voice = enVoice;
-
-            speakingIndex = qIdx;
-            updateSpeakButtonUI(qIdx, true);
-
-            utterance.onend = () => {
-                if (speakingIndex === qIdx) {
-                    speakingIndex = null;
-                    updateSpeakButtonUI(qIdx, false);
-                }
-            };
-            utterance.onerror = () => {
-                if (speakingIndex === qIdx) {
-                    speakingIndex = null;
-                    updateSpeakButtonUI(qIdx, false);
-                }
-            };
-
-            window.speechSynthesis.speak(utterance);
+            playNeuralOrFallback(audioUrl, fullText, qIdx);
         }
 
         function renderGrid() {
