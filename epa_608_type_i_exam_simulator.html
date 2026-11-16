@@ -84,6 +84,36 @@
                     <span id="keywordsToggleText" class="hidden sm:inline">秒杀词: 开</span>
                 </button>
 
+                <!-- Audio Playback Speed Control -->
+                <div class="relative" id="audioSpeedWrapper">
+                    <button id="audioSpeedBtn" onclick="toggleAudioSpeedPopover(event)" class="bg-indigo-900/90 hover:bg-indigo-800 text-white text-xs font-semibold px-2.5 py-1.5 rounded-lg border border-indigo-700 transition flex items-center gap-1.5" title="自由调节英语语音播放速度">
+                        <i class="fa-solid fa-gauge-high text-cyan-400 text-xs"></i>
+                        <span id="audioSpeedLabel" class="font-mono">1.0x</span>
+                    </button>
+                    <div id="audioSpeedPopover" class="hidden absolute right-0 mt-2 w-64 bg-white text-slate-800 rounded-xl shadow-xl border border-slate-200 p-3.5 z-50" onclick="event.stopPropagation()">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-xs font-bold text-slate-700">语音播放速度</span>
+                            <span id="audioSpeedPopoverValue" class="text-xs font-mono font-bold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded">1.00x</span>
+                        </div>
+                        <input id="audioSpeedSlider" type="range" min="0.5" max="2.5" step="0.05" value="1" oninput="setAudioSpeed(this.value)" class="w-full accent-indigo-600 cursor-pointer">
+                        <div class="flex justify-between text-[10px] text-slate-400 font-mono mt-0.5 mb-2.5">
+                            <span>0.5x</span>
+                            <span>1.0x</span>
+                            <span>1.5x</span>
+                            <span>2.0x</span>
+                            <span>2.5x</span>
+                        </div>
+                        <div class="grid grid-cols-3 gap-1.5">
+                            <button type="button" onclick="setAudioSpeed(0.75)" data-speed="0.75" class="speed-preset-btn text-[11px] font-mono font-semibold py-1 rounded-lg border border-slate-200 hover:bg-indigo-50 hover:text-indigo-700 transition">0.75x</button>
+                            <button type="button" onclick="setAudioSpeed(0.9)" data-speed="0.9" class="speed-preset-btn text-[11px] font-mono font-semibold py-1 rounded-lg border border-slate-200 hover:bg-indigo-50 hover:text-indigo-700 transition">0.9x</button>
+                            <button type="button" onclick="setAudioSpeed(1)" data-speed="1" class="speed-preset-btn text-[11px] font-mono font-semibold py-1 rounded-lg border border-slate-200 hover:bg-indigo-50 hover:text-indigo-700 transition">1.0x</button>
+                            <button type="button" onclick="setAudioSpeed(1.25)" data-speed="1.25" class="speed-preset-btn text-[11px] font-mono font-semibold py-1 rounded-lg border border-slate-200 hover:bg-indigo-50 hover:text-indigo-700 transition">1.25x</button>
+                            <button type="button" onclick="setAudioSpeed(1.5)" data-speed="1.5" class="speed-preset-btn text-[11px] font-mono font-semibold py-1 rounded-lg border border-slate-200 hover:bg-indigo-50 hover:text-indigo-700 transition">1.5x</button>
+                            <button type="button" onclick="setAudioSpeed(2)" data-speed="2" class="speed-preset-btn text-[11px] font-mono font-semibold py-1 rounded-lg border border-slate-200 hover:bg-indigo-50 hover:text-indigo-700 transition">2.0x</button>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Timer -->
                 <div class="bg-indigo-900/80 px-2 sm:px-3 py-1.5 rounded-lg flex items-center space-x-1.5 sm:space-x-2 text-xs sm:text-sm font-mono border border-indigo-700/60 shadow-inner">
                     <i class="fa-regular fa-clock text-amber-400"></i>
@@ -1816,7 +1846,68 @@
         }
 
         const AUDIO_EXAM_KEY = 'type1';
+        const AUDIO_SPEED_KEY = 'epa608_audio_speed';
         let currentAudio = null;
+        let audioPlaybackRate = (() => {
+            try {
+                const saved = typeof localStorage !== 'undefined' ? parseFloat(localStorage.getItem(AUDIO_SPEED_KEY)) : NaN;
+                if (!isNaN(saved) && saved >= 0.5 && saved <= 2.5) return saved;
+            } catch (e) {}
+            return 1.0;
+        })();
+
+        function updateAudioSpeedUI() {
+            if (typeof document === 'undefined') return;
+            const label = document.getElementById('audioSpeedLabel');
+            const popVal = document.getElementById('audioSpeedPopoverValue');
+            const slider = document.getElementById('audioSpeedSlider');
+            const shortText = `${parseFloat(audioPlaybackRate.toFixed(2))}x`;
+            if (label) label.textContent = shortText;
+            if (popVal) popVal.textContent = `${audioPlaybackRate.toFixed(2)}x`;
+            if (slider) slider.value = String(audioPlaybackRate);
+            document.querySelectorAll('.speed-preset-btn').forEach(btn => {
+                const btnVal = parseFloat(btn.getAttribute('data-speed'));
+                const isActive = Math.abs(btnVal - audioPlaybackRate) < 0.01;
+                btn.className = 'speed-preset-btn text-[11px] font-mono font-semibold py-1 rounded-lg border transition ' + (
+                    isActive
+                        ? 'bg-indigo-600 text-white border-indigo-600'
+                        : 'border-slate-200 text-slate-700 hover:bg-indigo-50 hover:text-indigo-700'
+                );
+            });
+        }
+
+        function setAudioSpeed(val) {
+            const parsed = parseFloat(val);
+            const rate = isNaN(parsed) ? 1.0 : Math.min(2.5, Math.max(0.5, Math.round(parsed * 20) / 20));
+            audioPlaybackRate = rate;
+            try {
+                if (typeof localStorage !== 'undefined') {
+                    localStorage.setItem(AUDIO_SPEED_KEY, String(rate));
+                }
+            } catch (e) {}
+            if (currentAudio) {
+                currentAudio.playbackRate = rate;
+            }
+            updateAudioSpeedUI();
+        }
+
+        function toggleAudioSpeedPopover(event) {
+            if (event) event.stopPropagation();
+            const pop = document.getElementById('audioSpeedPopover');
+            if (!pop) return;
+            pop.classList.toggle('hidden');
+        }
+
+        if (typeof document !== 'undefined' && typeof document.addEventListener === 'function') {
+            document.addEventListener('click', (e) => {
+                const wrapper = document.getElementById('audioSpeedWrapper');
+                const pop = document.getElementById('audioSpeedPopover');
+                if (pop && wrapper && !wrapper.contains(e.target)) {
+                    pop.classList.add('hidden');
+                }
+            });
+            updateAudioSpeedUI();
+        }
 
         function speakMistakeQuestion(sIdx, qId) {
             const setObj = allExamSets[sIdx];
@@ -1872,7 +1963,7 @@
             }
             const utterance = new SpeechSynthesisUtterance(fullText);
             utterance.lang = 'en-US';
-            utterance.rate = 0.95;
+            utterance.rate = audioPlaybackRate;
 
             const voices = window.speechSynthesis.getVoices();
             const enVoice = voices.find(v => v.lang === 'en-US') || voices.find(v => v.lang && v.lang.startsWith('en'));
@@ -1899,6 +1990,7 @@
             updateSpeakButtonUI(uiIdx, true);
 
             const audio = new Audio(audioUrl);
+            audio.playbackRate = audioPlaybackRate;
             currentAudio = audio;
             let fellBack = false;
 
