@@ -256,120 +256,178 @@
     <!-- VIEW 3: CHEAT SHEET (Type III) -->
     <section id="view-cheatsheet" class="hidden max-w-5xl mx-auto px-3 sm:px-4 py-6 flex-grow w-full space-y-6">
         <div class="bg-gradient-to-r from-indigo-600 to-blue-700 rounded-2xl p-5 sm:p-6 text-white shadow-md">
-            <h2 class="text-lg sm:text-xl font-bold">SkillCat EPA 608 Type III 考前速记卡（闭卷必背）</h2>
-            <p class="text-xs sm:text-sm text-indigo-100 mt-1">Type III 为闭卷监考，考前 10 分钟过一遍下面这 4 张核心数据表，直接锁定 85% 以上必考考点。</p>
+            <h2 class="text-lg sm:text-xl font-bold">SkillCat EPA 608 Type III 考前速记卡（闭卷必背 · 100% 同步真题）</h2>
+            <p class="text-xs sm:text-sm text-indigo-100 mt-1">涵盖本页面 Set 1 & Set 2 全部 100 道真题的核心考点（前 25 题 Core 通用基础 + 后 25 题 Type III 低压冷水机）。</p>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+            <!-- Card 1: Key Numbers -->
             <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm space-y-3">
                 <div class="flex items-center justify-between">
                     <h3 class="font-bold text-slate-900 flex items-center gap-2">
                         <span class="w-2.5 h-2.5 rounded-full bg-blue-600"></span>
-                        1. 必考核心数字 (Numbers to Memorize)
+                        1. 低压必背核心数字 (Numbers to Memorize)
                     </h3>
                     <span class="text-xs font-semibold px-2 py-0.5 bg-blue-50 text-blue-700 rounded-md">闭卷高频</span>
                 </div>
                 <div class="divide-y divide-slate-100 text-sm">
-                    <div class="py-2.5 flex justify-between gap-2">
+                    <div class="py-2 flex justify-between gap-2">
+                        <span class="text-slate-600">低压设备定义 (104°F / 40°C 下饱和压)</span>
+                        <span class="font-bold text-slate-900">&lt; 45 psia</span>
+                    </div>
+                    <div class="py-2 flex justify-between gap-2">
                         <span class="text-slate-600">1993-11-15 <b>后</b>设备 · 抽真空标准</span>
                         <span class="font-bold text-emerald-600">25 mm Hg absolute</span>
                     </div>
-                    <div class="py-2.5 flex justify-between gap-2">
+                    <div class="py-2 flex justify-between gap-2">
                         <span class="text-slate-600">1993-11-15 <b>前</b>设备 · 抽真空标准</span>
                         <span class="font-bold text-amber-600">25 in. Hg vacuum</span>
                     </div>
-                    <div class="py-2.5 flex justify-between gap-2">
-                        <span class="text-slate-600">干氮气加压检漏<b>最高上限</b></span>
-                        <span class="font-bold text-rose-600">10 psig (绝不能超!)</span>
+                    <div class="py-2 flex justify-between gap-2">
+                        <span class="text-slate-600">干氮气检漏上限 / 防爆片 (Rupture disc)</span>
+                        <span class="font-bold text-rose-600">10 psig 上限 / 15 psig 爆裂</span>
                     </div>
-                    <div class="py-2.5 flex justify-between gap-2">
-                        <span class="text-slate-600">爆破片 (Rupture disc) 破裂压力</span>
-                        <span class="font-bold text-slate-900">15 psig (向室外泄压)</span>
+                    <div class="py-2 flex justify-between gap-2">
+                        <span class="text-slate-600">热水升压最高水温 / 静置保压泄漏判定</span>
+                        <span class="font-bold text-slate-900">100–110°F / 1→ &gt;2.5 mm Hg</span>
                     </div>
-                    <div class="py-2.5 flex justify-between gap-2">
-                        <span class="text-slate-600">抽完液态后残留气态制冷剂比例</span>
-                        <span class="font-bold text-slate-900">10% – 15%</span>
+                    <div class="py-2 flex justify-between gap-2">
+                        <span class="text-slate-600">充液前气相升温目标 / 抽完液后残余蒸气</span>
+                        <span class="font-bold text-slate-900">36°F (高于 32°F) / 10%–15%</span>
                     </div>
-                    <div class="py-2.5 flex justify-between gap-2">
-                        <span class="text-slate-600">年泄漏率维修门槛 (≥50 lbs)</span>
-                        <span class="font-bold text-slate-900">舒适10% / 商20% / 工30%</span>
+                    <div class="py-2 flex justify-between gap-2">
+                        <span class="text-slate-600">≥50 lb 年漏率阈值 / 修漏期限与复检</span>
+                        <span class="font-bold text-slate-900">舒适 10% · 商 20% / 30天+10天复检</span>
                     </div>
                 </div>
             </div>
 
+            <!-- Card 2: Low-Pressure Refrigerants & Safety -->
             <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm space-y-3">
                 <div class="flex items-center justify-between">
                     <h3 class="font-bold text-slate-900 flex items-center gap-2">
                         <span class="w-2.5 h-2.5 rounded-full bg-emerald-600"></span>
-                        2. 低压制冷剂与负压特性 (Low-Pressure)
+                        2. 低压冷媒与机房安全 (Refrigerants & ASHRAE 15)
                     </h3>
                     <span class="text-xs font-semibold px-2 py-0.5 bg-emerald-50 text-emerald-700 rounded-md">必考</span>
                 </div>
-                <ul class="space-y-2.5 text-sm text-slate-700">
-                    <li class="bg-slate-50 p-2.5 rounded-xl border border-slate-100">
-                        <div class="font-semibold text-slate-900">常见低压制冷剂 (104°F 下饱和压 &lt; 45 psia)：</div>
-                        <div class="text-xs text-slate-600 mt-1">
-                            • <b>R-11</b> (CFC，已停产)、<b>R-113</b> (CFC)<br>
-                            • <b>R-123</b> (HCFC，安全等级 <b>B1 高毒不可燃</b>)<br>
-                            • 蒸发器及停机时处于<b>真空/负压</b>，泄漏会<b>吸入空气和水分</b>
-                        </div>
+                <ul class="space-y-2 text-sm text-slate-700">
+                    <li class="flex items-start gap-2">
+                        <span class="text-emerald-600 font-bold">•</span>
+                        <span><b>三代低压冷媒：</b><b>R-11 / R-113</b>（已停产 CFC）➔ <b>R-123</b>（HCFC，<b>Class B1</b> 高毒不燃，室温 68°F 约 20 in. Hg 真空；非 drop-in，腐蚀旧垫片绝缘）➔ <b>R-1233zd</b>（零 ODP 极低 GWP HFO）。</span>
                     </li>
-                    <li class="bg-slate-50 p-2.5 rounded-xl border border-slate-100">
-                        <div class="font-semibold text-slate-900">R-123 机房安全 (ASHRAE 15)：</div>
-                        <div class="text-xs text-slate-600 mt-1">
-                            • 传感器装在<b>低处/靠近地面</b>（蒸气比空气重）<br>
-                            • 配备泄漏声光报警 + 自动<b>机械事故排风</b> + 机房外 <b>SCBA 呼吸器</b>
-                        </div>
+                    <li class="flex items-start gap-2">
+                        <span class="text-emerald-600 font-bold">•</span>
+                        <span><b>负压泄漏特性：</b>运行及停机均处于<b>真空负压</b>，泄漏会<b>吸入空气和水分</b>（停机水管漏水会压入冷媒壳体）。</span>
+                    </li>
+                    <li class="flex items-start gap-2">
+                        <span class="text-emerald-600 font-bold">•</span>
+                        <span><b>ASHRAE 15 机房要求：</b>低处近地面安装泄漏探头（蒸气比空气重）+ 报警自动开启<b>大风量机械排风</b> + 机房门外配 <b>SCBA</b>；防爆片排气管必须引至<b>室外</b>。</span>
                     </li>
                 </ul>
             </div>
 
+            <!-- Card 3: Recovery, Freeze Protection & Purge -->
             <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm space-y-3">
                 <div class="flex items-center justify-between">
                     <h3 class="font-bold text-slate-900 flex items-center gap-2">
                         <span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span>
-                        3. 回收顺序与防冻铁律 (Recovery & Freeze)
+                        3. 回收防冻、充注与 Purge (Operations)
                     </h3>
-                    <span class="text-xs font-semibold px-2 py-0.5 bg-amber-50 text-amber-700 rounded-md">必考场景</span>
+                    <span class="text-xs font-semibold px-2 py-0.5 bg-amber-50 text-amber-700 rounded-md">实操必考</span>
                 </div>
                 <ul class="space-y-2 text-sm text-slate-700">
                     <li class="flex items-start gap-2">
                         <span class="text-amber-600 font-bold">•</span>
-                        <span><b>回收顺序：</b>先从最低点回收 <b>Liquid (液态)</b>，再从最高点回收 <b>Vapor (气态)</b>；抽到 25 mm Hg abs 后关阀静置几分钟，若压力回升说明仍有液态未抽净。</span>
+                        <span><b>回收与防冻：</b>先从<b>蒸发器最低排液阀抽液态</b>，再从<b>最高点抽气态</b>；全程保持<b>水泵循环或排空积水</b>，防压降过快跌破 32°F 冻裂铜管。</span>
                     </li>
                     <li class="flex items-start gap-2">
                         <span class="text-amber-600 font-bold">•</span>
-                        <span><b>防冻保护：</b>回收与抽真空全程必须保持<b>冷冻水泵与冷却水泵运行</b>（或排干管内水），否则降压沸点跌破 32°F 会冻裂铜管！</span>
+                        <span><b>充注与油加热：</b>深真空下先充<b>气态至饱和温度 36°F</b> 再充液态；油箱加热器开机前蒸发油中冷媒；引射回油系统把蒸发器迁移油抽回油箱；严禁用堵漏剂。</span>
                     </li>
                     <li class="flex items-start gap-2">
                         <span class="text-amber-600 font-bold">•</span>
-                        <span><b>充注顺序：</b>大修后真空状态下先充 <b>Vapor (气态)</b> 抬高压力至 32°F 饱和压以上，再改用 <b>Liquid (液态)</b> 充注。</span>
+                        <span><b>Purge 抽气装置：</b>装在<b>冷凝器顶部</b>排不凝气；频繁启动+冷凝高压高 ➔ <b>漏空气</b>；排出大量水 ➔ <b>换热管漏水</b>（测管漏前先<b>排干水室 Water boxes</b>）。</span>
                     </li>
                 </ul>
             </div>
 
+            <!-- Card 4: Core Q1-Q25 Essentials -->
             <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm space-y-3">
                 <div class="flex items-center justify-between">
                     <h3 class="font-bold text-slate-900 flex items-center gap-2">
                         <span class="w-2.5 h-2.5 rounded-full bg-rose-500"></span>
-                        4. Purge 抽气装置与检漏 (Purge & Leaks)
+                        4. Core 通用基础必考考点 (对应前 25 题)
                     </h3>
-                    <span class="text-xs font-semibold px-2 py-0.5 bg-rose-50 text-rose-700 rounded-md">秒杀词对应</span>
+                    <span class="text-xs font-semibold px-2 py-0.5 bg-rose-50 text-rose-700 rounded-md">占考卷 50%</span>
                 </div>
                 <ul class="space-y-2 text-sm text-slate-700">
                     <li class="flex items-start gap-2">
                         <span class="text-rose-600 font-bold">•</span>
-                        <span><b>Purge Unit 位置与作用：</b>安装在<b>冷凝器顶部 (Top of condenser)</b>，排出空气等不凝性气体并将夹带的制冷剂冷凝回系统。</span>
+                        <span><b>臭氧与法规：</b>1 个氯原子破坏 <b>100,000</b> 个臭氧分子（平流层检出 ClO 为铁证）；《蒙特利尔议定书》淘汰 ODS；AIM 法案因高 <b>GWP</b> 削减 HFC；拆软管允许 <i>De minimis</i> 微量排放。</span>
                     </li>
                     <li class="flex items-start gap-2">
                         <span class="text-rose-600 font-bold">•</span>
-                        <span>看到 <b>Purge 频繁工作 / 冷凝高压升高</b> ➔ 系统有<b>空气泄漏 (Air leak)</b>；看到 Purge 排出大量水 ➔ <b>换热器铜管漏水 (Tube leak)</b>。</span>
+                        <span><b>3R 与钢瓶：</b>转售须再生至 <b>AHRI 700</b>；回收瓶<b>黄身灰顶</b>、限充 <b>80%</b>、每 <b>5 年</b>水压测试；DOT-39 一次性瓶抽空刺破报废；严禁明火烤瓶（防炸裂+光气）。</span>
                     </li>
                     <li class="flex items-start gap-2">
                         <span class="text-rose-600 font-bold">•</span>
-                        <span><b>铜管检漏前必做：</b>先排干<b>水室 (Drain water boxes)</b> 里的水，再用干氮气加压 (≤ 10 psig) 或循环热水 (100°F–110°F) 检漏。</span>
+                        <span><b>仪表与基础：</b>深真空用<b>电子微米表</b>（复合表不准）；氮气瓶必装<b>减压阀</b>（满瓶 &gt;2,000 psig）；电子检漏报警后用<b>肥皂水</b>精确定位；POE 油强吸湿；400 系列必须<b>液相充注</b>。</span>
                     </li>
                 </ul>
+            </div>
+        </div>
+
+        <!-- Card 5: High-Frequency Kill-Word Lookup Table -->
+        <div class="bg-white rounded-2xl p-5 border border-amber-200 shadow-sm space-y-3">
+            <div class="flex items-center justify-between flex-wrap gap-2">
+                <h3 class="font-bold text-slate-900 flex items-center gap-2">
+                    <span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span>
+                    5. ⚡ 考场高频秒杀对照表（看到题眼 ➔ 直接秒选）
+                </h3>
+                <span class="text-xs font-semibold px-2 py-0.5 bg-amber-50 text-amber-800 border border-amber-200 rounded-md">闭卷考前必背</span>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-2.5 text-xs">
+                <div class="p-2.5 rounded-xl bg-amber-50/60 border border-amber-100 flex items-center justify-between gap-2">
+                    <span class="text-slate-700"><b>1993-11-15 后</b>真空标准 / <b>前</b>真空标准</span>
+                    <span class="font-bold text-emerald-700 shrink-0">➔ 25 mm Hg abs / 25 in. Hg</span>
+                </div>
+                <div class="p-2.5 rounded-xl bg-amber-50/60 border border-amber-100 flex items-center justify-between gap-2">
+                    <span class="text-slate-700">加压到 <b>16 psig</b> 会怎样 / 最高试压</span>
+                    <span class="font-bold text-emerald-700 shrink-0">➔ 15 psig 防爆片爆 / ≤ 10 psig</span>
+                </div>
+                <div class="p-2.5 rounded-xl bg-amber-50/60 border border-amber-100 flex items-center justify-between gap-2">
+                    <span class="text-slate-700">静置保压 1 mm Hg 回升 <b>&gt; 2.5 mm Hg</b></span>
+                    <span class="font-bold text-emerald-700 shrink-0">➔ 有漏点/水分，先查漏修复</span>
+                </div>
+                <div class="p-2.5 rounded-xl bg-amber-50/60 border border-amber-100 flex items-center justify-between gap-2">
+                    <span class="text-slate-700">回收后 25 mm Hg 回升至 <b>50 mm Hg</b></span>
+                    <span class="font-bold text-emerald-700 shrink-0">➔ 残液仍在蒸发，继续回收</span>
+                </div>
+                <div class="p-2.5 rounded-xl bg-amber-50/60 border border-amber-100 flex items-center justify-between gap-2">
+                    <span class="text-slate-700">真空下何时由<b>气态</b>切换为<b>液态</b>充注</span>
+                    <span class="font-bold text-emerald-700 shrink-0">➔ 饱和温度达 36°F (&gt;32°F)</span>
+                </div>
+                <div class="p-2.5 rounded-xl bg-amber-50/60 border border-amber-100 flex items-center justify-between gap-2">
+                    <span class="text-slate-700">Purge 频繁启动+高压 / Purge 排大量水</span>
+                    <span class="font-bold text-emerald-700 shrink-0">➔ 漏空气 / 换热铜管漏水</span>
+                </div>
+                <div class="p-2.5 rounded-xl bg-amber-50/60 border border-amber-100 flex items-center justify-between gap-2">
+                    <span class="text-slate-700">铜管测漏第一步 / 热水升压最高水温</span>
+                    <span class="font-bold text-emerald-700 shrink-0">➔ 排空水室 / 100°F–110°F</span>
+                </div>
+                <div class="p-2.5 rounded-xl bg-amber-50/60 border border-amber-100 flex items-center justify-between gap-2">
+                    <span class="text-slate-700">舒适性空调 / 商业制冷年漏率阈值</span>
+                    <span class="font-bold text-emerald-700 shrink-0">➔ 10% / 20% (30天修+10天复检)</span>
+                </div>
+                <div class="p-2.5 rounded-xl bg-amber-50/60 border border-amber-100 flex items-center justify-between gap-2">
+                    <span class="text-slate-700">R-1233zd / R-123 属于哪类 / 安全等级</span>
+                    <span class="font-bold text-emerald-700 shrink-0">➔ Type III 低压 / R-123 为 B1</span>
+                </div>
+                <div class="p-2.5 rounded-xl bg-amber-50/60 border border-amber-100 flex items-center justify-between gap-2">
+                    <span class="text-slate-700">R-123 探头位置 / 报警后动作 / 排气管</span>
+                    <span class="font-bold text-emerald-700 shrink-0">➔ 近地面 / 机械排风 / 引向室外</span>
+                </div>
             </div>
         </div>
     </section>
@@ -1210,13 +1268,13 @@
               explanationEn: "Water-cooled recovery condensers improve heat rejection and speed up condensation of large volumes of low-pressure refrigerant.",
               explanationZh: "水冷冷凝器散热效率高，能加快大流量低压制冷剂的冷凝回收。" },
             { id: 39, part: "type3", category: CAT.EVAC,
-              questionEn: "If you are recovering refrigerant from a chiller with a 'major repair' planned, when is the ONLY time you may stop before reaching 25 mm Hg absolute?",
-              questionZh: "对冷水机进行大修前回收制冷剂，什么情况下允许不抽到 25 mm Hg absolute？",
-              optionsEn: ["Whenever you are in a hurry","Never, unless using a certified pre-1993 machine (which must still reach 25 in. Hg vac) or the system is being opened only for a non-major repair that doesn't require full evacuation? Wait—under EPA rules, any major repair on a low-pressure system requires full evacuation to the applicable level (25 mm Hg abs or 25 in. Hg vac)","Whenever ambient temperature is below 70°F","Whenever the chiller holds less than 200 lb"],
-              optionsZh: ["只要时间赶就可以","只有使用 1993 年前的合规老设备时按 25 in. Hg 真空标准；凡属大修都必须抽到对应标准真空度","只要室温低于 70°F","只要充注量不到 200 磅"],
+              questionEn: "During a standing vacuum test on a low-pressure chiller after evacuation to 1 mm Hg, what does a pressure rise above 2.5 mm Hg indicate?",
+              questionZh: "低压冷水机抽真空至 1 mm Hg 后进行静置保压测试（Standing vacuum test），若压力回升超过 2.5 mm Hg，说明什么？",
+              optionsEn: ["The chiller is completely dry and ready for liquid charging","The system has a leak (or remaining moisture) that must be located and repaired before proceeding","The rupture disc has failed","The cooling tower fan is running backward"],
+              optionsZh: ["系统已完全干燥，可以直接加注液态制冷剂","系统存在泄漏（或残留水分），必须先查漏并修复后才能继续","爆破片已破裂","冷却塔风机反转"],
               answer: 1,
-              explanationEn: "Every major repair (replacing compressor, condenser, evaporator, or major heat exchanger) requires full evacuation to 25 mm Hg absolute (or 25 in. Hg vac for pre-1993 machines).",
-              explanationZh: "凡涉及大修（如更换压缩机、蒸发器、冷凝器），都必须抽到规定的完整真空度（25 mm Hg abs 或老机 25 in. Hg vac）。" },
+              explanationEn: "If vacuum pressure rises above 2.5 mm Hg from a 1 mm Hg starting point during a standing vacuum test, a leak is present and must be found and repaired before charging.",
+              explanationZh: "从 1 mm Hg 静置后若压力回升超过 2.5 mm Hg，表明存在泄漏，必须先检漏修复再充注。" },
             { id: 40, part: "type3", category: CAT.EVAC,
               questionEn: "During vapor recovery from a low-pressure chiller, what happens if the system pressure drops too quickly while water is sitting stagnant in the evaporator tubes?",
               questionZh: "气态回收过程中，如果蒸发器铜管内有静止的水而系统压力下降过快，会发生什么？",
@@ -1336,28 +1394,44 @@
         let mistakesSet = new Set();
         let mistakeTempAnswers = {};
 
-        const HIGHLIGHT_TERMS = [
-            "AFTER November 15, 1993", "BEFORE November 15, 1993", "November 15, 1993",
-            "25 mm Hg absolute", "25 mm Hg abs", "25 inches of Hg vacuum", "25 in. Hg vacuum",
-            "45 psia at 104°F", "100°F–110°F", "10 psig", "15 psig", "16 psig", "32°F",
-            "10% to 15%", "10%–15%", "50 lb", "30 days", "10 days",
-            "AHRI Standard 700", "AHRI 700", "Section 608", "ASHRAE Standard 15", "ASHRAE 15", "ASHRAE 34",
-            "low-pressure", "centrifugal", "purge unit", "rupture disc", "water boxes", "drain the water",
-            "chilled water", "condenser water", "non-condensable", "non-condensables",
-            "compressor burnout", "liquid first", "vapor first", "stabilizes", "pressure rise",
-            "dry nitrogen", "de minimis", "yellow body", "gray top", "DOT-39", "80%",
-            "open flame", "phosgene", "Class B1", "SCBA", "mechanical ventilation",
-            "R-123", "R-113", "R-11", "R-410A", "R-22", "R-134a"
-        ].sort((a, b) => b.length - a.length);
+        const KILL_GUIDE = {"0_1": {"stem": ["Type III certification exam", "SkillCat"], "ans": ["closed-book, proctored exam"], "t": "Type III exam format (Type III 考试形式)", "a": "closed-book, proctored (闭卷 + 远程监考)"}, "0_2": {"stem": ["highest Ozone Depletion Potential (ODP)"], "ans": ["CFCs"], "t": "highest ODP class (臭氧破坏潜能最高)", "a": "CFCs (全氯氟烃，含氯无氢)"}, "0_3": {"stem": ["how many ozone molecules", "single chlorine atom destroy"], "ans": ["100,000"], "t": "1 chlorine atom destroys ozone (1个氯原子破坏臭氧数)", "a": "100,000 (10万个臭氧分子)"}, "0_4": {"stem": ["primary evidence", "CFCs and HCFCs reach the stratosphere"], "ans": ["chlorine monoxide (ClO) and CFCs in air samples collected from the stratosphere"], "t": "evidence CFCs reach stratosphere (平流层破坏铁证)", "a": "chlorine monoxide (ClO) in stratosphere air samples (平流层空气样本检出氧化氯)"}, "0_5": {"stem": ["allowable 'de minimis' release"], "ans": ["trapped in hoses during disconnection", "good-faith recovery"], "t": "allowable de minimis release (合法微量释放)", "a": "trapped in hoses during disconnection (拆软管时不可避免的极少量排放)"}, "0_6": {"stem": ["NEVER be used to pressurize", "leak testing"], "ans": ["Oxygen or compressed air"], "t": "NEVER use to pressurize (严禁用于打压检漏)", "a": "Oxygen or compressed air (严禁用氧气或压缩空气，防爆炸与水分)"}, "0_7": {"stem": ["pressure regulator and relief valve", "dry nitrogen cylinder"], "ans": ["over 2,000 psig", "rupture system components"], "t": "why nitrogen regulator & relief valve (氮气瓶为何必配减压阀)", "a": "over 2,000 psig / rupture (满瓶超2000 psig会炸裂系统)"}, "0_8": {"stem": ["What does 'recover' mean"], "ans": ["remove refrigerant in any condition", "external container without necessarily testing"], "t": "definition of 'recover' (回收 Recover 定义)", "a": "remove & store in external container without testing (仅抽出存入容器，不检测处理)"}, "0_9": {"stem": ["resold to a different owner"], "ans": ["reclaimed to AHRI Standard 700 purity"], "t": "resold to a different owner (转售给其他业主)", "a": "reclaimed to AHRI Standard 700 (必须经认证再生至 AHRI 700 纯度)"}, "0_10": {"stem": ["testing recovered refrigerant chemically"], "ans": ["verify that purity meets AHRI Standard 700"], "t": "chemical testing by reclaimer (再生商化学检测目的)", "a": "verify purity meets AHRI Standard 700"}, "0_11": {"stem": ["never mix two different refrigerants"], "ans": ["cannot be reclaimed and must be destroyed at high cost"], "t": "never mix refrigerants (严禁混装不同冷媒原因)", "a": "cannot be reclaimed -> destroyed at high cost (无法再生，只能高价销毁)"}, "0_12": {"stem": ["changing the oil in a recovery machine more frequently"], "ans": ["compressor burnout"], "t": "change recovery machine oil more often (何时需频繁换回收机油)", "a": "compressor burnout (回收过烧毁压缩机的酸性系统后)"}, "0_13": {"stem": ["refillable refrigerant recovery cylinders color-coded"], "ans": ["Yellow body with a gray top (shoulder)"], "t": "recovery cylinder color code (回收钢瓶标准颜色)", "a": "Yellow body with a gray top (黄身灰顶)"}, "0_14": {"stem": ["maximum allowable fill level", "recovery cylinder"], "ans": ["80% of capacity by weight"], "t": "recovery cylinder max fill level (回收瓶安全充装上限)", "a": "80% of capacity by weight"}, "0_15": {"stem": ["how often", "refillable DOT recovery cylinder be hydrostatically tested"], "ans": ["Every 5 years"], "t": "DOT recovery cylinder hydrostatic test (回收瓶水压测试周期)", "a": "Every 5 years (每 5 年一次)"}, "0_16": {"stem": ["shipping a cylinder of recovered refrigerant"], "ans": ["upright, secured, with DOT classification tags"], "t": "shipping recovery cylinder (运输回收钢瓶要求)", "a": "upright, secured, DOT tags & valve caps (直立固定+DOT标签+阀帽)"}, "0_17": {"stem": ["pinpoint the exact location", "after an electronic detector beeps"], "ans": ["Soap bubbles"], "t": "pinpoint exact leak location (电子检漏仪报警后精确定位)", "a": "Soap bubbles (肥皂水气泡定位精确漏点)"}, "0_18": {"stem": ["personal protective equipment (PPE)", "handling liquid refrigerant"], "ans": ["Safety glasses/goggles and butyl-lined (or neoprene) gloves"], "t": "PPE for liquid refrigerant (接触液态制冷剂个人防护)", "a": "Safety glasses/goggles + butyl/neoprene gloves (护目镜+防冻手套)"}, "0_19": {"stem": ["boiling point (saturation temperature)", "pressure decreases"], "ans": ["It decreases"], "t": "pressure decreases -> boiling point? (压力下降沸点如何变)", "a": "It decreases (压力越低，沸点越低)"}, "0_20": {"stem": ["change from a high-pressure vapor to a high-pressure liquid"], "ans": ["Condenser"], "t": "high-pressure vapor -> high-pressure liquid (高压气变高压液部位)", "a": "Condenser (冷凝器)"}, "0_21": {"stem": ["POE (polyolester) oils", "especially challenging"], "ans": ["highly hygroscopic and absorb moisture rapidly"], "t": "POE oil challenge (POE酯类油难点)", "a": "highly hygroscopic / absorb moisture rapidly (强吸湿性，极易吸水)"}, "0_22": {"stem": ["ASHRAE Standard 34", "'A1' safety classification"], "ans": ["Lower toxicity, no flame propagation (non-flammable)"], "t": "ASHRAE 34 Class A1 (A1安全等级含义)", "a": "Lower toxicity, non-flammable (低毒、不燃)"}, "0_23": {"stem": ["ASHRAE 34 classification describes R-123"], "ans": ["B1"], "t": "R-123 ASHRAE 34 safety class (R-123安全等级)", "a": "B1 (较高毒性、不燃)"}, "0_24": {"stem": ["recovery hoses be kept as short as possible", "shutoff valves"], "ans": ["minimize refrigerant loss during disconnection and reduce recovery time"], "t": "short hoses + shutoff valves (短软管配截止阀目的)", "a": "minimize loss & reduce recovery time (减少拆管损耗并加快回收)"}, "0_25": {"stem": ["zeotropic blend such as R-407C", "how must it be charged"], "ans": ["As a liquid from the cylinder to prevent fractionation"], "t": "charging zeotropic blend R-407C (400系列非共沸充注方式)", "a": "As a liquid to prevent fractionation (必须液相充注防组分分馏)"}, "0_26": {"stem": ["defines a 'low-pressure' appliance"], "ans": ["liquid-phase saturation pressure below 45 psia at 104°F"], "t": "low-pressure appliance definition (低压设备法定定义)", "a": "below 45 psia at 104°F (40°C)"}, "0_27": {"stem": ["group of refrigerants is typically used in Type III low-pressure"], "ans": ["R-11, R-113, R-123"], "t": "Type III low-pressure refrigerants (低压冷水机典型冷媒)", "a": "R-11, R-113, R-123 (以及 R-1233zd)"}, "0_28": {"stem": ["operates below atmospheric pressure (in a vacuum)", "consequence of a leak"], "ans": ["Air and moisture are drawn into the system"], "t": "leak in vacuum evaporator (负压蒸发器泄漏后果)", "a": "Air and moisture are drawn into the system (空气和水分被吸入系统)"}, "0_29": {"stem": ["saturation pressure of R-123", "room temperature of 68°F"], "ans": ["About 20 inches of Hg vacuum"], "t": "R-123 pressure at 68°F room temp (室温68°F下R-123压力)", "a": "About 20 inches of Hg vacuum (约 20 in. Hg 负压真空)"}, "0_30": {"stem": ["MAXIMUM pressure allowed when pressurizing a low-pressure chiller with dry nitrogen"], "ans": ["10 psig"], "t": "MAX test pressure for low-pressure chiller (低压机干氮检漏最高压力)", "a": "10 psig (严禁超过 10 psig)"}, "0_31": {"stem": ["At what pressure does the rupture disc", "relieve"], "ans": ["15 psig"], "t": "rupture disc relief pressure (低压冷水机防爆片爆破压力)", "a": "15 psig"}, "0_32": {"stem": ["Besides using dry nitrogen, how else", "raise the pressure inside a low-pressure chiller"], "ans": ["Circulating hot water", "heater blanket"], "t": "raise pressure besides nitrogen (除氮气外安全的升压检漏法)", "a": "Circulating hot water / heater blanket (循环热水或加热毯)"}, "0_33": {"stem": ["Before performing a leak test on the evaporator or condenser tubes", "must the technician do"], "ans": ["Drain the water from the water boxes and tubes"], "t": "before tube leak test (换热管检漏前必做步骤)", "a": "Drain the water from the water boxes and tubes (排空水室与换热管积水)"}, "0_34": {"stem": ["Where are leaks most commonly found on an older open-drive low-pressure centrifugal chiller"], "ans": ["Compressor shaft seal, purge unit, gaskets, and tube sheets"], "t": "common leak points on open-drive chiller (开启式离心机常见漏点)", "a": "Compressor shaft seal, purge unit, gaskets, tube sheets (轴封、抽气装置、垫片、管板)"}, "0_35": {"stem": ["comfort cooling appliances containing 50 lb or more", "annual leak rate triggers mandatory repair"], "ans": ["10%"], "t": "comfort cooling ≥50 lb leak rate threshold (舒适性空调年漏率阈值)", "a": "10% (舒适性空调 10%，商业制冷 20%，工业过程 30%)"}, "0_36": {"stem": ["within how many days must leaks be repaired"], "ans": ["30 days"], "t": "days to repair leak after exceeding threshold (超阈值法定修漏期限)", "a": "30 days (30 天内修复)"}, "0_37": {"stem": ["required evacuation level", "AFTER November 15, 1993"], "ans": ["25 mm Hg absolute"], "t": "low-pressure evacuation AFTER Nov 15, 1993 (93年后低压回收真空标准)", "a": "25 mm Hg absolute (绝对压力 25 毫米汞柱)"}, "0_38": {"stem": ["required evacuation level", "BEFORE November 15, 1993"], "ans": ["25 inches of Hg vacuum"], "t": "low-pressure evacuation BEFORE Nov 15, 1993 (93年前低压回收真空标准)", "a": "25 inches of Hg vacuum (25 英寸汞柱表压真空)"}, "0_39": {"stem": ["correct sequence when recovering refrigerant from a low-pressure centrifugal chiller"], "ans": ["Recover liquid first, then recover the remaining vapor"], "t": "low-pressure chiller recovery sequence (低压冷水机回收先后顺序)", "a": "Recover liquid first, then vapor (先抽液态，再抽剩余气态)"}, "0_40": {"stem": ["After all liquid refrigerant has been removed", "what percentage of the original charge remains as vapor"], "ans": ["10% to 15%"], "t": "percentage remaining as vapor after liquid removal (抽完液态后剩余气态比例)", "a": "10% to 15% (约10%~15%，如350冷吨机仍剩约100磅气态)"}, "0_41": {"stem": ["After reaching 25 mm Hg absolute", "why must the technician wait a few minutes with the valves closed"], "ans": ["check if system pressure rises, indicating trapped liquid refrigerant is still boiling off"], "t": "wait with valves closed after 25 mm Hg (抽到真空后关阀静置目的)", "a": "check if pressure rises (检查压力是否回升，判断有无残液蒸发或泄漏)"}, "0_42": {"stem": ["Where is the recovery machine typically connected when removing vapor"], "ans": ["The highest access point"], "t": "where to connect when removing vapor (抽气态制冷剂连接位置)", "a": "The highest access point (最高处接口，如冷凝器顶部)"}, "0_43": {"stem": ["Where is the purge unit located", "what is its function"], "ans": ["Top of the condenser; removes air and moisture (non-condensables)"], "t": "purge unit location & function (抽气装置位置与作用)", "a": "Top of the condenser; removes air/moisture (冷凝器顶部，排空气水分并回收冷媒)"}, "0_44": {"stem": ["symptom strongly indicates", "air leak and the purge unit is working overtime"], "ans": ["High condenser head pressure and frequent purge unit operation"], "t": "symptom of air leak in low-pressure chiller (低压机漏入空气典型症状)", "a": "High condenser head pressure + frequent purge (冷凝高压偏高 + Purge频繁启动)"}, "0_45": {"stem": ["Why must the chilled water and condenser water pumps be kept running", "while recovering refrigerant"], "ans": ["prevent water inside the heat exchanger tubes from freezing and bursting the tubes"], "t": "why keep water pumps running during recovery (回收时保持水泵循环原因)", "a": "prevent water from freezing and bursting tubes (防止管内水结冰胀裂铜管)"}, "0_46": {"stem": ["charging a low-pressure chiller that is in a deep vacuum", "introduce refrigerant VAPOR first"], "ans": ["Liquid flashed into a deep vacuum drops below 32°F and can freeze water"], "t": "why charge VAPOR first in deep vacuum (深真空下为何必须先充气态)", "a": "Liquid drops below 32°F and freezes water (直接充液会闪蒸低于32°F冻裂水管)"}, "0_47": {"stem": ["safety equipment is required in a chiller machinery room housing an R-123 (Class B1) chiller", "ASHRAE Standard 15"], "ans": ["refrigerant leak monitor/alarm, mechanical ventilation, and SCBA available outside"], "t": "ASHRAE 15 R-123 machinery room safety (R-123机房必备安全设施)", "a": "leak monitor/alarm + mechanical ventilation + SCBA outside (泄漏报警器+机械通风+门外SCBA)"}, "0_48": {"stem": ["purpose of the oil heater", "oil sump"], "ans": ["vaporize dissolved refrigerant out of the oil before startup"], "t": "chiller oil sump heater purpose (油箱加热器作用)", "a": "vaporize dissolved refrigerant before startup (开机前蒸发油中溶解的制冷剂，防起泡失粘)"}, "0_49": {"stem": ["increases the efficiency of a high-efficiency purge unit"], "ans": ["Condensing refrigerant out of the air-refrigerant mixture at very low temperature"], "t": "high-efficiency purge unit principle (高效抽气装置节能减排原理)", "a": "Condensing refrigerant at very low temperature (低温深度冷凝回收冷媒后再排空气)"}, "0_50": {"stem": ["hot water to pressurize an R-123 chiller", "maximum water temperature"], "ans": ["100°F–110°F (38°C–43°C)"], "t": "max hot water temp for R-123 leak test (R-123热水升压最高水温)", "a": "100°F–110°F (防止超压顶破15 psig防爆片)"}, "1_1": {"stem": ["primary purpose of the stratospheric ozone layer"], "ans": ["absorb harmful ultraviolet (UV-B) radiation"], "t": "stratospheric ozone layer purpose (平流层臭氧层作用)", "a": "absorb harmful UV-B radiation (吸收有害紫外线 UV-B)"}, "1_2": {"stem": ["international treaty phased out the production of CFCs and HCFCs"], "ans": ["The Montreal Protocol"], "t": "international treaty phasing out CFCs/HCFCs (淘汰ODS的国际条约)", "a": "The Montreal Protocol (《蒙特利尔议定书》)"}, "1_3": {"stem": ["who is responsible for ensuring refrigerant is recovered before an appliance is disposed of"], "ans": ["final person in the disposal chain"], "t": "disposal recovery responsibility (报废设备回收责任人)", "a": "final person in the disposal chain (处置链最终一环，如废品拆解场)"}, "1_4": {"stem": ["pass Type II on SkillCat and later pass Type I and Type III on SkillCat", "Core requirement"], "ans": ["includes 25 Core questions plus 25 Type-specific questions"], "t": "SkillCat exam structure (SkillCat单科考试题量构成)", "a": "25 Core + 25 Type-specific = 50 questions"}, "1_5": {"stem": ["Why are HFCs (like R-134a and R-410A) subject to phasedown under the U.S. AIM Act"], "ans": ["high Global Warming Potential (GWP)"], "t": "why AIM Act phases down HFCs (AIM法案削减HFC原因)", "a": "high Global Warming Potential (GWP)"}, "1_6": {"stem": ["Since November 14, 1994, who may legally purchase regulated refrigerants"], "ans": ["EPA Section 608 (or Section 609 for MVAC) certified technicians"], "t": "who may purchase refrigerants (合法购买制冷剂资格)", "a": "EPA Section 608/609 certified technicians (持证技师或其授权雇主)"}, "1_7": {"stem": ["What does 'GWP' stand for"], "ans": ["Global Warming Potential"], "t": "GWP meaning (GWP全称)", "a": "Global Warming Potential (全球变暖潜能值)"}, "1_8": {"stem": ["When may recycled refrigerant be used without being reclaimed to AHRI 700"], "ans": ["same appliance or another appliance owned by the same owner"], "t": "when recycled refrigerant can be used (回用制冷剂使用条件)", "a": "same appliance or same owner (原设备或同一业主的其他设备)"}, "1_9": {"stem": ["before switching from recovering R-22 to recovering R-123 or R-134a"], "ans": ["Evacuate the recovery machine to remove residual R-22"], "t": "switching recovery machine refrigerants (回收机切换不同冷媒前)", "a": "Evacuate the recovery machine (抽真空清除残氟防交叉污染)"}, "1_10": {"stem": ["Why does EPA require recovery machines manufactured after November 15, 1993 to be certified"], "ans": ["achieve required vacuum levels and have low-loss fittings"], "t": "why certify post-1993 recovery machines (认证回收机目的)", "a": "achieve required vacuum + low-loss fittings (确保达标真空度并配低损耗接头)"}, "1_11": {"stem": ["fastest way to recover refrigerant from a large system containing a large pool of liquid"], "ans": ["Liquid recovery (or push-pull method) first, followed by vapor recovery"], "t": "fastest recovery for large liquid system (大系统最快回收法)", "a": "Liquid recovery / push-pull first, then vapor (先液态/推拉法，后气态)"}, "1_12": {"stem": ["recover refrigerant too rapidly in liquid form without separating oil"], "ans": ["Large amounts of oil can be pulled out of the system"], "t": "recovering liquid too rapidly (抽液过快后果)", "a": "Large amounts of oil pulled out (会把大量冷冻油一起抽走)"}, "1_13": {"stem": ["disposable (DOT-39) cylinder versus a refillable recovery cylinder"], "ans": ["yellow with a gray top and have a DOT-4BA/4BW rating; DOT-39 are non-refillable"], "t": "DOT-39 vs. refillable recovery cylinder (一次性瓶 vs 回收瓶区分)", "a": "Yellow + gray top (DOT-4BA/4BW) vs. non-refillable DOT-39"}, "1_14": {"stem": ["check the actual fill level of a recovery cylinder safely"], "ans": ["calibrated refrigerant scale", "never exceed 80% capacity"], "t": "check cylinder fill level safely (安全监测回收瓶充装量)", "a": "calibrated scale / float switch, ≤ 80% capacity (用电子秤或浮球开关，不超80%)"}, "1_15": {"stem": ["Before disposing of an empty disposable (DOT-39) refrigerant cylinder"], "ans": ["Recover any remaining refrigerant to 0 psig (or vacuum), then render the cylinder useless"], "t": "dispose of empty DOT-39 cylinder (废弃一次性钢瓶步骤)", "a": "Recover to vacuum + puncture/render useless (抽空至真空并刺破报废)"}, "1_16": {"stem": ["danger of using a nitrogen cylinder without a pressure regulator"], "ans": ["Extreme pressure (over 2,000 psig) can explode the equipment"], "t": "nitrogen cylinder without regulator (氮气瓶不装减压阀危险)", "a": "over 2,000 psig can explode equipment (超2000 psig高压炸裂设备)"}, "1_17": {"stem": ["compressor motor burnout, what should you check in the oil"], "ans": ["Acid content using an acid test kit"], "t": "compressor burnout oil check (压缩机烧毁必查油指标)", "a": "Acid content using an acid test kit (用测酸试剂盒检测酸度)"}, "1_18": {"stem": ["large refrigerant leak occurs in an enclosed mechanical room, what should you do FIRST"], "ans": ["Evacuate the area immediately and ventilate; only re-enter with proper SCBA"], "t": "large leak in enclosed room FIRST action (密闭机房大泄漏第一步)", "a": "Evacuate immediately & ventilate; re-enter with SCBA (立即撤离并通风，戴SCBA方可重入)"}, "1_19": {"stem": ["What does a compound gauge", "measure"], "ans": ["Both positive pressure (psig) and vacuum (inches of Hg"], "t": "compound gauge measurement (低压复合表测量范围)", "a": "Both positive pressure (psig) and vacuum (in. Hg)"}, "1_20": {"stem": ["Why is a thermistor (micron) vacuum gauge much more accurate"], "ans": ["compound gauge cannot accurately resolve deep vacuum levels near 500 microns or 25 mm Hg"], "t": "why micron gauge over compound gauge (为何深真空必须用电子微米表)", "a": "compound gauge cannot resolve deep vacuum (机械复合表无法分辨深真空微米级变化)"}, "1_21": {"stem": ["What is 'superheat'"], "ans": ["Temperature of refrigerant vapor above its saturation (boiling) temperature"], "t": "definition of superheat (过热度 Superheat 定义)", "a": "vapor temperature ABOVE saturation boiling temp (气态高于饱和沸点温度)"}, "1_22": {"stem": ["What is 'subcooling'"], "ans": ["Temperature of liquid refrigerant below its saturation (condensing) temperature"], "t": "definition of subcooling (过冷度 Subcooling 定义)", "a": "liquid temperature BELOW saturation condensing temp (液态低于饱和冷凝温度)"}, "1_23": {"stem": ["separates the high-pressure side from the low-pressure side"], "ans": ["Compressor and metering device (expansion valve)"], "t": "separates high side from low side (高低压侧分界部件)", "a": "Compressor and metering device (压缩机与节流膨胀装置)"}, "1_24": {"stem": ["What happens if moisture remains inside a refrigeration system"], "ans": ["freeze at the metering device and react with refrigerant/oil to form corrosive acids"], "t": "moisture inside refrigeration system (系统残留水分两大危害)", "a": "freeze at metering device + form corrosive acids (节流口冰堵 + 生成腐蚀性酸)"}, "1_25": {"stem": ["Why must a recovery cylinder NEVER be heated with an open flame"], "ans": ["risking cylinder rupture or decomposing refrigerant into toxic phosgene gas"], "t": "NEVER heat cylinder with open flame (严禁明火烤瓶原因)", "a": "cylinder rupture + toxic phosgene gas (钢瓶爆裂 + 分解产生剧毒光气)"}, "1_26": {"stem": ["Why do low-pressure chillers use centrifugal compressors"], "ans": ["very large specific vapor volumes requiring high-volume centrifugal flow"], "t": "why centrifugal compressor for low-pressure (低压机为何用离心式压缩机)", "a": "large specific vapor volumes (负压下比容极大，需大流量离心叶轮)"}, "1_27": {"stem": ["low-pressure chiller refrigerants R-11, R-123, and R-1233zd"], "ans": ["R-11 is a phased-out CFC, R-123 is an HCFC phased out for new equipment, and R-1233zd is a modern zero-ODP, ultra-low-GWP HFO replacement"], "t": "R-11 vs. R-123 vs. R-1233zd (三代低压冷媒对比)", "a": "R-11 (CFC) -> R-123 (HCFC) -> R-1233zd (zero-ODP HFO)"}, "1_28": {"stem": ["normal operation of an R-123 chiller, what is the pressure inside the evaporator"], "ans": ["In a vacuum (sub-atmospheric pressure)"], "t": "R-123 evaporator normal operating pressure (R-123蒸发器运行压力)", "a": "In a vacuum / sub-atmospheric (处于低于大气压的负压真空状态)"}, "1_29": {"stem": ["Why can't R-123 be used as a simple 'drop-in' replacement in an older R-11 chiller"], "ans": ["incompatible with certain older elastomers, gaskets, and motor insulation"], "t": "why R-123 is not a drop-in for R-11 (R-123不可直接替R-11原因)", "a": "incompatible with elastomers, gaskets & motor insulation (腐蚀旧橡胶垫片与电机绝缘)"}, "1_30": {"stem": ["pressurizes a low-pressure chiller to 16 psig", "what will happen"], "ans": ["The 15 psig rupture disc will burst"], "t": "pressurize chiller to 16 psig (打压到16 psig后果)", "a": "15 psig rupture disc will burst (超过15 psig防爆片会爆裂泄压)"}, "1_31": {"stem": ["check for a water-to-refrigerant tube leak inside an evaporator or condenser"], "ans": ["Drain the water boxes, pressurize the refrigerant side (≤10 psig), and probe the tube sheets"], "t": "check water-to-refrigerant tube leak (检查换热器铜管内漏步骤)", "a": "Drain water boxes + pressurize ≤10 psig + probe tube sheets (排水室、打压≤10 psig、探管板)"}, "1_32": {"stem": ["water-cooled condenser tubes develop a leak while the system is shut down"], "ans": ["Water from the cooling tower/condenser water loop can be forced into the vacuum-side refrigerant shell"], "t": "condenser tube leak while shut down (停机时冷凝水管漏后果)", "a": "Water forced into the vacuum-side refrigerant shell (水被压入负压冷媒侧壳体)"}, "1_33": {"stem": ["annual leak rate threshold for Commercial Refrigeration appliances (≥50 lb charge)"], "ans": ["20%"], "t": "Commercial Refrigeration ≥50 lb leak threshold (商业制冷年漏率阈值)", "a": "20% (商业制冷 20%，舒适性空调 10%，工业过程制冷 30%)"}, "1_34": {"stem": ["After repairing a leak on an appliance with ≥50 lb", "what verification tests are required"], "ans": ["initial verification test before/during recharging, and a follow-up verification test within 10 days"], "t": "≥50 lb leak repair verification tests (修漏后双重验证测试)", "a": "initial verification + follow-up within 10 days (充注前初检 + 恢复运行10天内复检)"}, "1_35": {"stem": ["NEVER use a leak-stop additive in a low-pressure centrifugal chiller"], "ans": ["foul heat exchanger surfaces, plug oil passages/orifices, and contaminate refrigerant"], "t": "never use leak-stop additive (严禁用堵漏剂原因)", "a": "foul heat exchangers, plug oil passages & contaminate (结垢、堵油路、污染冷媒)"}, "1_36": {"stem": ["unit is used to specify the required EPA evacuation level for post-1993 low-pressure"], "ans": ["25 mm Hg absolute"], "t": "post-1993 low-pressure evacuation unit (93年后低压抽真空标准与单位)", "a": "25 mm Hg absolute (必须看清是 mm Hg absolute，不是 inches Hg!)"}, "1_37": {"stem": ["Why is 25 mm Hg absolute specified as an absolute pressure rather than a vacuum gauge reading"], "ans": ["barometric pressure changes with altitude and weather"], "t": "why absolute pressure instead of gauge (为何用绝对压力而非表压)", "a": "barometric pressure changes with altitude/weather (大气压随海拔和天气变化)"}, "1_38": {"stem": ["why is the recovery machine's condenser often water-cooled"], "ans": ["reject heat efficiently and condense low-pressure vapor"], "t": "why water-cooled recovery condenser (低压回收机常用水冷冷凝器原因)", "a": "reject heat efficiently & condense vapor without high pressure (高效散热冷凝低压蒸气)"}, "1_39": {"stem": ["standing vacuum test", "after evacuation to 1 mm Hg, what does a pressure rise above 2.5 mm Hg indicate"], "ans": ["The system has a leak (or remaining moisture) that must be located and repaired"], "t": "standing vacuum test 1 mm -> >2.5 mm Hg (保压测试升超2.5 mm Hg)", "a": "system has a leak that must be repaired (说明有漏点或水分，须先修漏)"}, "1_40": {"stem": ["pressure drops too quickly while water is sitting stagnant in the evaporator tubes"], "ans": ["refrigerant temperature drops below 32°F, freezing the stagnant water and potentially splitting the copper tubes"], "t": "pressure drops fast with stagnant water (管内死水+抽气过快)", "a": "drops below 32°F -> freezing water & splitting tubes (低于32°F结冰胀裂铜管)"}, "1_41": {"stem": ["standing vacuum check, the chiller pressure rises from 25 mm Hg abs back up to 50 mm Hg abs"], "ans": ["Continue recovery until the pressure stabilizes at or below 25 mm Hg absolute"], "t": "pressure rises from 25 to 50 mm Hg abs (静置后压力回升至50 mm Hg)", "a": "Continue recovery until stabilizes ≤ 25 mm Hg abs (残液仍在气化，需继续回收至稳定)"}, "1_42": {"stem": ["Which valve on a low-pressure chiller is used to remove liquid refrigerant"], "ans": ["lowest liquid drain/charging valve on the evaporator or condenser"], "t": "valve to remove liquid refrigerant (抽液态制冷剂所用阀门)", "a": "lowest liquid drain/charging valve on evaporator (蒸发器最底部排液/充注阀)"}, "1_43": {"stem": ["Why does a purge unit sit at the top of the condenser"], "ans": ["air and other non-condensable gases are lighter", "collect at the top of the condenser"], "t": "why purge unit at top of condenser (抽气装置为何装在冷凝器顶部)", "a": "non-condensable gases collect at the top (不凝性气体聚集在冷凝器最顶部)"}, "1_44": {"stem": ["purge unit is discharging excessive water"], "ans": ["tube leak in the evaporator or condenser allowing water into the refrigerant side"], "t": "purge unit discharging excessive water (抽气装置排出大量水说明什么)", "a": "tube leak in evaporator or condenser (蒸发器或冷凝器换热铜管漏水)"}, "1_45": {"stem": ["at what point is it safe to switch from vapor charging to liquid charging"], "ans": ["saturation temperature reaches 36°F (safely above the 32°F freezing point of water)"], "t": "when to switch vapor -> liquid charging (何时由充气态切换为充液态)", "a": "saturation temperature reaches 36°F (饱和温度达36°F、高于冰点32°F时)"}, "1_46": {"stem": ["Why are older purge units on R-11 chillers a significant source of refrigerant emissions"], "ans": ["vent air without deeply chilling it, allowing much more refrigerant vapor to escape"], "t": "why older R-11 purge units emit more (老式抽气装置排氟多原因)", "a": "vent air without deeply chilling it (未深度冷却冷凝，排空气时带走大量冷媒)"}, "1_47": {"stem": ["vent line of a low-pressure chiller's rupture disc when the chiller is located indoors"], "ans": ["Piped to the outdoors"], "t": "indoor chiller rupture disc vent line (室内冷水机防爆片排气管去向)", "a": "Piped to the outdoors (必须引管通向室外安全处)"}, "1_48": {"stem": ["R-123 leak alarm, what action should the room ventilation system take"], "ans": ["Activate high-volume mechanical exhaust ventilation"], "t": "R-123 leak alarm trips -> ventilation action (R-123泄漏报警触发动作)", "a": "Activate high-volume mechanical exhaust ventilation (自动启动大风量机械排风)"}, "1_49": {"stem": ["Where should refrigerant leak sensors be mounted in a chiller machinery room"], "ans": ["Near the floor (close to the chiller), because refrigerant vapors are heavier than air"], "t": "where to mount refrigerant leak sensors (机房冷媒泄漏探头安装位置)", "a": "Near the floor — heavier than air (贴近地面安装，因为冷媒蒸气比空气重)"}, "1_50": {"stem": ["purpose of a chiller's 'oil return' (oil recovery / eductor) system"], "ans": ["return oil that migrates into the evaporator back to the compressor oil sump"], "t": "oil return / eductor system purpose (引射回油系统作用)", "a": "return oil from evaporator back to oil sump (将迁移到蒸发器的油抽回压缩机油箱)"}};
+        let revealedKillTips = {};
 
-        const KW_REGEX = new RegExp(
-            '(' + HIGHLIGHT_TERMS.map(t => t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|') + ')',
-            'gi'
-        );
+        function highlightTerms(text, terms) {
+            if (!showKeywords || !text || !terms || !terms.length) return text;
+            const sorted = [...terms].filter(Boolean).sort((a, b) => b.length - a.length);
+            if (!sorted.length) return text;
+            const re = new RegExp('(' + sorted.map(t => t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|') + ')', 'gi');
+            return text.replace(re, '<span class="kw-highlight">$1</span>');
+        }
 
-        function formatEnglishText(text) {
-            if (!showKeywords || !text) return text;
-            return text.replace(KW_REGEX, '<span class="kw-highlight">$1</span>');
+        function escapeHtmlSimple(str) {
+            return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        }
+
+        function toggleKillTip(key) {
+            revealedKillTips[key] = !revealedKillTips[key];
+            if (currentTab === 'mistakes') renderMistakes();
+            else renderPage(currentPage);
+        }
+
+        function getKillTipHtml(sIdx, qId, isRevealed) {
+            if (!showKeywords) return '';
+            const key = `${sIdx}_${qId}`;
+            const g = KILL_GUIDE[key];
+            if (!g) return '';
+            const showBody = isRevealed || !!revealedKillTips[key];
+            if (!showBody) {
+                return `<button type="button" onclick="toggleKillTip('${key}')" class="mt-2 inline-flex items-center gap-1 text-[11px] font-semibold px-2.5 py-1 rounded-lg bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-200 transition"><i class="fa-solid fa-bolt text-amber-500"></i> 查看本题秒杀词</button>`;
+            }
+            return `
+                <div class="mt-2.5 px-3 py-2 rounded-xl bg-amber-50 border border-amber-200 text-xs text-amber-950 flex flex-wrap items-center gap-1.5">
+                    <span class="font-bold text-amber-700"><i class="fa-solid fa-bolt mr-1"></i>秒杀口诀：</span>
+                    <span>看到 <code class="bg-amber-100/90 px-1.5 py-0.5 rounded font-semibold text-amber-900">${escapeHtmlSimple(g.t)}</code></span>
+                    <span class="font-bold text-amber-600">➔</span>
+                    <span>秒选 <strong class="text-emerald-800 bg-emerald-100/80 px-1.5 py-0.5 rounded">${escapeHtmlSimple(g.a)}</strong></span>
+                </div>
+            `;
         }
 
         function loadMistakesFromStorage() {
@@ -1618,7 +1692,7 @@
                                     ${labels[optIdx]}
                                 </span>
                                 <div>
-                                    <p class="text-sm font-semibold text-slate-800">${formatEnglishText(optEn)}</p>
+                                    <p class="text-sm font-semibold text-slate-800">${((isSubmitted || isStudyMode || userAnswers[realIndex] !== null || revealedKillTips[`${currentSetIndex}_${q.id}`]) && optIdx === q.answer) ? highlightTerms(optEn, (KILL_GUIDE[`${currentSetIndex}_${q.id}`] || {}).ans) : optEn}</p>
                                     <p class="text-xs text-slate-500 mt-0.5 zh-text ${showChinese ? '' : 'hidden'}">${optZh}</p>
                                 </div>
                             </div>
@@ -1656,11 +1730,12 @@
                                 ${q.category}
                             </span>
                             <h3 class="text-base font-bold text-slate-900 leading-snug">
-                                ${q.id}. ${formatEnglishText(q.questionEn)}
+                                ${q.id}. ${highlightTerms(q.questionEn, (KILL_GUIDE[`${currentSetIndex}_${q.id}`] || {}).stem)}
                             </h3>
                             <p class="text-xs font-medium text-slate-500 mt-1 zh-text ${showChinese ? '' : 'hidden'}">
                                 ${q.questionZh}
                             </p>
+                            ${getKillTipHtml(currentSetIndex, q.id, isSubmitted || isStudyMode || userAnswers[realIndex] !== null)}
                         </div>
                         <div class="flex items-center gap-1 shrink-0">
                             <button id="speakBtn-${realIndex}" onclick="speakQuestion(${realIndex})" class="${speakingIndex === realIndex ? 'text-indigo-600 bg-indigo-50 ring-1 ring-indigo-200' : 'text-slate-400 hover:text-indigo-600 hover:bg-indigo-50'} p-2 rounded-lg transition" title="英语朗读题目与选项 (Play English Audio)">
@@ -1740,7 +1815,7 @@
                             <div class="flex items-start space-x-3 pr-2">
                                 <span class="w-7 h-7 rounded-lg bg-slate-100 border border-slate-200 flex items-center justify-center font-bold text-xs text-slate-600 shrink-0 mt-0.5">${labels[idx]}</span>
                                 <div>
-                                    <p class="text-sm font-semibold text-slate-800">${formatEnglishText(optEn)}</p>
+                                    <p class="text-sm font-semibold text-slate-800">${(hasChosen || revealedKillTips[`${sIdx}_${q.id}`]) && idx === q.answer ? highlightTerms(optEn, (KILL_GUIDE[`${sIdx}_${q.id}`] || {}).ans) : optEn}</p>
                                     <p class="text-xs text-slate-500 mt-0.5 ${showChinese ? '' : 'hidden'}">${q.optionsZh[idx]}</p>
                                 </div>
                             </div>
@@ -1756,8 +1831,9 @@
                                     <span class="px-2 py-0.5 rounded-md text-xs font-bold bg-slate-900 text-white">${setTitle} · Q${q.id}</span>
                                     <span class="px-2.5 py-0.5 rounded-md text-xs font-semibold bg-indigo-50 text-indigo-700 border border-indigo-100">${q.category}</span>
                                 </div>
-                                <h3 class="text-base font-bold text-slate-900 leading-snug">${q.id}. ${formatEnglishText(q.questionEn)}</h3>
+                                <h3 class="text-base font-bold text-slate-900 leading-snug">${q.id}. ${highlightTerms(q.questionEn, (KILL_GUIDE[`${sIdx}_${q.id}`] || {}).stem)}</h3>
                                 <p class="text-xs font-medium text-slate-500 mt-1 ${showChinese ? '' : 'hidden'}">${q.questionZh}</p>
+                                ${getKillTipHtml(sIdx, q.id, hasChosen)}
                             </div>
                             <div class="flex items-center gap-1 shrink-0">
                                 <button onclick="speakMistakeQuestion(${sIdx}, ${q.id})" class="text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 p-2 rounded-lg transition" title="英语朗读">
